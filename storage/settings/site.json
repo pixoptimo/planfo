@@ -1,0 +1,25 @@
+{
+  "siteName": "Aero Static CMS",
+  "siteUrl": "http://localhost:3000",
+  "tagline": "Modern, high-performance static website powered by a file-based CMS.",
+  "logo": "",
+  "favicon": "",
+  "defaultSEO": {
+    "title": "Aero Static CMS - Blazing Fast Content Management",
+    "description": "Manage rich content with zero database overhead and deploy lightning-fast static HTML.",
+    "canonical": "http://localhost:3000",
+    "ogTitle": "Aero Static CMS",
+    "ogDescription": "Manage rich content with zero database overhead.",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "socialLinks": {
+    "twitter": "https://twitter.com",
+    "github": "https://github.com"
+  },
+  "analyticsId": "",
+  "timezone": "UTC",
+  "language": "en",
+  "footerText": "© 2026 Aero Static CMS. Built with TypeScript and React.",
+  "updatedAt": "2026-09-15T17:40:34.642Z"
+}

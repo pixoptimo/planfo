@@ -1,0 +1,57 @@
+{
+  "id": "menu_main",
+  "name": "Main Navigation",
+  "slug": "main",
+  "items": [
+    {
+      "id": "m_home",
+      "label": "Home",
+      "url": "/",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "m_about",
+      "label": "About",
+      "url": "/about-us",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "m_products",
+      "label": "Products",
+      "url": "/products",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "m_blog",
+      "label": "Blog",
+      "url": "/blog",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "m_contact",
+      "label": "Contact",
+      "url": "/contact",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "item_1789494917310_n9lg",
+      "label": "Features",
+      "url": "/features",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "item_1789495453887_49gd",
+      "label": "testing",
+      "url": "/testing",
+      "target": "_self",
+      "children": []
+    }
+  ],
+  "updatedAt": "2026-09-15T18:04:26.342Z"
+}

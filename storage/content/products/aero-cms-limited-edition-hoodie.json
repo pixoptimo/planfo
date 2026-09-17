@@ -1,0 +1,46 @@
+{
+  "id": "prod_2",
+  "name": "Aero CMS Limited Edition Hoodie",
+  "slug": "aero-cms-limited-edition-hoodie",
+  "sku": "HOODIE-CMS-01",
+  "price": 59,
+  "currency": "USD",
+  "shortDescription": "Heavyweight organic cotton hoodie with embroidered static lightning icon.",
+  "description": {
+    "blocks": [
+      {
+        "id": "hd_1",
+        "type": "heading",
+        "level": 2,
+        "text": "Comfort Meets Quality"
+      },
+      {
+        "id": "hd_2",
+        "type": "paragraph",
+        "text": "Crafted from 100% GOTS certified organic ring-spun cotton for unmatched warmth, comfort, and durability."
+      }
+    ]
+  },
+  "images": [],
+  "category": "merchandise",
+  "tags": [
+    "apparel",
+    "hoodie",
+    "merch"
+  ],
+  "status": "published",
+  "featured": false,
+  "template": "default",
+  "seo": {
+    "title": "Aero CMS Limited Edition Hoodie",
+    "description": "Heavyweight organic cotton hoodie.",
+    "canonical": "http://localhost:3000/products/aero-cms-limited-edition-hoodie",
+    "ogTitle": "Aero CMS Limited Edition Hoodie",
+    "ogDescription": "Heavyweight organic cotton hoodie.",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-09-15T17:41:29.424Z",
+  "updatedAt": "2026-09-15T17:41:29.424Z",
+  "publishedAt": "2026-09-15T17:41:29.424Z"
+}

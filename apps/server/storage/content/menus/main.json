@@ -1,0 +1,43 @@
+{
+  "id": "menu_main",
+  "name": "Main Navigation",
+  "slug": "main",
+  "items": [
+    {
+      "id": "m_home",
+      "label": "Home",
+      "url": "/",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "m_about",
+      "label": "About",
+      "url": "/about-us",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "m_products",
+      "label": "Products",
+      "url": "/products",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "m_blog",
+      "label": "Blog",
+      "url": "/blog",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "m_contact",
+      "label": "Contact",
+      "url": "/contact",
+      "target": "_self",
+      "children": []
+    }
+  ],
+  "updatedAt": "2026-09-15T17:46:29.461Z"
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@cms/utils",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -b",
+    "dev": "tsc -b -w"
+  },
+  "dependencies": {
+    "@cms/schemas": "*",
+    "@cms/types": "*",
+    "sanitize-html": "^2.14.0",
+    "zod": "^3.24.1"
+  },
+  "devDependencies": {
+    "@types/sanitize-html": "^2.13.0",
+    "typescript": "^5.7.2"
+  }
+}

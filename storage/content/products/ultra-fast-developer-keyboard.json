@@ -1,0 +1,72 @@
+{
+  "id": "prod_1",
+  "name": "Ultra-Fast Developer Keyboard",
+  "slug": "ultra-fast-developer-keyboard",
+  "sku": "DEV-KB-001",
+  "price": 149.99,
+  "currency": "USD",
+  "shortDescription": "Custom mechanical keyboard tuned for maximum typing ergonomics and high tactile speed.",
+  "description": {
+    "blocks": [
+      {
+        "id": "pd_1",
+        "type": "heading",
+        "level": 2,
+        "text": "Engineered for Performance"
+      },
+      {
+        "id": "pd_2",
+        "type": "paragraph",
+        "text": "Featuring hot-swappable switches, PBT double-shot keycaps, and a CNC aluminum enclosure with sound-dampening foam."
+      },
+      {
+        "id": "pd_3",
+        "type": "table",
+        "headers": [
+          "Specification",
+          "Detail"
+        ],
+        "rows": [
+          [
+            "Layout",
+            "75% Compact"
+          ],
+          [
+            "Connectivity",
+            "USB-C / 2.4GHz / Bluetooth 5.2"
+          ],
+          [
+            "Battery",
+            "4000 mAh Rechargeable"
+          ],
+          [
+            "Weight",
+            "1.1 kg"
+          ]
+        ]
+      }
+    ]
+  },
+  "images": [],
+  "category": "hardware",
+  "tags": [
+    "hardware",
+    "gadgets",
+    "workstation"
+  ],
+  "status": "published",
+  "featured": true,
+  "template": "default",
+  "seo": {
+    "title": "Ultra-Fast Developer Keyboard | Hardware Store",
+    "description": "Custom mechanical keyboard tuned for ergonomics.",
+    "canonical": "http://localhost:3000/products/ultra-fast-developer-keyboard",
+    "ogTitle": "Ultra-Fast Developer Keyboard",
+    "ogDescription": "Custom mechanical keyboard tuned for ergonomics.",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-09-15T17:41:29.424Z",
+  "updatedAt": "2026-09-15T17:41:29.424Z",
+  "publishedAt": "2026-09-15T17:41:29.424Z"
+}

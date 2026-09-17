@@ -1,0 +1,62 @@
+<div class="blog-listing">
+  <header class="page-header">
+    <div class="container">
+      <h1 class="page-title">
+        <% if (locals.category) { %>
+          Category: <%= category.name %>
+        <% } else if (locals.tag) { %>
+          Tagged with #<%= tag %>
+        <% } else { %>
+          Our Blog & News
+        <% } %>
+      </h1>
+      <p class="page-desc">Articles, insights, and updates directly from our team.</p>
+
+      <% if (locals.categories && categories.length > 0) { %>
+        <div class="category-filter-nav">
+          <a href="/blog" class="filter-pill <%= !locals.category ? 'active' : '' %>">All</a>
+          <% categories.forEach(function(c) { %>
+            <a href="/blog/category/<%= c.slug %>" class="filter-pill <%= (locals.category && category.slug === c.slug) ? 'active' : '' %>">
+              <%= c.name %>
+            </a>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </header>
+
+  <div class="container blog-grid-container">
+    <% if (posts && posts.length > 0) { %>
+      <div class="grid grid-posts">
+        <% posts.forEach(function(post) { %>
+          <article class="card post-card">
+            <% if (post.featuredImage) { %>
+              <div class="card-img-wrap">
+                <img src="<%= post.featuredImage %>" alt="<%= post.title %>" class="card-img" loading="lazy">
+              </div>
+            <% } %>
+            <div class="card-body">
+              <div class="post-meta">
+                <span class="badge"><%= post.category %></span>
+                <time><%= formatDate(post.createdAt) %></time>
+              </div>
+              <h2 class="card-title">
+                <a href="/blog/<%= post.slug %>"><%= post.title %></a>
+              </h2>
+              <p class="card-desc"><%= post.excerpt %></p>
+              <div class="card-footer">
+                <span class="post-author">By <%= post.author %></span>
+                <a href="/blog/<%= post.slug %>" class="link-read">Read Article &rarr;</a>
+              </div>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <p>No articles found in this category.</p>
+        <a href="/blog" class="btn btn-outline">Back to All Posts</a>
+      </div>
+    <% } %>
+  </div>
+</div>

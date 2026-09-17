@@ -1,0 +1,478 @@
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import {
+  ArrowLeft,
+  Save,
+  Send,
+  Eye,
+  History,
+  Image as ImageIcon,
+  Loader2,
+  CheckCircle2,
+  AlertCircle,
+  Plus,
+  X
+} from 'lucide-react';
+import type { Post, Category, RevisionMeta } from '@cms/schemas';
+import { api } from '../../api/client.js';
+import { StructuredEditor } from '../../components/Editor/StructuredEditor.js';
+import { SEOFields } from '../../components/SEO/SEOFields.js';
+import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
+import { StatusBadge } from '../../components/UI/StatusBadge.js';
+import { useAuth } from '../../context/AuthContext.js';
+
+export const PostEdit: React.FC = () => {
+  const { slug } = useParams<{ slug?: string }>();
+  const isNew = !slug || slug === 'new';
+  const navigate = useNavigate();
+  const { user, can } = useAuth();
+
+  const [post, setPost] = useState<Partial<Post>>({
+    title: '',
+    slug: '',
+    excerpt: '',
+    author: user?.name || user?.email || 'Admin',
+    category: 'general',
+    tags: [],
+    status: 'draft',
+    template: 'default',
+    content: { blocks: [] },
+    featuredImage: '',
+    seo: {
+      title: '',
+      description: '',
+      canonical: '',
+      ogTitle: '',
+      ogDescription: '',
+      ogImage: '',
+      robots: 'index,follow'
+    }
+  });
+
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [tagInput, setTagInput] = useState('');
+  const [loading, setLoading] = useState(!isNew);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [showMediaPicker, setShowMediaPicker] = useState(false);
+
+  // Revisions
+  const [revisions, setRevisions] = useState<RevisionMeta[]>([]);
+  const [showRevisions, setShowRevisions] = useState(false);
+  const [loadingRevisions, setLoadingRevisions] = useState(false);
+
+  useEffect(() => {
+    loadCategories();
+    if (!isNew && slug) {
+      loadPost(slug);
+    }
+  }, [slug, isNew]);
+
+  const loadCategories = async () => {
+    try {
+      const data = await api.get<Category[]>('/api/categories?type=post');
+      setCategories(data);
+    } catch {
+      //
+    }
+  };
+
+  const loadPost = async (postSlug: string) => {
+    setLoading(true);
+    try {
+      const data = await api.get<Post>(`/api/posts/${postSlug}`);
+      setPost(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load post');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSave = async (publish = false) => {
+    if (!post.title?.trim()) {
+      setError('Post title is required');
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+    setSuccess(null);
+
+    const targetStatus = publish ? 'published' : post.status || 'draft';
+    const payload = {
+      ...post,
+      status: targetStatus
+    };
+
+    try {
+      if (isNew) {
+        const created = await api.post<Post>('/api/posts', payload);
+        navigate(`/posts/${created.slug}`, { replace: true });
+        setSuccess('Post created successfully!');
+      } else {
+        const updated = await api.put<Post>(`/api/posts/${slug}`, payload);
+        setPost(updated);
+        setSuccess(publish ? 'Post published successfully!' : 'Changes saved successfully!');
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Save failed');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const addTag = () => {
+    const clean = tagInput.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (clean && !post.tags?.includes(clean)) {
+      setPost({ ...post, tags: [...(post.tags || []), clean] });
+      setTagInput('');
+    }
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setPost({ ...post, tags: post.tags?.filter((t) => t !== tagToRemove) });
+  };
+
+  const loadRevisions = async () => {
+    if (isNew || !slug) return;
+    setLoadingRevisions(true);
+    try {
+      const data = await api.get<RevisionMeta[]>(`/api/posts/${slug}/revisions`);
+      setRevisions(data);
+    } catch {
+      //
+    } finally {
+      setLoadingRevisions(false);
+    }
+  };
+
+  const restoreRevision = async (revId: string) => {
+    if (!slug) return;
+    if (!confirm('Restore this revision?')) return;
+
+    try {
+      const restored = await api.post<Post>(`/api/posts/${slug}/revisions/${revId}/restore`);
+      setPost(restored);
+      setShowRevisions(false);
+      setSuccess('Restored revision successfully!');
+    } catch (err) {
+      alert(err instanceof Error ? err.message : 'Restore failed');
+    }
+  };
+
+  if (loading) {
+    return <div className="text-center py-20 text-slate-400">Loading post data...</div>;
+  }
+
+  return (
+    <div className="space-y-6 pb-20 max-w-5xl mx-auto">
+      {/* Top action bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+        <div className="flex items-center space-x-3">
+          <Link
+            to="/posts"
+            className="p-2 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+          >
+            <ArrowLeft className="w-4 h-4" />
+          </Link>
+          <div>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-bold text-white tracking-tight">
+                {isNew ? 'Create New Post' : `Edit: ${post.title}`}
+              </h1>
+              {!isNew && post.status && <StatusBadge status={post.status} />}
+            </div>
+            <p className="text-xs text-slate-400 font-mono mt-0.5">
+              URL: /blog/{post.slug || 'slug-preview'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {!isNew && (
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  setShowRevisions(true);
+                  loadRevisions();
+                }}
+                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
+              >
+                <History className="w-3.5 h-3.5" />
+                <span>Revisions</span>
+              </button>
+
+              <a
+                href={`/api/preview/post/${post.slug}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-brand-400 border border-slate-800 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
+              >
+                <Eye className="w-3.5 h-3.5" />
+                <span>Live Preview</span>
+              </a>
+            </>
+          )}
+
+          <button
+            type="button"
+            onClick={() => handleSave(false)}
+            disabled={saving}
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
+          >
+            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            <span>Save Draft</span>
+          </button>
+
+          {can('posts.publish') && (
+            <button
+              type="button"
+              onClick={() => handleSave(true)}
+              disabled={saving}
+              className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Publish Post</span>
+            </button>
+          )}
+        </div>
+      </div>
+
+      {error && (
+        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+          <span>{error}</span>
+        </div>
+      )}
+      {success && (
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+          <span>{success}</span>
+        </div>
+      )}
+
+      {/* Main Form Fields */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              Article Title *
+            </label>
+            <input
+              type="text"
+              required
+              value={post.title || ''}
+              onChange={(e) => setPost({ ...post, title: e.target.value })}
+              placeholder="E.g. Building Scalable Web Applications"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-base font-semibold text-white focus:outline-none focus:border-brand-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              URL Slug
+            </label>
+            <input
+              type="text"
+              value={post.slug || ''}
+              onChange={(e) => setPost({ ...post, slug: e.target.value })}
+              placeholder="auto-generated-from-title"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              Excerpt (Summary for cards & search)
+            </label>
+            <textarea
+              rows={2}
+              value={post.excerpt || ''}
+              onChange={(e) => setPost({ ...post, excerpt: e.target.value })}
+              placeholder="Brief summary of the article..."
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
+            />
+          </div>
+        </div>
+
+        {/* Sidebar Controls */}
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              Category
+            </label>
+            <select
+              value={post.category || 'general'}
+              onChange={(e) => setPost({ ...post, category: e.target.value })}
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+            >
+              <option value="general">General</option>
+              {categories.map((c) => (
+                <option key={c.id} value={c.slug}>{c.name}</option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              Author
+            </label>
+            <input
+              type="text"
+              value={post.author || ''}
+              onChange={(e) => setPost({ ...post, author: e.target.value })}
+              placeholder="Author name"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand-500"
+            />
+          </div>
+
+          {/* Tags */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              Tags
+            </label>
+            <div className="flex gap-2 mb-2">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
+                placeholder="Add tag..."
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand-500"
+              />
+              <button
+                type="button"
+                onClick={addTag}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-1.5">
+              {(post.tags || []).map((t) => (
+                <span
+                  key={t}
+                  className="bg-slate-950 border border-slate-800 text-slate-300 text-[11px] font-mono px-2 py-0.5 rounded-full flex items-center space-x-1"
+                >
+                  <span>#{t}</span>
+                  <button type="button" onClick={() => removeTag(t)} className="hover:text-red-400">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Featured Image */}
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              Featured Image
+            </label>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={post.featuredImage || ''}
+                  onChange={(e) => setPost({ ...post, featuredImage: e.target.value })}
+                  placeholder="/media/image.jpg"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowMediaPicker(true)}
+                  className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                </button>
+              </div>
+
+              {post.featuredImage && (
+                <div className="aspect-video bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
+                  <img src={post.featuredImage} alt="Featured" className="w-full h-full object-cover" />
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Structured Content Block Editor */}
+      <div className="space-y-2">
+        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+          Article Body Content
+        </label>
+        <StructuredEditor
+          content={post.content || { blocks: [] }}
+          onChange={(newContent) => setPost({ ...post, content: newContent })}
+        />
+      </div>
+
+      {/* SEO Accordion */}
+      <SEOFields
+        seo={post.seo || ({} as any)}
+        onChange={(newSeo) => setPost({ ...post, seo: newSeo })}
+        defaultTitle={post.title}
+        defaultDescription={post.excerpt}
+      />
+
+      {/* Media Picker Modal */}
+      <MediaPickerModal
+        isOpen={showMediaPicker}
+        onClose={() => setShowMediaPicker(false)}
+        onSelect={(url) => setPost({ ...post, featuredImage: url })}
+      />
+
+      {/* Revisions Drawer */}
+      {showRevisions && (
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
+          <div className="bg-slate-900 border-l border-slate-800 w-full max-w-md h-full flex flex-col p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+              <div className="flex items-center space-x-2">
+                <History className="w-5 h-5 text-brand-400" />
+                <h3 className="font-bold text-white text-base">Revision History</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowRevisions(false)}
+                className="text-slate-400 hover:text-white text-sm"
+              >
+                Close ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto space-y-3">
+              {loadingRevisions ? (
+                <div className="text-center py-10 text-slate-400">Loading revisions...</div>
+              ) : revisions.length === 0 ? (
+                <div className="text-center py-10 text-slate-500">No revisions found.</div>
+              ) : (
+                revisions.map((rev) => (
+                  <div key={rev.id} className="p-4 bg-slate-950 border border-slate-800 rounded-lg space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-xs font-bold font-mono text-emerald-400">Version {rev.version}</span>
+                      <span className="text-[11px] text-slate-500 font-mono">{new Date(rev.createdAt).toLocaleString()}</span>
+                    </div>
+                    <p className="text-xs text-slate-300">{rev.summary}</p>
+                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
+                      <span className="text-[11px] text-slate-400">By {rev.authorEmail}</span>
+                      <button
+                        type="button"
+                        onClick={() => restoreRevision(rev.id)}
+                        className="px-2.5 py-1 bg-brand-600/20 hover:bg-brand-600/40 text-brand-400 rounded text-xs font-semibold"
+                      >
+                        Restore
+                      </button>
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};

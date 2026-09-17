@@ -1,0 +1,42 @@
+{
+  "id": "post_2",
+  "title": "Building Resilience with Atomic File Operations",
+  "slug": "building-resilience-with-atomic-file-operations",
+  "excerpt": "How temporary files, atomic renames, and in-process lock managers protect your data without a SQL engine.",
+  "content": {
+    "blocks": [
+      {
+        "id": "at_1",
+        "type": "heading",
+        "level": 2,
+        "text": "Guaranteed Write Integrity"
+      },
+      {
+        "id": "at_2",
+        "type": "paragraph",
+        "text": "Writing directly to destination files risks partial writes during power failures or server reboots. By writing to a randomized temporary file, flushing, and using OS-level atomic renames, corrupted files become impossible."
+      }
+    ]
+  },
+  "author": "Security Engineer",
+  "category": "technology",
+  "tags": [
+    "nodejs",
+    "security",
+    "filesystem"
+  ],
+  "status": "published",
+  "template": "default",
+  "seo": {
+    "title": "Building Resilience with Atomic File Operations",
+    "description": "How temporary files and atomic renames protect data.",
+    "canonical": "http://localhost:3000/blog/building-resilience-with-atomic-file-operations",
+    "ogTitle": "Building Resilience with Atomic File Operations",
+    "ogDescription": "How temporary files and atomic renames protect data.",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-09-15T17:41:29.424Z",
+  "updatedAt": "2026-09-15T17:41:29.424Z",
+  "publishedAt": "2026-09-15T17:41:29.424Z"
+}

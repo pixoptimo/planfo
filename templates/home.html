@@ -1,0 +1,98 @@
+<div class="homepage">
+  <!-- Hero Section -->
+  <section class="hero-section">
+    <div class="container hero-container">
+      <div class="hero-content">
+        <span class="badge badge-accent">Static & Blazing Fast</span>
+        <h1 class="hero-title"><%= site.siteName %></h1>
+        <p class="hero-subtitle"><%= site.tagline %></p>
+        <div class="hero-cta">
+          <a href="/products" class="btn btn-primary btn-lg">Browse Products</a>
+          <a href="/blog" class="btn btn-secondary btn-lg">Read Our Blog</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Featured Products Section -->
+  <% if (products && products.length > 0) { %>
+    <section class="section section-products">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="section-tag">Featured Selection</span>
+            <h2 class="section-title">Top Products</h2>
+          </div>
+          <a href="/products" class="link-arrow">View all products &rarr;</a>
+        </div>
+
+        <div class="grid grid-products">
+          <% products.forEach(function(prod) { %>
+            <article class="card product-card">
+              <% if (prod.images && prod.images.length > 0) { %>
+                <div class="card-img-wrap">
+                  <img src="<%= prod.images[0] %>" alt="<%= prod.name %>" class="card-img" loading="lazy">
+                  <% if (prod.featured) { %>
+                    <span class="product-badge">Featured</span>
+                  <% } %>
+                </div>
+              <% } %>
+              <div class="card-body">
+                <div class="product-category"><%= prod.category %></div>
+                <h3 class="card-title">
+                  <a href="/products/<%= prod.slug %>"><%= prod.name %></a>
+                </h3>
+                <p class="card-desc"><%= prod.shortDescription %></p>
+                <div class="card-footer">
+                  <span class="product-price"><%= formatPrice(prod.price, prod.currency) %></span>
+                  <a href="/products/<%= prod.slug %>" class="btn btn-outline btn-sm">View Item</a>
+                </div>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      </div>
+    </section>
+  <% } %>
+
+  <!-- Latest Articles Section -->
+  <% if (posts && posts.length > 0) { %>
+    <section class="section section-blog bg-alt">
+      <div class="container">
+        <div class="section-header">
+          <div>
+            <span class="section-tag">Insights & News</span>
+            <h2 class="section-title">Latest Articles</h2>
+          </div>
+          <a href="/blog" class="link-arrow">Visit the blog &rarr;</a>
+        </div>
+
+        <div class="grid grid-posts">
+          <% posts.forEach(function(post) { %>
+            <article class="card post-card">
+              <% if (post.featuredImage) { %>
+                <div class="card-img-wrap">
+                  <img src="<%= post.featuredImage %>" alt="<%= post.title %>" class="card-img" loading="lazy">
+                </div>
+              <% } %>
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="badge"><%= post.category %></span>
+                  <time><%= formatDate(post.createdAt) %></time>
+                </div>
+                <h3 class="card-title">
+                  <a href="/blog/<%= post.slug %>"><%= post.title %></a>
+                </h3>
+                <p class="card-desc"><%= post.excerpt %></p>
+                <div class="card-footer">
+                  <span class="post-author">By <%= post.author %></span>
+                  <a href="/blog/<%= post.slug %>" class="link-read">Read Article &rarr;</a>
+                </div>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      </div>
+    </section>
+  <% } %>
+</div>

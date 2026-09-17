@@ -1,0 +1,35 @@
+{
+  "id": "page_1789495443568_bzbax",
+  "title": "testing",
+  "slug": "testing",
+  "status": "published",
+  "template": "default",
+  "content": {
+    "blocks": [
+      {
+        "id": "block_1789495438247_6iew",
+        "type": "heading",
+        "level": 2,
+        "text": "test"
+      },
+      {
+        "id": "block_1789495433881_1iu7",
+        "type": "paragraph",
+        "text": "testing"
+      }
+    ]
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "",
+    "description": "",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-09-15T18:04:03.568Z",
+  "updatedAt": "2026-09-15T18:04:03.568Z",
+  "publishedAt": "2026-09-15T18:04:03.568Z"
+}

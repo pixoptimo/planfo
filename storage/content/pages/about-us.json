@@ -1,0 +1,46 @@
+{
+  "id": "page_about",
+  "title": "About Us",
+  "slug": "about-us",
+  "status": "published",
+  "template": "default",
+  "content": {
+    "blocks": [
+      {
+        "id": "ab_1",
+        "type": "heading",
+        "level": 2,
+        "text": "Our Mission & Philosophy"
+      },
+      {
+        "id": "ab_2",
+        "type": "paragraph",
+        "text": "We believe that static websites offer unbeatable speed, security, and hosting cost benefits. Aero CMS bridges the gap between structured content management and purely static site generation."
+      },
+      {
+        "id": "ab_3",
+        "type": "list",
+        "style": "unordered",
+        "items": [
+          "Zero Database dependency at runtime",
+          "Atomic staging and publishing deployment",
+          "Argon2id password hashing and robust RBAC",
+          "Full JSON revision history and backup portability"
+        ]
+      }
+    ]
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "About Us - Aero Static CMS",
+    "description": "Learn about the philosophy and engineering behind Aero Static CMS.",
+    "canonical": "http://localhost:3000/about-us",
+    "ogTitle": "About Us",
+    "ogDescription": "Philosophy and engineering behind Aero Static CMS.",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-09-15T17:41:29.424Z",
+  "updatedAt": "2026-09-15T17:41:29.424Z",
+  "publishedAt": "2026-09-15T17:41:29.424Z"
+}

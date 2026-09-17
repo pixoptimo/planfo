@@ -1,0 +1,74 @@
+{
+  "users": [
+    {
+      "id": "usr_1789494035393",
+      "email": "testuser_1789494035220@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$wyqmWdQHR2F5sUcTzAziwg$c4wZv2qNvL8tbnhTXjj9GEhxRoAIroQpP+Y8I+MPpxg",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-09-15T17:40:35.393Z",
+      "updatedAt": "2026-09-15T17:40:35.393Z"
+    },
+    {
+      "id": "usr_1789494050449",
+      "email": "testuser_1789494050263@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$1A28IonGgsq/EycdgjMa5A$JkjcCTIi7EyeIZOsm9Nj9Y4Amlc3a9kqOSi/HVFrZGc",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-09-15T17:40:50.449Z",
+      "updatedAt": "2026-09-15T17:40:50.449Z"
+    },
+    {
+      "id": "usr_1789494074020",
+      "email": "testuser_1789494073853@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$JCnoy1Xeo+580XPbZ2HhGw$S13+rnKPQFhA1uRLJ27BABWS5zpJKTATXF5r0epL5fo",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-09-15T17:41:14.020Z",
+      "updatedAt": "2026-09-15T17:41:14.020Z"
+    },
+    {
+      "id": "usr_admin_default",
+      "email": "admin@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$vwc4ZE9yDxF8sdiIAyHDqQ$XBt60XQMq8oD8dDEpsVHBR5OQJvC6QR2/tkuoi36zBE",
+      "role": "admin",
+      "name": "admin",
+      "active": true,
+      "createdAt": "2026-09-15T17:41:29.424Z",
+      "updatedAt": "2026-09-15T17:45:17.191Z"
+    },
+    {
+      "id": "usr_1789494126830",
+      "email": "testuser_1789494126661@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$xYOMnR6rJSeHp4qU7q0+cQ$ohmRzlTi5Y3tLBuAP5eErCuwzxO53a3CoW9BFO73tRo",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-09-15T17:42:06.830Z",
+      "updatedAt": "2026-09-15T17:42:06.830Z"
+    },
+    {
+      "id": "usr_1789494164676",
+      "email": "testuser_1789494164500@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$rftwkJeWitbYKscho+iACQ$cK4dedsTze9WP214V8YK0ikGKKWvTV0Kpm9tCkEeO5c",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-09-15T17:42:44.676Z",
+      "updatedAt": "2026-09-15T17:42:44.676Z"
+    },
+    {
+      "id": "usr_1789494239089",
+      "email": "testuser_1789494238914@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$TG31zZzWvMbSS13PWvZ30Q$dLOSCCYvrttMsSZDKoW8gMS5p5z7T65o52Vx7tTBi+s",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-09-15T17:43:59.089Z",
+      "updatedAt": "2026-09-15T17:43:59.089Z"
+    }
+  ]
+}

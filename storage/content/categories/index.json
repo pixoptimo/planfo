@@ -1,0 +1,49 @@
+{
+  "categories": [
+    {
+      "id": "cat_general",
+      "name": "General",
+      "slug": "general",
+      "type": "post",
+      "description": "General articles and news",
+      "createdAt": "2026-09-15T17:40:34.639Z",
+      "updatedAt": "2026-09-15T17:40:34.640Z"
+    },
+    {
+      "id": "cat_featured_products",
+      "name": "Featured Products",
+      "slug": "featured-products",
+      "type": "product",
+      "description": "Top quality products",
+      "createdAt": "2026-09-15T17:40:34.640Z",
+      "updatedAt": "2026-09-15T17:40:34.640Z"
+    },
+    {
+      "id": "cat_tech",
+      "name": "Technology",
+      "slug": "technology",
+      "type": "post",
+      "description": "Articles on software, architecture, and static generation",
+      "createdAt": "2026-09-15T17:41:29.424Z",
+      "updatedAt": "2026-09-15T17:41:29.424Z"
+    },
+    {
+      "id": "cat_hardware",
+      "name": "Hardware & Devices",
+      "slug": "hardware",
+      "type": "product",
+      "description": "High performance hardware accessories",
+      "createdAt": "2026-09-15T17:41:29.424Z",
+      "updatedAt": "2026-09-15T17:41:29.424Z"
+    },
+    {
+      "id": "cat_apparel",
+      "name": "Merchandise",
+      "slug": "merchandise",
+      "type": "product",
+      "description": "Official CMS merchandise and apparel",
+      "createdAt": "2026-09-15T17:41:29.424Z",
+      "updatedAt": "2026-09-15T17:41:29.424Z"
+    }
+  ]
+}

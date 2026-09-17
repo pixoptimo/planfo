@@ -1,0 +1,60 @@
+<div class="product-catalog">
+  <header class="page-header">
+    <div class="container">
+      <h1 class="page-title">
+        <% if (locals.category) { %>
+          Category: <%= category.name %>
+        <% } else { %>
+          Product Catalog
+        <% } %>
+      </h1>
+      <p class="page-desc">Discover our range of products and items.</p>
+
+      <% if (locals.categories && categories.length > 0) { %>
+        <div class="category-filter-nav">
+          <a href="/products" class="filter-pill <%= !locals.category ? 'active' : '' %>">All Products</a>
+          <% categories.forEach(function(c) { %>
+            <a href="/products/category/<%= c.slug %>" class="filter-pill <%= (locals.category && category.slug === c.slug) ? 'active' : '' %>">
+              <%= c.name %>
+            </a>
+          <% }); %>
+        </div>
+      <% } %>
+    </div>
+  </header>
+
+  <div class="container product-grid-container">
+    <% if (products && products.length > 0) { %>
+      <div class="grid grid-products">
+        <% products.forEach(function(prod) { %>
+          <article class="card product-card">
+            <% if (prod.images && prod.images.length > 0) { %>
+              <div class="card-img-wrap">
+                <img src="<%= prod.images[0] %>" alt="<%= prod.name %>" class="card-img" loading="lazy">
+                <% if (prod.featured) { %>
+                  <span class="product-badge">Featured</span>
+                <% } %>
+              </div>
+            <% } %>
+            <div class="card-body">
+              <div class="product-category"><%= prod.category %></div>
+              <h2 class="card-title">
+                <a href="/products/<%= prod.slug %>"><%= prod.name %></a>
+              </h2>
+              <p class="card-desc"><%= prod.shortDescription %></p>
+              <div class="card-footer">
+                <span class="product-price"><%= formatPrice(prod.price, prod.currency) %></span>
+                <a href="/products/<%= prod.slug %>" class="btn btn-outline btn-sm">View Item</a>
+              </div>
+            </div>
+          </article>
+        <% }); %>
+      </div>
+    <% } else { %>
+      <div class="empty-state">
+        <p>No products found in this category.</p>
+        <a href="/products" class="btn btn-outline">Back to All Products</a>
+      </div>
+    <% } %>
+  </div>
+</div>

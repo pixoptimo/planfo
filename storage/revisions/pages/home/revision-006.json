@@ -1,0 +1,73 @@
+{
+  "id": "rev_page_home_v006",
+  "contentType": "page",
+  "contentId": "page_home",
+  "slug": "home",
+  "version": 6,
+  "createdAt": "2026-09-16T12:14:27.320Z",
+  "authorEmail": "admin@example.com",
+  "data": {
+    "id": "page_home",
+    "title": "Home",
+    "slug": "home",
+    "status": "published",
+    "template": "landing",
+    "content": {
+      "blocks": [
+        {
+          "id": "b1",
+          "type": "heading",
+          "level": 2,
+          "text": "Welcome to the Future of File-Based Static Content Management"
+        },
+        {
+          "id": "b2",
+          "type": "paragraph",
+          "text": "Aero CMS eliminates database overhead, vulnerability surfaces, and complex infrastructure. All content is stored as clean JSON files on disk and compiled into pure static HTML/CSS."
+        },
+        {
+          "id": "b3",
+          "type": "callout",
+          "variant": "success",
+          "title": "Zero Database Runtime",
+          "text": "Visitors load pure pre-rendered static files at maximum edge speed without hitting an API or database."
+        },
+        {
+          "id": "block_1789544924105_7qfd",
+          "type": "blockquote",
+          "text": "",
+          "citation": ""
+        },
+        {
+          "id": "block_1789544926473_ia7v",
+          "type": "button",
+          "text": "Learn More",
+          "url": "#",
+          "variant": "outline",
+          "target": "_self"
+        },
+        {
+          "id": "block_1789560620074_bwum",
+          "type": "image",
+          "url": "/media/3D_Button_-_Cover-1789560634314.png",
+          "alt": "3D Button - Cover",
+          "caption": ""
+        }
+      ]
+    },
+    "featuredImage": "",
+    "seo": {
+      "title": "Home - Aero Static CMS",
+      "description": "Modern, high-performance static website powered by a file-based CMS.",
+      "canonical": "http://localhost:3000/",
+      "ogTitle": "Aero Static CMS",
+      "ogDescription": "Manage content effortlessly on the filesystem.",
+      "ogImage": "",
+      "robots": "index,follow"
+    },
+    "createdAt": "2026-09-15T17:41:29.424Z",
+    "updatedAt": "2026-09-16T12:14:27.318Z",
+    "publishedAt": "2026-09-15T17:41:29.424Z"
+  },
+  "summary": "Updated and published"
+}
