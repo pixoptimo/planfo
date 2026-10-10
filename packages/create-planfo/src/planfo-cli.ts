@@ -1,8 +1,12 @@
 import { Command } from 'commander';
 import path from 'node:path';
 import fs from 'node:fs';
+import { fileURLToPath } from 'node:url';
 import { spawn } from 'node:child_process';
 import { createPlanfoProject } from './index.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const program = new Command();
 
@@ -38,11 +42,30 @@ program
     console.log(`\n\x1b[36m⚡ Starting Planfo CMS Development Server on port ${port}...\x1b[0m`);
     console.log(`\x1b[32m  ➜ CMS Dashboard: http://localhost:${port}\x1b[0m\n`);
 
-    const rootDir = findProjectRoot(process.cwd());
+    const monorepoRoot = findMonorepoRoot();
+    const currentDir = process.cwd();
+    const isPlanfoProject = fs.existsSync(path.join(currentDir, '.planfo'));
+
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      CMS_PORT: port,
+      PORT: port
+    };
+
+    if (isPlanfoProject) {
+      env.PLANFO_PROJECT_DIR = currentDir;
+      env.STORAGE_PATH = path.join(currentDir, '.planfo');
+      env.CONTENT_PATH = path.join(currentDir, '.planfo/content');
+      env.MEDIA_PATH = path.join(currentDir, '.planfo/media');
+      env.SETTINGS_PATH = path.join(currentDir, '.planfo');
+      env.OUTPUT_PATH = path.join(currentDir, 'generated');
+      env.THEMES_PATH = path.join(currentDir, '.planfo/themes');
+    }
+
     const child = spawn('npm', ['run', 'dev'], {
-      cwd: rootDir,
+      cwd: monorepoRoot,
       stdio: 'inherit',
-      env: { ...process.env, CMS_PORT: port, PORT: port }
+      env
     });
 
     child.on('error', (err) => {
@@ -56,10 +79,25 @@ program
   .description('Generate the static HTML website into generated/')
   .action(() => {
     console.log(`\n\x1b[36m⚡ Generating static website with Planfo CMS...\x1b[0m\n`);
-    const rootDir = findProjectRoot(process.cwd());
-    const child = spawn('npx', ['tsx', 'apps/generator/src/cli.ts'], {
-      cwd: rootDir,
-      stdio: 'inherit'
+    const monorepoRoot = findMonorepoRoot();
+    const currentDir = process.cwd();
+    const isPlanfoProject = fs.existsSync(path.join(currentDir, '.planfo'));
+
+    const env: NodeJS.ProcessEnv = {
+      ...process.env
+    };
+
+    if (isPlanfoProject) {
+      env.PLANFO_PROJECT_DIR = currentDir;
+      env.STORAGE_PATH = path.join(currentDir, '.planfo');
+      env.TEMPLATES_PATH = path.join(currentDir, '.planfo/themes');
+      env.OUTPUT_PATH = path.join(currentDir, 'generated');
+    }
+
+    const child = spawn('npx', ['tsx', path.join(monorepoRoot, 'apps/generator/src/cli.ts')], {
+      cwd: monorepoRoot,
+      stdio: 'inherit',
+      env
     });
 
     child.on('close', (code) => {
@@ -79,11 +117,16 @@ program
   .option('-p, --port <port>', 'Port for static preview server', '8080')
   .action((options) => {
     const port = options.port || '8080';
+    const currentDir = process.cwd();
+    const generatedDir = path.join(currentDir, 'generated');
+
+    if (!fs.existsSync(generatedDir)) {
+      console.warn(`\x1b[33m⚠ Warning: 'generated/' folder not found in ${currentDir}. Running 'planfo build' first...\x1b[0m`);
+    }
+
     console.log(`\n\x1b[36m⚡ Previewing generated static website on http://localhost:${port}...\x1b[0m\n`);
-    const rootDir = findProjectRoot(process.cwd());
-    const generatedDir = path.join(rootDir, 'generated');
     const child = spawn('npx', ['serve', generatedDir, '-p', port], {
-      cwd: rootDir,
+      cwd: currentDir,
       stdio: 'inherit'
     });
     child.on('error', (err) => {
@@ -97,10 +140,22 @@ program
   .description('Build and publish the static website to GitHub Pages')
   .action(() => {
     console.log(`\n\x1b[36m⚡ Publishing static website to GitHub Pages...\x1b[0m\n`);
-    const rootDir = findProjectRoot(process.cwd());
-    const child = spawn('npx', ['tsx', 'apps/generator/src/cli.ts', '--publish', 'git'], {
-      cwd: rootDir,
-      stdio: 'inherit'
+    const monorepoRoot = findMonorepoRoot();
+    const currentDir = process.cwd();
+    const isPlanfoProject = fs.existsSync(path.join(currentDir, '.planfo'));
+
+    const env: NodeJS.ProcessEnv = {
+      ...process.env
+    };
+
+    if (isPlanfoProject) {
+      env.PLANFO_PROJECT_DIR = currentDir;
+    }
+
+    const child = spawn('npx', ['tsx', path.join(monorepoRoot, 'apps/generator/src/cli.ts'), '--publish', 'git'], {
+      cwd: monorepoRoot,
+      stdio: 'inherit',
+      env
     });
     child.on('close', (code) => {
       if (code === 0) {
@@ -109,15 +164,21 @@ program
     });
   });
 
-function findProjectRoot(startDir: string): string {
-  let cur = startDir;
+function findMonorepoRoot(): string {
+  // 1. From package location (packages/create-planfo/dist -> ../../..)
+  const candidate = path.resolve(__dirname, '../../..');
+  if (fs.existsSync(path.join(candidate, 'package.json')) && fs.existsSync(path.join(candidate, 'apps/generator'))) {
+    return candidate;
+  }
+  // 2. From cwd upwards
+  let cur = process.cwd();
   while (cur !== path.dirname(cur)) {
-    if (fs.existsSync(path.join(cur, 'package.json')) && fs.existsSync(path.join(cur, 'apps'))) {
+    if (fs.existsSync(path.join(cur, 'package.json')) && fs.existsSync(path.join(cur, 'apps/generator'))) {
       return cur;
     }
     cur = path.dirname(cur);
   }
-  return startDir;
+  return candidate;
 }
 
 program.parse(process.argv);

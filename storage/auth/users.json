@@ -489,6 +489,36 @@
       "active": true,
       "createdAt": "2026-10-10T09:58:54.005Z",
       "updatedAt": "2026-10-10T09:58:54.005Z"
+    },
+    {
+      "id": "usr_1791626606859",
+      "email": "testuser_1791626606651@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$o/lG9boF0qkyIe4OSHIfjg$nOyavaNEqZp2FNACfTrZFlLDqvtVMFKofwpZosgUXAY",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-10-10T10:03:26.859Z",
+      "updatedAt": "2026-10-10T10:03:26.859Z"
+    },
+    {
+      "id": "usr_1791633529810",
+      "email": "testuser_1791633529598@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$uAAoVT1kpVoBQgf+nTx1BQ$Z7AU8mz0HkqOcq4WLnv5pdU5J+2CxyIXhsLIfN3vtk8",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-10-10T11:58:49.810Z",
+      "updatedAt": "2026-10-10T11:58:49.810Z"
+    },
+    {
+      "id": "usr_1791633584064",
+      "email": "testuser_1791633583891@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$Agbo5uQOds/qngDN0dKeig$RYka6Mr/Q/4xTkIhsMnrHFlqKHgGsu+w69GK8wUDryc",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-10-10T11:59:44.064Z",
+      "updatedAt": "2026-10-10T11:59:44.064Z"
     }
   ]
 }

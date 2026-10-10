@@ -69,7 +69,14 @@ export class StaticSiteGenerator {
         SiteSettingsSchema
       );
     } catch {
-      // Use defaults
+      try {
+        site = await readJson<SiteSettings>(
+          path.join(this.options.storagePath, 'settings.json'),
+          SiteSettingsSchema
+        );
+      } catch {
+        // Use defaults
+      }
     }
 
     // Menu
@@ -198,22 +205,21 @@ export class StaticSiteGenerator {
       const workspaceRoot = path.resolve(this.options.storagePath, '..');
       let effectiveTemplatesDir = this.options.templatesPath;
 
-      const isDefaultTemplates = !this.options.templatesPath || this.options.templatesPath.endsWith('templates');
-      if (isDefaultTemplates) {
-        const activeThemeId = site.activeTheme || 'planfo-default';
-        const candidatePaths = [
-          path.join(workspaceRoot, 'themes', activeThemeId),
-          path.join(workspaceRoot, '.planfo', 'themes', activeThemeId),
-          path.join(workspaceRoot, 'themes', 'planfo-default'),
-          path.join(workspaceRoot, '.planfo', 'themes', 'planfo-default'),
-          path.join(workspaceRoot, 'themes', 'aero-modern')
-        ];
+      const activeThemeId = site.activeTheme || 'planfo-default';
+      const candidatePaths = [
+        path.join(workspaceRoot, 'themes', activeThemeId),
+        path.join(workspaceRoot, '.planfo', 'themes', activeThemeId),
+        path.join(this.options.templatesPath, activeThemeId),
+        path.join(workspaceRoot, 'themes', 'planfo-default'),
+        path.join(workspaceRoot, '.planfo', 'themes', 'planfo-default'),
+        path.join(workspaceRoot, 'themes', 'aero-modern'),
+        this.options.templatesPath
+      ];
 
-        for (const candidate of candidatePaths) {
-          if (await pathExists(candidate)) {
-            effectiveTemplatesDir = candidate;
-            break;
-          }
+      for (const candidate of candidatePaths) {
+        if ((await pathExists(path.join(candidate, 'layout.html'))) || (await pathExists(path.join(candidate, 'index.html')))) {
+          effectiveTemplatesDir = candidate;
+          break;
         }
       }
 
