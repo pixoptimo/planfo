@@ -79,6 +79,10 @@ describe('Planfo CMS — Beta v0.1 Automated Verification Suite', () => {
       seo: {
         title: 'Services | Planfo Website',
         description: 'Explore our fast static web solutions',
+        canonical: '',
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: '',
         robots: 'index,follow'
       },
       createdAt: new Date().toISOString(),
@@ -181,7 +185,15 @@ describe('Planfo CMS — Beta v0.1 Automated Verification Suite', () => {
         ]
       },
       featuredImage: '',
-      seo: {},
+      seo: {
+        title: 'Preview',
+        description: '',
+        canonical: '',
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: '',
+        robots: 'noindex,nofollow'
+      },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
       publishedAt: null

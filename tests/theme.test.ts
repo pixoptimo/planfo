@@ -57,17 +57,19 @@ describe('Design Themes System', () => {
     const fs = await import('node:fs/promises');
     const path = await import('node:path');
 
+    const themeOutputDir = path.resolve(process.cwd(), './generated/theme-test-output');
+
     // 1. Activate and compile editorial-minimal
     await ThemeStore.activateTheme('editorial-minimal');
     const generator1 = new StaticSiteGenerator({
       storagePath: config.STORAGE_PATH,
       templatesPath: config.TEMPLATES_PATH,
-      outputPath: config.OUTPUT_PATH
+      outputPath: themeOutputDir
     });
     await generator1.build();
 
-    const editorialHtml = await fs.readFile(path.join(config.OUTPUT_PATH, 'index.html'), 'utf-8');
-    const editorialCss = await fs.readFile(path.join(config.OUTPUT_PATH, 'assets', 'style.css'), 'utf-8');
+    const editorialHtml = await fs.readFile(path.join(themeOutputDir, 'index.html'), 'utf-8');
+    const editorialCss = await fs.readFile(path.join(themeOutputDir, 'assets', 'style.css'), 'utf-8');
     expect(editorialHtml).toContain('theme-editorial');
     expect(editorialHtml).toContain('Newsreader');
     expect(editorialCss).toContain('--font-serif');
@@ -77,12 +79,12 @@ describe('Design Themes System', () => {
     const generator2 = new StaticSiteGenerator({
       storagePath: config.STORAGE_PATH,
       templatesPath: config.TEMPLATES_PATH,
-      outputPath: config.OUTPUT_PATH
+      outputPath: themeOutputDir
     });
     await generator2.build();
 
-    const modernHtml = await fs.readFile(path.join(config.OUTPUT_PATH, 'index.html'), 'utf-8');
-    const modernCss = await fs.readFile(path.join(config.OUTPUT_PATH, 'assets', 'style.css'), 'utf-8');
+    const modernHtml = await fs.readFile(path.join(themeOutputDir, 'index.html'), 'utf-8');
+    const modernCss = await fs.readFile(path.join(themeOutputDir, 'assets', 'style.css'), 'utf-8');
     expect(modernHtml).not.toContain('theme-editorial');
     expect(modernHtml).toContain('Plus+Jakarta+Sans');
     expect(modernCss).toContain('#0f172a');
