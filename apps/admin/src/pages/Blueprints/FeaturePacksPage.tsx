@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import {
   Package,
   Boxes,
+  Plus,
   CheckCircle2,
   AlertCircle,
   Loader2,
@@ -109,46 +110,46 @@ export const FeaturePacksPage: React.FC = () => {
       {/* Top Banner & Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <div className="flex items-center space-x-2">
-            <span className="text-[10px] px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 font-mono border border-brand-500/20 font-semibold uppercase tracking-wider flex items-center space-x-1.5">
-              <Puzzle className="w-3 h-3" />
-              <span>Plugin-Style Modular Capabilities</span>
-            </span>
+          <div className="inline-flex items-center space-x-1.5 text-xs font-mono text-emerald-400 mb-1">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>Schema Architect & Collections</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight mt-1 flex items-center space-x-2.5">
-            <span>Blueprint Studio: Feature Packs</span>
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+            <span>Blueprints Studio</span>
           </h1>
-          <p className="text-xs text-slate-400 mt-1 max-w-2xl">
-            Modular plugins providing specialized fields, logic, and blocks. Enabling a pack does <strong>not</strong> create page URLs automatically—use <strong>Blueprint Studio</strong> to design and assign custom URLs (e.g. <code className="text-brand-300">/shop</code>, <code className="text-brand-300">/portfolio</code>, <code className="text-brand-300">/team</code>) according to your own idea.
+          <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+            Visually design custom schemas, configure custom fields (text, media, dropdowns, dates), and automatically instantiate new collections in the sidebar without touching code.
           </p>
         </div>
 
-        <div className="flex items-center space-x-2">
-          <Link
-            to="/blueprints/studio"
-            className="px-3.5 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition"
-          >
-            <Boxes className="w-3.5 h-3.5" />
-            <span>Open Blueprint Studio</span>
-          </Link>
+        <div className="flex items-center space-x-2 self-start sm:self-auto">
+          {can('blueprints.create') && (
+            <Link
+              to="/blueprints/studio?action=new"
+              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Custom Blueprint</span>
+            </Link>
+          )}
         </div>
       </div>
 
       {/* Navigation Sub-Tabs */}
       <div className="flex border-b border-slate-800 space-x-2">
         <Link
-          to="/blueprints/feature-packs"
-          className="px-4 py-2.5 text-xs font-bold border-b-2 border-brand-500 text-brand-400 flex items-center space-x-2"
-        >
-          <Package className="w-4 h-4" />
-          <span>Feature Packs ({activePacksCount}/{FEATURE_PACKS.length} Active)</span>
-        </Link>
-        <Link
           to="/blueprints/studio"
           className="px-4 py-2.5 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center space-x-2 transition"
         >
           <Boxes className="w-4 h-4" />
           <span>Schema Builder & Blueprints</span>
+        </Link>
+        <Link
+          to="/blueprints/feature-packs"
+          className="px-4 py-2.5 text-xs font-bold border-b-2 border-brand-500 text-brand-400 flex items-center space-x-2"
+        >
+          <Package className="w-4 h-4" />
+          <span>Feature Packs Hub</span>
         </Link>
       </div>
 

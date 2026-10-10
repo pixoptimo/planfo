@@ -99,6 +99,10 @@ export const BlueprintStudio: React.FC = () => {
   };
 
   useEffect(() => {
+    const actionParam = searchParams.get('action');
+    if (actionParam === 'new') {
+      openCreateModal();
+    }
     const packParam = searchParams.get('pack');
     if (packParam) {
       const foundPack = FEATURE_PACKS.find((p) => p.id === packParam);
@@ -267,31 +271,33 @@ export const BlueprintStudio: React.FC = () => {
   const customs = blueprints.filter((b) => !b.isBuiltIn);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 w-full pb-20">
       {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
         <div>
-          <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-brand-500/10 border border-brand-500/20 text-brand-400 text-xs font-mono font-medium mb-2">
+          <div className="inline-flex items-center space-x-1.5 text-xs font-mono text-emerald-400 mb-1">
             <Sparkles className="w-3.5 h-3.5" />
             <span>Schema Architect & Collections</span>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <span>Content Blueprints Studio</span>
+            <span>Blueprints Studio</span>
           </h1>
           <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
             Visually design custom schemas, configure custom fields (text, media, dropdowns, dates), and automatically instantiate new collections in the sidebar without touching code.
           </p>
         </div>
 
-        {can('blueprints.create') && (
-          <button
-            onClick={() => openCreateModal()}
-            className="px-4 py-2.5 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-xl flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition self-start"
-          >
-            <Plus className="w-4 h-4" />
-            <span>Create Custom Blueprint</span>
-          </button>
-        )}
+        <div className="flex items-center space-x-2 self-start sm:self-auto">
+          {can('blueprints.create') && (
+            <button
+              onClick={() => openCreateModal()}
+              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create Custom Blueprint</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {/* Navigation Sub-Tabs */}

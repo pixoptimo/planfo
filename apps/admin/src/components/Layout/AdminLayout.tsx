@@ -131,8 +131,10 @@ export const AdminLayout: React.FC = () => {
     { to: '/pages', label: 'Pages', icon: FileText, show: can('pages.read') },
     { to: '/posts', label: 'Posts', icon: BookOpen, show: can('posts.read') },
     { to: '/products', label: 'Products', icon: ShoppingBag, show: can('products.read') },
-    { to: '/categories', label: 'Categories & Tags', icon: FolderTree, show: can('categories.read') },
+
+    { section: 'Blueprints & Taxonomy' },
     { to: '/blueprints/studio', label: 'Blueprints', icon: Boxes, show: can('blueprints.read') },
+    { to: '/categories', label: 'Categories & Tags', icon: FolderTree, show: can('categories.read') },
 
     ...(customBlueprints.length > 0 ? [
       { section: 'Collections' },
