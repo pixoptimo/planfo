@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { NavLink, Outlet, useNavigate } from 'react-router-dom';
+import { NavLink, Outlet, useNavigate, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   FileText,
@@ -112,6 +112,8 @@ export const AdminLayout: React.FC = () => {
     }
   };
 
+  const location = useLocation();
+
   interface NavItem {
     section?: string;
     to?: string;
@@ -130,6 +132,7 @@ export const AdminLayout: React.FC = () => {
     { to: '/posts', label: 'Posts', icon: BookOpen, show: can('posts.read') },
     { to: '/products', label: 'Products', icon: ShoppingBag, show: can('products.read') },
     { to: '/categories', label: 'Categories & Tags', icon: FolderTree, show: can('categories.read') },
+    { to: '/blueprints/studio', label: 'Blueprints', icon: Boxes, show: can('blueprints.read') },
 
     ...(customBlueprints.length > 0 ? [
       { section: 'Collections' },
@@ -196,18 +199,25 @@ export const AdminLayout: React.FC = () => {
               if (item.show === false) return null;
 
               const Icon = item.icon!;
+              const isBlueprintActive = item.to === '/blueprints/studio' && (
+                location.pathname === '/blueprints' ||
+                location.pathname.startsWith('/blueprints/studio') ||
+                location.pathname.startsWith('/blueprints/feature-packs')
+              );
+
               return (
                 <NavLink
                   key={item.to}
                   to={item.to!}
                   end={item.exact}
-                  className={({ isActive }) =>
-                    `flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition ${
-                      isActive
+                  className={({ isActive }) => {
+                    const currentActive = isActive || isBlueprintActive;
+                    return `flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition ${
+                      currentActive
                         ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20 shadow-sm'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
-                    }`
-                  }
+                    }`;
+                  }}
                 >
                   <div className="flex items-center space-x-3 truncate">
                     <Icon className="w-4 h-4 flex-shrink-0" />
