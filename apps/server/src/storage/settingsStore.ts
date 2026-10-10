@@ -3,9 +3,26 @@ import { readJson, writeJsonAtomic } from '@cms/utils';
 import { SiteSettingsSchema, type SiteSettings } from '@cms/schemas';
 import { config } from '../config/env.js';
 
+import fs from 'node:fs';
+
 export class SettingsStore {
   private static getFilePath(): string {
-    return path.join(config.SETTINGS_PATH, 'site.json');
+    const directSettings = path.join(config.SETTINGS_PATH, 'settings.json');
+    if (fs.existsSync(directSettings)) {
+      return directSettings;
+    }
+    const storageSettings = path.join(config.STORAGE_PATH, 'settings.json');
+    if (fs.existsSync(storageSettings)) {
+      return storageSettings;
+    }
+    const siteJson = path.join(config.SETTINGS_PATH, 'site.json');
+    if (fs.existsSync(siteJson)) {
+      return siteJson;
+    }
+    if (config.STORAGE_PATH.endsWith('planfo') || config.STORAGE_PATH.endsWith('.planfo')) {
+      return directSettings;
+    }
+    return siteJson;
   }
 
   static async get(): Promise<SiteSettings> {

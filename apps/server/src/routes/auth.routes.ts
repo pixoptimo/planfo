@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import { Router, type Request, type Response } from 'express';
 import { LoginCredentialsSchema, type User } from '@cms/schemas';
 import { UserStore } from '../storage/userStore.js';
@@ -5,6 +7,7 @@ import { verifyPassword, hashPassword } from '../auth/password.js';
 import { createSession, destroySession } from '../auth/session.js';
 import { requireAuth, loginRateLimiter } from '../auth/middleware.js';
 import { SettingsStore } from '../storage/settingsStore.js';
+import { config } from '../config/env.js';
 import { logger } from '@cms/utils';
 
 export const authRouter = Router();
@@ -34,20 +37,21 @@ authRouter.post('/setup', async (req: Request, res: Response): Promise<void> => 
     return;
   }
 
-  const { email, password, name, siteName, tagline, enableCatalog, themeId } = req.body;
+  const { email, usernameOrEmail, password, name, siteName, tagline, themeId } = req.body;
+  const identifier = (usernameOrEmail || email || name || '').trim();
 
-  if (!email || !email.includes('@')) {
+  if (!identifier || identifier.length < 3) {
     res.status(400).json({
       success: false,
-      error: { code: 'VALIDATION_ERROR', message: 'A valid email address is required.' }
+      error: { code: 'VALIDATION_ERROR', message: 'A username or email address (at least 3 characters) is required.' }
     });
     return;
   }
 
-  if (!password || password.length < 8) {
+  if (!password || password.length < 6) {
     res.status(400).json({
       success: false,
-      error: { code: 'VALIDATION_ERROR', message: 'Password must be at least 8 characters long.' }
+      error: { code: 'VALIDATION_ERROR', message: 'Password must be at least 6 characters long.' }
     });
     return;
   }
@@ -56,8 +60,8 @@ authRouter.post('/setup', async (req: Request, res: Response): Promise<void> => 
   const now = new Date().toISOString();
   const adminUser: User = {
     id: `usr_master_${Date.now()}`,
-    email: email.trim().toLowerCase(),
-    name: name || 'Admin',
+    email: identifier.toLowerCase(),
+    name: name || identifier,
     passwordHash,
     role: 'admin',
     active: true,
@@ -69,16 +73,23 @@ authRouter.post('/setup', async (req: Request, res: Response): Promise<void> => 
 
   // Configure initial settings
   await SettingsStore.update({
-    siteName: siteName?.trim() || 'Aero Static CMS',
-    tagline: tagline?.trim() || 'Modern, high-performance static website',
-    featurePacks: {
-      catalog: Boolean(enableCatalog)
-    },
-    activeTheme: themeId || 'aero-modern'
+    siteName: siteName?.trim() || 'Planfo Website',
+    tagline: tagline?.trim() || 'Built with Planfo CMS — Database-free static website builder',
+    activeTheme: themeId || 'planfo-default'
   });
 
+  // Also update config.json in project if present
+  const configPath = path.join(config.STORAGE_PATH, 'config.json');
+  if (fs.existsSync(configPath)) {
+    try {
+      const cfg = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      cfg.name = siteName?.trim() || cfg.name;
+      fs.writeFileSync(configPath, JSON.stringify(cfg, null, 2), 'utf8');
+    } catch {}
+  }
+
   const session = await createSession(adminUser, res);
-  logger.audit('Initial QuickLaunch Setup Completed', { email: adminUser.email });
+  logger.audit('Initial Planfo Setup Completed', { usernameOrEmail: identifier });
 
   res.json({
     success: true,

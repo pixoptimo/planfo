@@ -24,11 +24,11 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
 
     // 1. Create directory tree
     const dirs = [
-      '.planfo',
-      '.planfo/content/pages',
-      '.planfo/media',
-      '.planfo/themes/planfo-default/assets',
-      '.planfo/themes/planfo-default/page',
+      'planfo',
+      'planfo/content/pages',
+      'planfo/media',
+      'planfo/themes/planfo-default/assets',
+      'planfo/themes/planfo-default/page',
       'generated',
       'generated/assets',
       'generated/assets/css',
@@ -40,7 +40,7 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
       fs.mkdirSync(path.join(projectDir, d), { recursive: true });
     }
 
-    // 2. .planfo/config.json
+    // 2. planfo/config.json
     const configData = {
       name,
       version: '0.1.0',
@@ -48,9 +48,9 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
       siteUrl,
       createdAt: new Date().toISOString()
     };
-    fs.writeFileSync(path.join(projectDir, '.planfo/config.json'), JSON.stringify(configData, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(projectDir, 'planfo/config.json'), JSON.stringify(configData, null, 2), 'utf-8');
 
-    // 3. .planfo/settings.json
+    // 3. planfo/settings.json
     const settingsData = {
       siteName: name.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase()),
       siteUrl,
@@ -69,7 +69,7 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
         robots: 'index,follow'
       }
     };
-    fs.writeFileSync(path.join(projectDir, '.planfo/settings.json'), JSON.stringify(settingsData, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(projectDir, 'planfo/settings.json'), JSON.stringify(settingsData, null, 2), 'utf-8');
 
     // 4. Initial Pages
     // Home Page
@@ -104,7 +104,7 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
       updatedAt: new Date().toISOString(),
       publishedAt: new Date().toISOString()
     };
-    fs.writeFileSync(path.join(projectDir, '.planfo/content/pages/home.json'), JSON.stringify(homePage, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(projectDir, 'planfo/content/pages/home.json'), JSON.stringify(homePage, null, 2), 'utf-8');
 
     // About Page
     const aboutPage = {
@@ -138,7 +138,7 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
       updatedAt: new Date().toISOString(),
       publishedAt: new Date().toISOString()
     };
-    fs.writeFileSync(path.join(projectDir, '.planfo/content/pages/about.json'), JSON.stringify(aboutPage, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(projectDir, 'planfo/content/pages/about.json'), JSON.stringify(aboutPage, null, 2), 'utf-8');
 
     // Contact Page
     const contactPage = {
@@ -172,11 +172,11 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
       updatedAt: new Date().toISOString(),
       publishedAt: new Date().toISOString()
     };
-    fs.writeFileSync(path.join(projectDir, '.planfo/content/pages/contact.json'), JSON.stringify(contactPage, null, 2), 'utf-8');
+    fs.writeFileSync(path.join(projectDir, 'planfo/content/pages/contact.json'), JSON.stringify(contactPage, null, 2), 'utf-8');
 
-    // 5. Default Theme Files in .planfo/themes/planfo-default/
+    // 5. Default Theme Files in planfo/themes/planfo-default/
     const defaultThemeSource = path.resolve(__dirname, '../../../themes/planfo-default');
-    const targetThemeDir = path.join(projectDir, '.planfo/themes/planfo-default');
+    const targetThemeDir = path.join(projectDir, 'planfo/themes/planfo-default');
 
     if (fs.existsSync(defaultThemeSource)) {
       copyRecursiveSync(defaultThemeSource, targetThemeDir);
@@ -240,7 +240,7 @@ This static website was created with **Planfo CMS** (Beta v0.1) — a simple, da
 
 \`\`\`
 ${name}/
-├── .planfo/
+├── planfo/
 │   ├── config.json         # Planfo Project configuration
 │   ├── settings.json       # Site title, metadata & deployment settings
 │   ├── content/
@@ -280,7 +280,7 @@ ${name}/
    \`\`\`bash
    planfo publish
    \`\`\`
-   Only files in \`generated/\` are published to GitHub Pages. The \`.planfo/\` directory is never published.
+   Only files in \`generated/\` are published to GitHub Pages. The \`planfo/\` directory is never published.
 `;
     fs.writeFileSync(path.join(projectDir, 'README.md'), readmeContent, 'utf-8');
 

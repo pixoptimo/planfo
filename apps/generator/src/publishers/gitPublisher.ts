@@ -152,6 +152,7 @@ export class GitPublisher implements Publisher {
 
     // SECURITY CHECK: Verify strictly that NO private CMS files or secrets exist in the public output
     const forbiddenPatterns = [
+      'planfo',
       '.planfo',
       'storage',
       'content',

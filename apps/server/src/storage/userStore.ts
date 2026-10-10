@@ -23,9 +23,16 @@ export class UserStore {
     return users.find((u) => u.id === id) || null;
   }
 
-  static async findByEmail(email: string): Promise<User | null> {
+  static async findByEmail(identifier: string): Promise<User | null> {
     const users = await this.getAllUsers();
-    return users.find((u) => u.email.toLowerCase() === email.toLowerCase()) || null;
+    const query = identifier.trim().toLowerCase();
+    return (
+      users.find(
+        (u) =>
+          u.email.toLowerCase() === query ||
+          (u.name && u.name.toLowerCase() === query)
+      ) || null
+    );
   }
 
   static async saveUser(user: User): Promise<void> {

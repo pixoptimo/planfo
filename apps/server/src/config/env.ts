@@ -69,21 +69,40 @@ function findWorkspaceRoot(startDir: string): string {
 
 export const workspaceRoot = findWorkspaceRoot(process.cwd());
 
+function detectPlanfoProject(): { projectDir: string; storageDir: string } | null {
+  const envDir = process.env.PLANFO_PROJECT_DIR;
+  if (envDir) {
+    const directPlanfo = path.join(envDir, 'planfo');
+    const directDotPlanfo = path.join(envDir, '.planfo');
+    if (fs.existsSync(directPlanfo)) return { projectDir: envDir, storageDir: directPlanfo };
+    if (fs.existsSync(directDotPlanfo)) return { projectDir: envDir, storageDir: directDotPlanfo };
+    return { projectDir: envDir, storageDir: directPlanfo };
+  }
+
+  const cur = process.cwd();
+  if (fs.existsSync(path.join(cur, 'planfo'))) return { projectDir: cur, storageDir: path.join(cur, 'planfo') };
+  if (fs.existsSync(path.join(cur, '.planfo'))) return { projectDir: cur, storageDir: path.join(cur, '.planfo') };
+
+  return null;
+}
+
+const activePlanfo = detectPlanfoProject();
+
 // Resolve all relative paths against workspaceRoot
 export const config = {
   ...rawConfig,
   WORKSPACE_ROOT: workspaceRoot,
   ADMIN_DIST_PATH: path.resolve(workspaceRoot, 'apps/admin/dist'),
-  STORAGE_PATH: path.resolve(workspaceRoot, rawConfig.STORAGE_PATH),
-  MEDIA_PATH: path.resolve(workspaceRoot, rawConfig.MEDIA_PATH),
-  CONTENT_PATH: path.resolve(workspaceRoot, rawConfig.CONTENT_PATH),
-  REVISION_PATH: path.resolve(workspaceRoot, rawConfig.REVISION_PATH),
-  SESSION_PATH: path.resolve(workspaceRoot, rawConfig.SESSION_PATH),
-  SETTINGS_PATH: path.resolve(workspaceRoot, rawConfig.SETTINGS_PATH),
-  BACKUP_PATH: path.resolve(workspaceRoot, rawConfig.BACKUP_PATH),
-  OUTPUT_PATH: path.resolve(workspaceRoot, rawConfig.OUTPUT_PATH),
-  TEMPLATES_PATH: path.resolve(workspaceRoot, rawConfig.TEMPLATES_PATH),
-  THEMES_PATH: path.resolve(workspaceRoot, rawConfig.THEMES_PATH)
+  STORAGE_PATH: activePlanfo ? activePlanfo.storageDir : path.resolve(workspaceRoot, rawConfig.STORAGE_PATH),
+  MEDIA_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'media') : path.resolve(workspaceRoot, rawConfig.MEDIA_PATH),
+  CONTENT_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'content') : path.resolve(workspaceRoot, rawConfig.CONTENT_PATH),
+  REVISION_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'revisions') : path.resolve(workspaceRoot, rawConfig.REVISION_PATH),
+  SESSION_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'sessions') : path.resolve(workspaceRoot, rawConfig.SESSION_PATH),
+  SETTINGS_PATH: activePlanfo ? activePlanfo.storageDir : path.resolve(workspaceRoot, rawConfig.SETTINGS_PATH),
+  BACKUP_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'backups') : path.resolve(workspaceRoot, rawConfig.BACKUP_PATH),
+  OUTPUT_PATH: activePlanfo ? path.join(activePlanfo.projectDir, 'generated') : path.resolve(workspaceRoot, rawConfig.OUTPUT_PATH),
+  TEMPLATES_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'themes') : path.resolve(workspaceRoot, rawConfig.TEMPLATES_PATH),
+  THEMES_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'themes') : path.resolve(workspaceRoot, rawConfig.THEMES_PATH)
 };
 
 export type AppConfig = typeof config;

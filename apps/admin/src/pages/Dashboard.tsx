@@ -216,7 +216,7 @@ export const Dashboard: React.FC = () => {
             <FileText className="w-5 h-5 text-brand-400" />
             <div>
               <h2 className="font-semibold text-sm text-white">Website Pages</h2>
-              <p className="text-[11px] text-slate-400">Home, About, Contact & custom pages stored in .planfo/content/pages/</p>
+              <p className="text-[11px] text-slate-400">Home, About, Contact & custom pages stored in planfo/content/pages/</p>
             </div>
           </div>
 

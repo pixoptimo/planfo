@@ -207,11 +207,13 @@ export class StaticSiteGenerator {
 
       const activeThemeId = site.activeTheme || 'planfo-default';
       const candidatePaths = [
-        path.join(workspaceRoot, 'themes', activeThemeId),
+        path.join(workspaceRoot, 'planfo', 'themes', activeThemeId),
         path.join(workspaceRoot, '.planfo', 'themes', activeThemeId),
+        path.join(workspaceRoot, 'themes', activeThemeId),
         path.join(this.options.templatesPath, activeThemeId),
-        path.join(workspaceRoot, 'themes', 'planfo-default'),
+        path.join(workspaceRoot, 'planfo', 'themes', 'planfo-default'),
         path.join(workspaceRoot, '.planfo', 'themes', 'planfo-default'),
+        path.join(workspaceRoot, 'themes', 'planfo-default'),
         path.join(workspaceRoot, 'themes', 'aero-modern'),
         this.options.templatesPath
       ];

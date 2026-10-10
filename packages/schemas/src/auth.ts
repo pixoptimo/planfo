@@ -5,7 +5,7 @@ export type UserRole = z.infer<typeof UserRoleSchema>;
 
 export const UserSchema = z.object({
   id: z.string().min(1),
-  email: z.string().email(),
+  email: z.string().min(2),
   passwordHash: z.string().min(1),
   role: UserRoleSchema,
   name: z.string().optional().default(''),
@@ -21,14 +21,14 @@ export const UsersFileSchema = z.object({
 export type UsersFile = z.infer<typeof UsersFileSchema>;
 
 export const LoginCredentialsSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6)
+  email: z.string().min(2),
+  password: z.string().min(4)
 });
 export type LoginCredentials = z.infer<typeof LoginCredentialsSchema>;
 
 export const CreateUserSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(8),
+  email: z.string().min(2),
+  password: z.string().min(6),
   role: UserRoleSchema,
   name: z.string().optional().default(''),
   active: z.boolean().default(true)
@@ -36,8 +36,8 @@ export const CreateUserSchema = z.object({
 export type CreateUserInput = z.infer<typeof CreateUserSchema>;
 
 export const UpdateUserSchema = z.object({
-  email: z.string().email().optional(),
-  password: z.string().min(8).optional(),
+  email: z.string().min(2).optional(),
+  password: z.string().min(6).optional(),
   role: UserRoleSchema.optional(),
   name: z.string().optional(),
   active: z.boolean().optional()
@@ -47,7 +47,7 @@ export type UpdateUserInput = z.infer<typeof UpdateUserSchema>;
 export const SessionSchema = z.object({
   id: z.string(),
   userId: z.string(),
-  email: z.string().email(),
+  email: z.string().min(2),
   role: UserRoleSchema,
   createdAt: z.string().datetime(),
   expiresAt: z.string().datetime()

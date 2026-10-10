@@ -12,8 +12,16 @@ import type { Page } from '@cms/schemas';
 describe('Planfo CMS — Beta v0.1 Automated Verification Suite', () => {
   const testProjectName = 'test-planfo-workspace';
   const testProjectDir = path.resolve(process.cwd(), testProjectName);
-  const planfoDir = path.join(testProjectDir, '.planfo');
+  const planfoDir = path.join(testProjectDir, 'planfo');
   const generatedDir = path.join(testProjectDir, 'generated');
+
+  beforeAll(async () => {
+    try {
+      await fs.rm(testProjectDir, { recursive: true, force: true });
+    } catch {
+      // Ignore cleanup error
+    }
+  });
 
   afterAll(async () => {
     try {
@@ -223,12 +231,20 @@ describe('Planfo CMS — Beta v0.1 Automated Verification Suite', () => {
     // Clean up leak
     await fs.rm(leakedFilePath, { force: true });
 
-    // Verify .planfo leak protection
-    const leakedPlanfoPath = path.join(generatedDir, '.planfo');
+    // Verify planfo leak protection
+    const leakedPlanfoPath = path.join(generatedDir, 'planfo');
     await fs.mkdir(leakedPlanfoPath, { recursive: true });
 
     await expect(publisher.validate(generatedDir)).rejects.toThrow('Security validation failed');
 
     await fs.rm(leakedPlanfoPath, { recursive: true, force: true });
+
+    // Verify .planfo leak protection
+    const leakedDotPlanfoPath = path.join(generatedDir, '.planfo');
+    await fs.mkdir(leakedDotPlanfoPath, { recursive: true });
+
+    await expect(publisher.validate(generatedDir)).rejects.toThrow('Security validation failed');
+
+    await fs.rm(leakedDotPlanfoPath, { recursive: true, force: true });
   });
 });
