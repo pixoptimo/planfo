@@ -42,6 +42,7 @@ export const SiteSettingsPage: React.FC = () => {
     try {
       const updated = await api.put<SiteSettings>('/api/settings', settings);
       setSettings(updated);
+      window.dispatchEvent(new CustomEvent('settings-updated', { detail: updated }));
       setSuccess('Site settings and default SEO updated successfully!');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Save failed');

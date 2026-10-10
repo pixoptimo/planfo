@@ -40,9 +40,23 @@ export const AdminLayout: React.FC = () => {
   const [liveSiteUrl, setLiveSiteUrl] = useState('http://localhost:3000');
   const [sitePort, setSitePort] = useState<number | null>(null);
   const [isCatalogEnabled, setIsCatalogEnabled] = useState(false);
+  const [projectName, setProjectName] = useState('My Website');
   const [customBlueprints, setCustomBlueprints] = useState<
     Array<{ id: string; name: string; slug: string; icon: string; entryCount?: number }>
   >([]);
+
+  const loadSettings = () => {
+    api.get<{ siteName?: string; description?: string; featurePacks?: { catalog?: boolean } }>('/api/settings')
+      .then((data) => {
+        if (data?.siteName) {
+          setProjectName(data.siteName);
+        }
+        if (data?.featurePacks?.catalog) {
+          setIsCatalogEnabled(true);
+        }
+      })
+      .catch(() => {});
+  };
 
   const loadCustomBlueprints = () => {
     api.get<Array<{ id: string; name: string; slug: string; icon: string; isBuiltIn?: boolean; entryCount?: number }>>('/api/blueprints')
@@ -66,18 +80,13 @@ export const AdminLayout: React.FC = () => {
       })
       .catch(() => {});
 
-    api.get<{ featurePacks?: { catalog?: boolean } }>('/api/settings')
-      .then((data) => {
-        if (data?.featurePacks?.catalog) {
-          setIsCatalogEnabled(true);
-        }
-      })
-      .catch(() => {});
-
+    loadSettings();
     loadCustomBlueprints();
 
+    window.addEventListener('settings-updated', loadSettings);
     window.addEventListener('blueprints-updated', loadCustomBlueprints);
     return () => {
+      window.removeEventListener('settings-updated', loadSettings);
       window.removeEventListener('blueprints-updated', loadCustomBlueprints);
     };
   }, []);
@@ -103,22 +112,50 @@ export const AdminLayout: React.FC = () => {
     }
   };
 
-interface NavItem {
-  section?: string;
-  to?: string;
-  label?: string;
-  icon?: React.ComponentType<{ className?: string }>;
-  exact?: boolean;
-  show?: boolean;
-  badge?: string;
-}
+  interface NavItem {
+    section?: string;
+    to?: string;
+    label?: string;
+    icon?: React.ComponentType<{ className?: string }>;
+    exact?: boolean;
+    show?: boolean;
+    badge?: string;
+  }
 
   const navItems: NavItem[] = [
     { to: '/', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+
+    { section: 'Content' },
     { to: '/pages', label: 'Pages', icon: FileText, show: can('pages.read') },
-    { to: '/media', label: 'Media', icon: ImageIcon, show: can('media.read') },
-    { to: '/themes', label: 'Theme', icon: Palette, show: can('settings.read') },
-    { to: '/settings', label: 'Settings', icon: SettingsIcon, show: can('settings.read') }
+    { to: '/posts', label: 'Posts', icon: BookOpen, show: can('posts.read') },
+    { to: '/products', label: 'Products', icon: ShoppingBag, show: can('products.read') },
+    { to: '/categories', label: 'Categories & Tags', icon: FolderTree, show: can('categories.read') },
+
+    ...(customBlueprints.length > 0 ? [
+      { section: 'Collections' },
+      ...customBlueprints.map((bp) => ({
+        to: `/blueprints/${bp.slug}`,
+        label: bp.name,
+        icon: getBlueprintIcon(bp.icon),
+        show: true,
+        badge: bp.entryCount !== undefined ? String(bp.entryCount) : undefined
+      }))
+    ] : []),
+
+    { section: 'Assets & Nav' },
+    { to: '/media', label: 'Media Library', icon: ImageIcon, show: can('media.read') },
+    { to: '/navigation', label: 'Navigation', icon: MenuIcon, show: can('menus.read') },
+
+    { section: 'Design & Themes' },
+    { to: '/themes', label: 'Themes', icon: Palette, show: can('settings.read') },
+
+    { section: 'Configuration' },
+    { to: '/settings', label: 'Site Settings & SEO', icon: SettingsIcon, show: can('settings.read') },
+    { to: '/users', label: 'Users & Roles', icon: Users, show: can('users.read') },
+
+    { section: 'Maintenance' },
+    { to: '/revisions', label: 'Revisions', icon: History, show: can('revisions.read') },
+    { to: '/backups', label: 'Backups', icon: Archive, show: can('backups.read') }
   ];
 
   return (
@@ -126,21 +163,38 @@ interface NavItem {
       {/* Sidebar */}
       <aside className="w-64 bg-slate-900 border-r border-slate-800 flex flex-col justify-between flex-shrink-0">
         <div>
-          {/* Brand header */}
-          <div className="h-16 px-6 border-b border-slate-800 flex items-center space-x-3">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-lg shadow-md">
+          {/* Brand header: Planfo CMS Logo + Project Name */}
+          <div className="h-16 px-5 border-b border-slate-800 flex items-center space-x-3">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-base shadow-md flex-shrink-0" title="Planfo CMS">
               P
             </div>
-            <div>
-              <span className="font-bold text-white text-base tracking-tight block leading-tight">Planfo CMS</span>
-              <span className="text-[10px] text-emerald-400 font-mono tracking-wide uppercase font-semibold">Beta v0.1 &bull; Static</span>
+            <div className="min-w-0 flex-1">
+              <span className="font-bold text-white text-sm tracking-tight truncate block leading-snug" title={projectName}>
+                {projectName}
+              </span>
+              <div className="flex items-center space-x-1.5">
+                <span className="text-[10px] text-emerald-400 font-mono tracking-wide uppercase font-semibold">
+                  Planfo CMS
+                </span>
+                <span className="text-[8px] text-slate-500">&bull;</span>
+                <span className="text-[10px] text-slate-400 font-mono">Static</span>
+              </div>
             </div>
           </div>
 
-          {/* Navigation Links */}
-          <nav className="p-3 space-y-1">
-            {navItems.map((item) => {
+          {/* Categorized Navigation Links */}
+          <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
+            {navItems.map((item, idx) => {
+              if (item.section) {
+                return (
+                  <div key={idx} className="px-3 pt-3.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                    {item.section}
+                  </div>
+                );
+              }
+
               if (item.show === false) return null;
+
               const Icon = item.icon!;
               return (
                 <NavLink
@@ -148,7 +202,7 @@ interface NavItem {
                   to={item.to!}
                   end={item.exact}
                   className={({ isActive }) =>
-                    `flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition ${
+                    `flex items-center justify-between px-3 py-2 rounded-lg text-sm font-medium transition ${
                       isActive
                         ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20 shadow-sm'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
@@ -159,46 +213,14 @@ interface NavItem {
                     <Icon className="w-4 h-4 flex-shrink-0" />
                     <span className="truncate">{item.label}</span>
                   </div>
+                  {item.badge && (
+                    <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-slate-800 text-slate-400">
+                      {item.badge}
+                    </span>
+                  )}
                 </NavLink>
               );
             })}
-
-            {/* Planfo Beta Divider & Quick Actions */}
-            <div className="pt-4 pb-2">
-              <div className="border-t border-slate-800/80 my-2"></div>
-              <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
-                Actions
-              </div>
-              <div className="space-y-1.5 mt-2">
-                <a
-                  href="/api/preview"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-800 border border-slate-800 transition"
-                >
-                  <Eye className="w-3.5 h-3.5 text-brand-400" />
-                  <span>Preview</span>
-                </a>
-                <button
-                  type="button"
-                  onClick={handlePublish}
-                  disabled={isPublishing}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-800 border border-slate-800 transition disabled:opacity-50"
-                >
-                  {isPublishing ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" /> : <Sparkles className="w-3.5 h-3.5 text-emerald-400" />}
-                  <span>Build</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handlePublish}
-                  disabled={isPublishing}
-                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold text-slate-950 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 shadow-md transition disabled:opacity-50"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Publish</span>
-                </button>
-              </div>
-            </div>
           </nav>
         </div>
 
@@ -229,24 +251,46 @@ interface NavItem {
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden">
-        {/* Top bar */}
-        <header className="h-16 px-8 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between backdrop-blur-sm">
-          <div className="flex items-center space-x-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-xs text-slate-400 font-mono">
-              Static Generator: Ready {sitePort ? `(:${sitePort})` : ''}
-            </span>
-          </div>
-
-          <div className="flex items-center space-x-4">
+        {/* Top bar with WordPress-style Project Name + Actions */}
+        <header className="h-16 px-6 lg:px-8 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between backdrop-blur-sm">
+          <div className="flex items-center space-x-3">
+            {/* WordPress-style: (P) [icon] Project Name */}
             <a
               href={liveSiteUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition"
+              className="flex items-center space-x-2.5 px-3 py-1.5 rounded-lg bg-slate-800/80 hover:bg-slate-800 border border-slate-700/60 hover:border-slate-600 transition group"
+              title={`Visit Live Website: ${liveSiteUrl}`}
+            >
+              <div className="w-5 h-5 rounded-md bg-gradient-to-tr from-brand-600 to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center shadow-xs">
+                P
+              </div>
+              <span className="font-semibold text-xs text-white tracking-tight truncate max-w-[220px]">
+                {projectName}
+              </span>
+              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-400 transition" />
+            </a>
+
+            <div className="h-4 w-px bg-slate-800 hidden sm:block"></div>
+
+            <div className="hidden sm:flex items-center space-x-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-xs text-slate-400 font-mono">
+                Static Generator: Ready {sitePort ? `(:${sitePort})` : ''}
+              </span>
+            </div>
+          </div>
+
+          <div className="flex items-center space-x-3">
+            <a
+              href={liveSiteUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-semibold rounded-lg flex items-center space-x-2 transition border border-slate-700/50"
               title={`Visit Live Website (${liveSiteUrl})`}
             >
-              <span>Visit Live Website</span>
+              <Eye className="w-3.5 h-3.5 text-brand-400" />
+              <span>Preview</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </a>
 
