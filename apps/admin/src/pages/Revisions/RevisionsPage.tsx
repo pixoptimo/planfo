@@ -27,7 +27,7 @@ export const RevisionsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 max-w-5xl mx-auto">
+    <div className="space-y-6 w-full">
       <div>
         <h1 className="text-2xl font-bold text-white tracking-tight">Revision Explorer</h1>
         <p className="text-xs text-slate-400 mt-1">Audit historical published versions and content snapshots stored on disk</p>

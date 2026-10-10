@@ -65,55 +65,32 @@ export const Dashboard: React.FC = () => {
   const publishedCount = pages.filter((p) => p.status === 'published').length;
 
   return (
-    <div className="space-y-8 max-w-6xl mx-auto">
-      {/* Planfo CMS Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gradient-to-r from-slate-900 via-slate-900/90 to-slate-950 border border-slate-800 p-6 rounded-2xl shadow-xl">
+    <div className="space-y-6 w-full">
+      {/* Dashboard Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center space-x-2.5 mb-1.5">
-            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold tracking-wider uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              Beta v0.1
-            </span>
-            <span className="text-xs text-slate-400 font-mono">Zero Database &bull; Pure Static</span>
+          <div className="flex items-center space-x-2 text-xs font-mono text-emerald-400 mb-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span>Beta v0.1 &bull; Zero Database &bull; Pure Static</span>
           </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">
-            Planfo CMS Dashboard
+            Dashboard
           </h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Manage your pages, generate static HTML, and publish directly to GitHub Pages.
+          <p className="text-xs text-slate-400 mt-1">
+            Manage your pages, generate static HTML, and publish directly to GitHub Pages
           </p>
         </div>
 
-        {/* Top Action Buttons */}
-        <div className="flex flex-wrap items-center gap-2.5">
-          <a
-            href="/api/preview"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl flex items-center space-x-2 transition border border-slate-700/60 shadow-sm"
-          >
-            <Eye className="w-4 h-4 text-brand-400" />
-            <span>Preview</span>
-          </a>
-
-          <button
-            type="button"
-            onClick={handleBuild}
-            disabled={building}
-            className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-xl flex items-center space-x-2 transition border border-slate-700/60 shadow-sm disabled:opacity-50"
-          >
-            {building ? <Loader2 className="w-4 h-4 animate-spin text-emerald-400" /> : <Sparkles className="w-4 h-4 text-emerald-400" />}
-            <span>Build</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={handleBuild}
-            disabled={building}
-            className="px-4 py-2.5 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-xl flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition transform active:scale-95 disabled:opacity-50"
-          >
-            <Send className="w-4 h-4 text-slate-950" />
-            <span>Publish</span>
-          </button>
+        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+          {can('pages.create') && (
+            <Link
+              to="/pages/new"
+              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Create New Page</span>
+            </Link>
+          )}
         </div>
       </div>
 

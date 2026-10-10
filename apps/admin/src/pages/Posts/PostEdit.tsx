@@ -168,7 +168,7 @@ export const PostEdit: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 pb-20 max-w-5xl mx-auto">
+    <div className="space-y-6 pb-20 w-full">
       {/* Top action bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div className="flex items-center space-x-3">

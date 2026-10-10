@@ -81,7 +81,7 @@ export const MediaLibrary: React.FC = () => {
   );
 
   return (
-    <div className="space-y-6 max-w-6xl mx-auto">
+    <div className="space-y-6 w-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Media Library</h1>
@@ -128,7 +128,7 @@ export const MediaLibrary: React.FC = () => {
           <p className="text-xs text-slate-500 mt-1">Upload JPG, PNG, WEBP, GIF, or SVG images to get started.</p>
         </div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 gap-4">
           {filtered.map((item) => (
             <div
               key={item.id}
