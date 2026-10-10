@@ -23,6 +23,10 @@ Thumbs.db
 # Temporary files
 *.tmp
 *.temp
+.active-ports.json
+storage/sessions/*.json
+!storage/sessions/.gitkeep
 
 # Vitest
 coverage
+

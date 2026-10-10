@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="<%= site.language || 'en' %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- metaTags %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;0,6..72,700;1,6..72,400;1,6..72,600&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+  <% if (site.favicon) { %>
+    <link rel="icon" href="<%= site.favicon %>">
+  <% } %>
+</head>
+<body class="theme-editorial">
+  <!-- Masthead Header -->
+  <header class="site-header">
+    <div class="container">
+      <div class="masthead-topbar">
+        <span><%= new Date().toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' }) %></span>
+        <span class="theme-badge">Design Theme: Editorial Minimal</span>
+        <span>Aero Static Edition</span>
+      </div>
+
+      <div class="masthead-main">
+        <a href="/" class="site-logo">
+          <% if (site.logo) { %>
+            <img src="<%= site.logo %>" alt="<%= site.siteName %>" class="logo-img" style="max-height: 52px; margin: 0 auto;">
+          <% } else { %>
+            <span class="logo-text"><%= site.siteName %></span>
+          <% } %>
+        </a>
+        <% if (site.tagline) { %>
+          <div class="masthead-tagline"><%= site.tagline %></div>
+        <% } %>
+      </div>
+    </div>
+
+    <!-- Centered Editorial Navigation -->
+    <div class="site-nav-bar">
+      <div class="container nav-container">
+        <nav class="site-nav">
+          <% if (menu && menu.items && menu.items.length > 0) { %>
+            <ul class="nav-list">
+              <% menu.items.forEach(function(item) { %>
+                <li class="nav-item">
+                  <a href="<%= item.url %>" target="<%= item.target || '_self' %>" class="nav-link">
+                    <%= item.label %>
+                  </a>
+                </li>
+              <% }); %>
+            </ul>
+          <% } else { %>
+            <ul class="nav-list">
+              <li class="nav-item"><a href="/" class="nav-link">Home</a></li>
+              <li class="nav-item"><a href="/about-us" class="nav-link">About</a></li>
+              <li class="nav-item"><a href="/blog" class="nav-link">Dispatches</a></li>
+              <li class="nav-item"><a href="/contact" class="nav-link">Contact</a></li>
+            </ul>
+          <% } %>
+        </nav>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="site-main">
+    <%- body %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div class="footer-col brand-col">
+          <h3 class="footer-brand"><%= site.siteName %></h3>
+          <p class="footer-tagline"><%= site.tagline || 'Published with Aero CMS Concept.' %></p>
+        </div>
+
+        <div class="footer-col">
+          <h4>Navigation</h4>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/about-us">About Us</a></li>
+            <li><a href="/blog">Dispatches</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-col">
+          <h4>Publication</h4>
+          <ul>
+            <li><a href="/sitemap.xml">Sitemap</a></li>
+            <li><a href="/robots.txt">Robots.txt</a></li>
+            <li><span class="theme-badge">Editorial Minimal</span></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p><%= site.footerText || `© ${new Date().getFullYear()} ${site.siteName}` %></p>
+        <p>Aero CMS &bull; Zero-Database Static Architecture</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

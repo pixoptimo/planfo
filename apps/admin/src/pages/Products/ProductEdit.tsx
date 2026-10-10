@@ -20,6 +20,7 @@ import { StructuredEditor } from '../../components/Editor/StructuredEditor.js';
 import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { StatusBadge } from '../../components/UI/StatusBadge.js';
+import { CategorySelector } from '../../components/Taxonomy/CategorySelector.js';
 import { useAuth } from '../../context/AuthContext.js';
 
 export const ProductEdit: React.FC = () => {
@@ -336,21 +337,12 @@ export const ProductEdit: React.FC = () => {
 
         {/* Sidebar Controls */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Category
-            </label>
-            <select
-              value={product.category || 'general'}
-              onChange={(e) => setProduct({ ...product, category: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
-            >
-              <option value="general">General</option>
-              {categories.map((c) => (
-                <option key={c.id} value={c.slug}>{c.name}</option>
-              ))}
-            </select>
-          </div>
+          <CategorySelector
+            value={product.category || 'general'}
+            onChange={(slug) => setProduct({ ...product, category: slug })}
+            type="product"
+            label="Product Category"
+          />
 
           <div className="pt-2">
             <label className="flex items-center space-x-2 text-xs font-semibold text-slate-300 cursor-pointer">

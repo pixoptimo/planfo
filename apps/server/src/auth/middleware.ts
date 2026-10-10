@@ -1,7 +1,7 @@
 import type { Request, Response, NextFunction } from 'express';
 import rateLimit from 'express-rate-limit';
 import { RolePermissions, type Permission, type User, type Session } from '@cms/schemas';
-import { getSessionFromRequest } from './session.js';
+import { getSessionFromRequest, SESSION_COOKIE_NAME } from './session.js';
 import { UserStore } from '../storage/userStore.js';
 import { config } from '../config/env.js';
 import { logger } from '@cms/utils';
@@ -18,9 +18,25 @@ declare global {
 
 export const apiRateLimiter = rateLimit({
   windowMs: config.RATE_LIMIT_WINDOW_MS,
-  max: config.RATE_LIMIT_MAX,
+  max: config.NODE_ENV === 'development' ? 10000 : config.RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    // 1. In development or test mode, never throttle
+    if (config.NODE_ENV === 'development' || config.NODE_ENV === 'test') {
+      return true;
+    }
+    // 2. Loopback/localhost requests (local admin)
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (ip === '127.0.0.1' || ip === '::1' || ip.includes('127.0.0.1') || ip === '::ffff:127.0.0.1') {
+      return true;
+    }
+    // 3. Authenticated sessions with active session cookie
+    if (req.cookies && req.cookies[SESSION_COOKIE_NAME]) {
+      return true;
+    }
+    return false;
+  },
   message: {
     success: false,
     error: {
@@ -32,9 +48,19 @@ export const apiRateLimiter = rateLimit({
 
 export const loginRateLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 mins
-  max: config.LOGIN_RATE_LIMIT_MAX,
+  max: config.NODE_ENV === 'development' ? 200 : config.LOGIN_RATE_LIMIT_MAX,
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req) => {
+    if (config.NODE_ENV === 'development' || config.NODE_ENV === 'test') {
+      return true;
+    }
+    const ip = req.ip || req.socket?.remoteAddress || '';
+    if (ip === '127.0.0.1' || ip === '::1' || ip.includes('127.0.0.1') || ip === '::ffff:127.0.0.1') {
+      return true;
+    }
+    return false;
+  },
   message: {
     success: false,
     error: {

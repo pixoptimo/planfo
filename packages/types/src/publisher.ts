@@ -1,4 +1,4 @@
-export type PublisherType = 'local' | 'server' | 'sftp' | 's3' | 'git';
+export type PublisherType = 'local' | 'server' | 'sftp' | 's3' | 'git' | 'github-pages';
 
 export interface PublisherConfig {
   type: PublisherType;

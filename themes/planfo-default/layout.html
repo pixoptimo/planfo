@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- metaTags %>
+  <% const assetPrefix = (typeof page !== 'undefined' && page && page.slug === 'home') ? '.' : '..'; %>
+  <link rel="stylesheet" href="<%= assetPrefix %>/assets/style.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="site-header">
+    <div class="container header-inner">
+      <a href="<%= assetPrefix %>/index.html" class="site-brand">
+        <span class="site-brand-logo"><%= site.siteName ? site.siteName.charAt(0) : 'P' %></span>
+        <span><%= site.siteName || 'Planfo Website' %></span>
+      </a>
+
+      <!-- Desktop Nav -->
+      <nav aria-label="Main Navigation">
+        <ul class="nav-links">
+          <li>
+            <a href="<%= assetPrefix %>/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'home') ? 'active' : '' %>">Home</a>
+          </li>
+          <li>
+            <a href="<%= assetPrefix %>/about/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'about') ? 'active' : '' %>">About</a>
+          </li>
+          <li>
+            <a href="<%= assetPrefix %>/contact/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'contact') ? 'active' : '' %>">Contact</a>
+          </li>
+          <% if (typeof pages !== 'undefined' && Array.isArray(pages)) { %>
+            <% pages.filter(p => p.slug !== 'home' && p.slug !== 'about' && p.slug !== 'contact' && p.status === 'published').forEach(p => { %>
+              <li>
+                <a href="<%= assetPrefix %>/<%= p.slug %>/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === p.slug) ? 'active' : '' %>">
+                  <%= p.title %>
+                </a>
+              </li>
+            <% }); %>
+          <% } %>
+        </ul>
+      </nav>
+
+      <!-- Mobile Menu Button -->
+      <button id="mobile-menu-toggle" class="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Mobile Nav Drawer -->
+  <nav id="mobile-nav-drawer" class="mobile-nav" aria-label="Mobile Navigation">
+    <ul class="mobile-nav-links">
+      <li>
+        <a href="<%= assetPrefix %>/index.html" class="mobile-nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'home') ? 'active' : '' %>">Home</a>
+      </li>
+      <li>
+        <a href="<%= assetPrefix %>/about/index.html" class="mobile-nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'about') ? 'active' : '' %>">About</a>
+      </li>
+      <li>
+        <a href="<%= assetPrefix %>/contact/index.html" class="mobile-nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'contact') ? 'active' : '' %>">Contact</a>
+      </li>
+      <% if (typeof pages !== 'undefined' && Array.isArray(pages)) { %>
+        <% pages.filter(p => p.slug !== 'home' && p.slug !== 'about' && p.slug !== 'contact' && p.status === 'published').forEach(p => { %>
+          <li>
+            <a href="<%= assetPrefix %>/<%= p.slug %>/index.html" class="mobile-nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === p.slug) ? 'active' : '' %>">
+              <%= p.title %>
+            </a>
+          </li>
+        <% }); %>
+      <% } %>
+    </ul>
+  </nav>
+
+  <!-- Main Body Content -->
+  <main class="site-main">
+    <%- body %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div>
+        <p class="footer-brand"><%= site.siteName || 'Planfo Website' %></p>
+        <p class="footer-tagline"><%= site.tagline || 'Published with Planfo CMS — Database-free static architecture' %></p>
+      </div>
+      <ul class="footer-links">
+        <li><a href="<%= assetPrefix %>/index.html" class="footer-link">Home</a></li>
+        <li><a href="<%= assetPrefix %>/about/index.html" class="footer-link">About</a></li>
+        <li><a href="<%= assetPrefix %>/contact/index.html" class="footer-link">Contact</a></li>
+      </ul>
+      <p class="footer-tagline">&copy; <%= currentYear %> <%= site.siteName %>. All rights reserved.</p>
+    </div>
+  </footer>
+
+  <script src="<%= assetPrefix %>/assets/script.js"></script>
+</body>
+</html>

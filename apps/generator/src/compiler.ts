@@ -31,6 +31,18 @@ export class TemplateCompiler {
     }
   }
 
+  async templateExists(templatePath: string): Promise<boolean> {
+    const fullPath = path.isAbsolute(templatePath)
+      ? templatePath
+      : path.join(this.templatesDir, templatePath);
+    try {
+      await fs.access(fullPath);
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   formatDate(dateStr: string): string {
     if (!dateStr) return '';
     try {
@@ -101,6 +113,7 @@ export class TemplateCompiler {
       site: context.site,
       menu: context.menu,
       page: context.page,
+      pages: (context as any).pages || [],
       post: context.post,
       product: context.product,
       posts: context.posts,
@@ -110,7 +123,7 @@ export class TemplateCompiler {
       tag: context.tag,
       activeSlug: context.activeSlug,
       currentYear: new Date().getFullYear(),
-      renderContent: (c: StructuredContent) => renderStructuredContent(c),
+      renderContent: (c: any) => renderStructuredContent(c),
       formatDate: (d: string) => this.formatDate(d),
       formatPrice: (amt: number, curr: string) => this.formatPrice(amt, curr),
       escapeHtml: (s: string) => escapeHtml(s),
@@ -141,6 +154,20 @@ export class TemplateCompiler {
       { views: [this.templatesDir] }
     );
 
-    return finalHtml;
+    // Self-healing URL normalizer:
+    // Ensures any internal links referencing products under /blog/ are automatically corrected to /products/
+    let sanitizedHtml = finalHtml;
+    if (Array.isArray(context.products) && context.products.length > 0) {
+      for (const prod of context.products) {
+        if (prod.slug) {
+          sanitizedHtml = sanitizedHtml.replaceAll(
+            `/blog/${prod.slug}`,
+            `/products/${prod.slug}`
+          );
+        }
+      }
+    }
+
+    return sanitizedHtml;
   }
 }

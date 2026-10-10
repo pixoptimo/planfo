@@ -18,10 +18,15 @@ import {
   AlertCircle,
   Loader2,
   ExternalLink,
-  Sparkles
+  Sparkles,
+  Palette,
+  Boxes,
+  Package,
+  Eye
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
 import { api } from '../../api/client.js';
+import { getBlueprintIcon } from '../../utils/blueprintIcons.js';
 import type { PublishResult } from '@cms/types';
 
 export const AdminLayout: React.FC = () => {
@@ -32,6 +37,50 @@ export const AdminLayout: React.FC = () => {
   const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
   const [publishError, setPublishError] = useState<string | null>(null);
   const [showPublishModal, setShowPublishModal] = useState(false);
+  const [liveSiteUrl, setLiveSiteUrl] = useState('http://localhost:3000');
+  const [sitePort, setSitePort] = useState<number | null>(null);
+  const [isCatalogEnabled, setIsCatalogEnabled] = useState(false);
+  const [customBlueprints, setCustomBlueprints] = useState<
+    Array<{ id: string; name: string; slug: string; icon: string; entryCount?: number }>
+  >([]);
+
+  const loadCustomBlueprints = () => {
+    api.get<Array<{ id: string; name: string; slug: string; icon: string; isBuiltIn?: boolean; entryCount?: number }>>('/api/blueprints')
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setCustomBlueprints(data.filter((b) => !b.isBuiltIn));
+        }
+      })
+      .catch(() => {});
+  };
+
+  React.useEffect(() => {
+    api.get<{ siteUrl: string; sitePort: number }>('/api/system/info')
+      .then((data) => {
+        if (data?.siteUrl) {
+          setLiveSiteUrl(data.siteUrl);
+        }
+        if (data?.sitePort) {
+          setSitePort(data.sitePort);
+        }
+      })
+      .catch(() => {});
+
+    api.get<{ featurePacks?: { catalog?: boolean } }>('/api/settings')
+      .then((data) => {
+        if (data?.featurePacks?.catalog) {
+          setIsCatalogEnabled(true);
+        }
+      })
+      .catch(() => {});
+
+    loadCustomBlueprints();
+
+    window.addEventListener('blueprints-updated', loadCustomBlueprints);
+    return () => {
+      window.removeEventListener('blueprints-updated', loadCustomBlueprints);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await logout();
@@ -54,22 +103,22 @@ export const AdminLayout: React.FC = () => {
     }
   };
 
-  const navItems = [
+interface NavItem {
+  section?: string;
+  to?: string;
+  label?: string;
+  icon?: React.ComponentType<{ className?: string }>;
+  exact?: boolean;
+  show?: boolean;
+  badge?: string;
+}
+
+  const navItems: NavItem[] = [
     { to: '/', label: 'Dashboard', icon: LayoutDashboard, exact: true },
-    { section: 'Content' },
     { to: '/pages', label: 'Pages', icon: FileText, show: can('pages.read') },
-    { to: '/posts', label: 'Posts', icon: BookOpen, show: can('posts.read') },
-    { to: '/products', label: 'Products', icon: ShoppingBag, show: can('products.read') },
-    { to: '/categories', label: 'Categories & Tags', icon: FolderTree, show: can('categories.read') },
-    { section: 'Assets & Nav' },
-    { to: '/media', label: 'Media Library', icon: ImageIcon, show: can('media.read') },
-    { to: '/navigation', label: 'Navigation', icon: MenuIcon, show: can('menus.read') },
-    { section: 'Configuration' },
-    { to: '/settings', label: 'Site Settings & SEO', icon: SettingsIcon, show: can('settings.read') },
-    { to: '/users', label: 'Users & Roles', icon: Users, show: can('users.read') },
-    { section: 'Maintenance' },
-    { to: '/revisions', label: 'Revisions', icon: History, show: can('revisions.read') },
-    { to: '/backups', label: 'Backups', icon: Archive, show: can('backups.read') }
+    { to: '/media', label: 'Media', icon: ImageIcon, show: can('media.read') },
+    { to: '/themes', label: 'Theme', icon: Palette, show: can('settings.read') },
+    { to: '/settings', label: 'Settings', icon: SettingsIcon, show: can('settings.read') }
   ];
 
   return (
@@ -80,27 +129,18 @@ export const AdminLayout: React.FC = () => {
           {/* Brand header */}
           <div className="h-16 px-6 border-b border-slate-800 flex items-center space-x-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-lg shadow-md">
-              A
+              P
             </div>
             <div>
-              <span className="font-bold text-white text-base tracking-tight block leading-tight">Aero CMS</span>
-              <span className="text-[10px] text-emerald-400 font-mono tracking-wide uppercase font-semibold">File-Based Static</span>
+              <span className="font-bold text-white text-base tracking-tight block leading-tight">Planfo CMS</span>
+              <span className="text-[10px] text-emerald-400 font-mono tracking-wide uppercase font-semibold">Beta v0.1 &bull; Static</span>
             </div>
           </div>
 
           {/* Navigation Links */}
-          <nav className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-140px)]">
-            {navItems.map((item, idx) => {
-              if (item.section) {
-                return (
-                  <div key={idx} className="px-3 pt-4 pb-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
-                    {item.section}
-                  </div>
-                );
-              }
-
+          <nav className="p-3 space-y-1">
+            {navItems.map((item) => {
               if (item.show === false) return null;
-
               const Icon = item.icon!;
               return (
                 <NavLink
@@ -108,18 +148,57 @@ export const AdminLayout: React.FC = () => {
                   to={item.to!}
                   end={item.exact}
                   className={({ isActive }) =>
-                    `flex items-center space-x-3 px-3 py-2 rounded-lg text-sm font-medium transition ${
+                    `flex items-center justify-between px-3 py-2.5 rounded-lg text-sm font-medium transition ${
                       isActive
                         ? 'bg-brand-500/10 text-brand-400 border border-brand-500/20 shadow-sm'
                         : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
                     }`
                   }
                 >
-                  <Icon className="w-4 h-4" />
-                  <span>{item.label}</span>
+                  <div className="flex items-center space-x-3 truncate">
+                    <Icon className="w-4 h-4 flex-shrink-0" />
+                    <span className="truncate">{item.label}</span>
+                  </div>
                 </NavLink>
               );
             })}
+
+            {/* Planfo Beta Divider & Quick Actions */}
+            <div className="pt-4 pb-2">
+              <div className="border-t border-slate-800/80 my-2"></div>
+              <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-500 font-mono">
+                Actions
+              </div>
+              <div className="space-y-1.5 mt-2">
+                <a
+                  href="/api/preview"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-800 border border-slate-800 transition"
+                >
+                  <Eye className="w-3.5 h-3.5 text-brand-400" />
+                  <span>Preview</span>
+                </a>
+                <button
+                  type="button"
+                  onClick={handlePublish}
+                  disabled={isPublishing}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-semibold text-slate-300 hover:text-white bg-slate-800/50 hover:bg-slate-800 border border-slate-800 transition disabled:opacity-50"
+                >
+                  {isPublishing ? <Loader2 className="w-3.5 h-3.5 animate-spin text-emerald-400" /> : <Sparkles className="w-3.5 h-3.5 text-emerald-400" />}
+                  <span>Build</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handlePublish}
+                  disabled={isPublishing}
+                  className="w-full flex items-center space-x-2.5 px-3 py-2 rounded-lg text-xs font-bold text-slate-950 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 shadow-md transition disabled:opacity-50"
+                >
+                  <Send className="w-3.5 h-3.5" />
+                  <span>Publish</span>
+                </button>
+              </div>
+            </div>
           </nav>
         </div>
 
@@ -154,15 +233,18 @@ export const AdminLayout: React.FC = () => {
         <header className="h-16 px-8 bg-slate-900/60 border-b border-slate-800 flex items-center justify-between backdrop-blur-sm">
           <div className="flex items-center space-x-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span className="text-xs text-slate-400 font-mono">Static Generator: Ready</span>
+            <span className="text-xs text-slate-400 font-mono">
+              Static Generator: Ready {sitePort ? `(:${sitePort})` : ''}
+            </span>
           </div>
 
           <div className="flex items-center space-x-4">
             <a
-              href="http://localhost:3000"
+              href={liveSiteUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition"
+              title={`Visit Live Website (${liveSiteUrl})`}
             >
               <span>Visit Live Website</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -238,6 +320,20 @@ export const AdminLayout: React.FC = () => {
                   <span>Sitemap & Robots:</span>
                   <span className="font-mono text-emerald-400">Generated (XML & TXT)</span>
                 </div>
+                {publishResult.deployment && (
+                  <div className="flex justify-between text-slate-400 border-t border-slate-800 pt-2">
+                    <span>Target Deployment:</span>
+                    <span className="font-mono text-brand-400 font-semibold uppercase">
+                      {publishResult.deployment.target === 'github-pages' ? 'GitHub Pages' : publishResult.deployment.target}
+                    </span>
+                  </div>
+                )}
+                {publishResult.deployment?.branch && (
+                  <div className="flex justify-between text-slate-400">
+                    <span>Release Branch:</span>
+                    <span className="font-mono text-slate-200">{publishResult.deployment.branch}</span>
+                  </div>
+                )}
               </div>
             )}
 
@@ -249,13 +345,26 @@ export const AdminLayout: React.FC = () => {
 
             <div className="flex justify-end space-x-3 mt-6">
               {!isPublishing && (
-                <button
-                  type="button"
-                  onClick={() => setShowPublishModal(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold"
-                >
-                  Close
-                </button>
+                <>
+                  <button
+                    type="button"
+                    onClick={() => setShowPublishModal(false)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold"
+                  >
+                    Close
+                  </button>
+                  {publishResult?.success && (
+                    <a
+                      href={liveSiteUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 transition"
+                    >
+                      <span>Visit Live Site</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
+                  )}
+                </>
               )}
             </div>
           </div>

@@ -185,7 +185,29 @@ export async function atomicDirectorySwap(
       await fs.rename(liveTargetDir, backupDir);
     }
 
-    await fs.rename(stagingDir, liveTargetDir);
+    let renamed = false;
+    for (let attempt = 0; attempt < 5; attempt++) {
+      try {
+        if (await pathExists(liveTargetDir)) {
+          await fs.rm(liveTargetDir, { recursive: true, force: true });
+        }
+        await fs.rename(stagingDir, liveTargetDir);
+        renamed = true;
+        break;
+      } catch (err: unknown) {
+        const error = err as NodeJS.ErrnoException;
+        if (error.code === 'ENOTEMPTY' || error.code === 'EEXIST') {
+          await new Promise((r) => setTimeout(r, 60 * (attempt + 1)));
+          continue;
+        }
+        throw err;
+      }
+    }
+
+    if (!renamed) {
+      await fs.cp(stagingDir, liveTargetDir, { recursive: true });
+      await fs.rm(stagingDir, { recursive: true, force: true });
+    }
 
     if (liveExists && (await pathExists(backupDir))) {
       await fs.rm(backupDir, { recursive: true, force: true });

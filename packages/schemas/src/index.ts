@@ -10,3 +10,6 @@ export * from './media.js';
 export * from './settings.js';
 export * from './revision.js';
 export * from './backup.js';
+export * from './theme.js';
+export * from './blueprint.js';
+

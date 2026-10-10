@@ -9,8 +9,8 @@ const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   CMS_HOST: z.string().default('localhost'),
   CMS_PORT: z.coerce.number().default(4000),
-  SITE_URL: z.string().url().default('http://localhost:3000'),
-  ADMIN_URL: z.string().url().default('http://localhost:5173'),
+  SITE_URL: z.string().url().default('http://localhost:4000'),
+  ADMIN_URL: z.string().url().default('http://localhost:4000'),
   
   // Storage & paths
   STORAGE_PATH: z.string().default('./storage'),
@@ -23,6 +23,7 @@ const EnvSchema = z.object({
 
   OUTPUT_PATH: z.string().default('./generated/website'),
   TEMPLATES_PATH: z.string().default('./templates'),
+  THEMES_PATH: z.string().default('./themes'),
 
   // Security
   COOKIE_SECURE: z.preprocess((val) => val === 'true' || val === true, z.boolean()).default(false),
@@ -30,8 +31,8 @@ const EnvSchema = z.object({
   
   // Rate limiting
   RATE_LIMIT_WINDOW_MS: z.coerce.number().default(15 * 60 * 1000),
-  RATE_LIMIT_MAX: z.coerce.number().default(100),
-  LOGIN_RATE_LIMIT_MAX: z.coerce.number().default(10)
+  RATE_LIMIT_MAX: z.coerce.number().default(5000),
+  LOGIN_RATE_LIMIT_MAX: z.coerce.number().default(100)
 });
 
 const parsed = EnvSchema.safeParse(process.env);
@@ -66,11 +67,13 @@ function findWorkspaceRoot(startDir: string): string {
   return startDir;
 }
 
-const workspaceRoot = findWorkspaceRoot(process.cwd());
+export const workspaceRoot = findWorkspaceRoot(process.cwd());
 
 // Resolve all relative paths against workspaceRoot
 export const config = {
   ...rawConfig,
+  WORKSPACE_ROOT: workspaceRoot,
+  ADMIN_DIST_PATH: path.resolve(workspaceRoot, 'apps/admin/dist'),
   STORAGE_PATH: path.resolve(workspaceRoot, rawConfig.STORAGE_PATH),
   MEDIA_PATH: path.resolve(workspaceRoot, rawConfig.MEDIA_PATH),
   CONTENT_PATH: path.resolve(workspaceRoot, rawConfig.CONTENT_PATH),
@@ -79,7 +82,8 @@ export const config = {
   SETTINGS_PATH: path.resolve(workspaceRoot, rawConfig.SETTINGS_PATH),
   BACKUP_PATH: path.resolve(workspaceRoot, rawConfig.BACKUP_PATH),
   OUTPUT_PATH: path.resolve(workspaceRoot, rawConfig.OUTPUT_PATH),
-  TEMPLATES_PATH: path.resolve(workspaceRoot, rawConfig.TEMPLATES_PATH)
+  TEMPLATES_PATH: path.resolve(workspaceRoot, rawConfig.TEMPLATES_PATH),
+  THEMES_PATH: path.resolve(workspaceRoot, rawConfig.THEMES_PATH)
 };
 
 export type AppConfig = typeof config;

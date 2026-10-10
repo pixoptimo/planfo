@@ -1,0 +1,56 @@
+{
+  "id": "bp_1790342154196_wh2rr",
+  "name": "Testimonials",
+  "singularName": "Testimonial",
+  "slug": "testimonials",
+  "icon": "MessageSquare",
+  "description": "Client reviews, testimonials, and star ratings",
+  "hasCategories": true,
+  "hasTags": true,
+  "hasContentEditor": true,
+  "isBuiltIn": false,
+  "fields": [
+    {
+      "id": "fld_author_role",
+      "name": "author_role",
+      "label": "Author Title / Position",
+      "type": "text",
+      "required": true,
+      "options": [],
+      "placeholder": "e.g. Founder & CEO",
+      "description": ""
+    },
+    {
+      "id": "fld_company",
+      "name": "company",
+      "label": "Company / Organization",
+      "type": "text",
+      "required": false,
+      "options": [],
+      "placeholder": "e.g. Stripe",
+      "description": ""
+    },
+    {
+      "id": "fld_rating",
+      "name": "rating",
+      "label": "Star Rating (1-5)",
+      "type": "number",
+      "required": false,
+      "options": [],
+      "placeholder": "5",
+      "description": ""
+    },
+    {
+      "id": "fld_avatar",
+      "name": "author_avatar",
+      "label": "Author Photo",
+      "type": "image",
+      "required": false,
+      "options": [],
+      "placeholder": "",
+      "description": ""
+    }
+  ],
+  "createdAt": "2026-09-25T13:15:54.196Z",
+  "updatedAt": "2026-09-25T13:15:54.196Z"
+}

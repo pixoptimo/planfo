@@ -1,0 +1,9 @@
+{
+  "id": "aero-modern",
+  "name": "Aero Modern Editorial",
+  "version": "1.0.0",
+  "author": "Aero CMS Team",
+  "description": "High-contrast, sleek modern static design theme with dark-accented typography and fluid layouts.",
+  "thumbnail": "assets/thumbnail.svg",
+  "supportedPacks": ["pages", "articles", "catalog"]
+}

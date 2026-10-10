@@ -143,6 +143,9 @@ export const MediaLibrary: React.FC = () => {
                   alt={item.alt || item.originalName}
                   className="w-full h-full object-cover group-hover:scale-105 transition duration-200"
                 />
+                <span className="absolute top-1.5 right-1.5 px-1.5 py-0.5 rounded text-[9px] font-mono font-bold bg-slate-900/90 backdrop-blur border border-slate-700 text-brand-400 uppercase shadow-sm">
+                  {item.filename.endsWith('.webp') ? 'WEBP' : item.filename.endsWith('.svg') ? 'SVG' : 'IMG'}
+                </span>
               </div>
 
               <div className="p-2.5 flex-1 flex flex-col justify-between">
@@ -150,9 +153,16 @@ export const MediaLibrary: React.FC = () => {
                   <p className="text-xs font-medium text-white truncate" title={item.originalName}>
                     {item.originalName}
                   </p>
-                  <span className="text-[10px] text-slate-400 font-mono block mt-0.5">
-                    {formatFileSize(item.size)}
-                  </span>
+                  <div className="flex items-center space-x-1.5 mt-0.5">
+                    <span className="text-[10px] text-slate-400 font-mono">
+                      {formatFileSize(item.size)}
+                    </span>
+                    {item.compressionRatio !== undefined && item.compressionRatio > 0 && (
+                      <span className="text-[9px] font-bold text-emerald-400 font-mono bg-emerald-500/10 px-1 py-0.2 rounded border border-emerald-500/20">
+                        -{item.compressionRatio}%
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-800">
@@ -197,10 +207,21 @@ export const MediaLibrary: React.FC = () => {
               <img src={previewItem.url} alt="" className="max-h-full max-w-full object-contain rounded-lg shadow" />
             </div>
 
-            <div className="p-4 bg-slate-900 border-t border-slate-800 flex items-center justify-between text-xs">
-              <div className="space-y-0.5">
+            <div className="p-4 bg-slate-900 border-t border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+              <div className="space-y-1">
                 <p className="text-slate-400">File: <span className="font-mono text-slate-200">{previewItem.filename}</span></p>
-                <p className="text-slate-400">Size: <span className="font-mono text-slate-200">{formatFileSize(previewItem.size)}</span></p>
+                <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-slate-400">
+                  <p>Format: <span className="font-mono text-brand-400 uppercase font-semibold">{previewItem.format || (previewItem.filename.endsWith('.webp') ? 'webp' : 'svg')}</span></p>
+                  {previewItem.width && previewItem.height && (
+                    <p>Dimensions: <span className="font-mono text-slate-200">{previewItem.width} × {previewItem.height} px</span></p>
+                  )}
+                  <p>Size: <span className="font-mono text-emerald-400 font-semibold">{formatFileSize(previewItem.size)}</span></p>
+                </div>
+                {previewItem.originalSize !== undefined && previewItem.originalSize > previewItem.size && (
+                  <p className="text-slate-400">
+                    Optimization: <span className="font-mono text-slate-400 line-through">{formatFileSize(previewItem.originalSize)}</span> → <span className="font-mono text-emerald-400 font-bold">{formatFileSize(previewItem.size)}</span> <span className="text-emerald-400">({previewItem.compressionRatio}% size reduction)</span>
+                  </p>
+                )}
                 <p className="text-slate-400">URL: <span className="font-mono text-emerald-400">{previewItem.url}</span></p>
               </div>
 

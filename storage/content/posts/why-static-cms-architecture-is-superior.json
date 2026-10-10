@@ -49,7 +49,7 @@
   "seo": {
     "title": "Why Static CMS Architecture is Superior for 2026",
     "description": "Explore why file-based static publishing outperforms traditional monolithic CMS platforms.",
-    "canonical": "http://localhost:3000/blog/why-static-cms-architecture-is-superior",
+    "canonical": "http://localhost:4000/blog/why-static-cms-architecture-is-superior",
     "ogTitle": "Why Static CMS Architecture is Superior for 2026",
     "ogDescription": "Explore why file-based static publishing outperforms traditional CMS.",
     "ogImage": "",

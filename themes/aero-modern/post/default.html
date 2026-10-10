@@ -1,0 +1,60 @@
+<article class="post-detail">
+  <header class="post-header">
+    <div class="container">
+      <div class="post-header-meta">
+        <span class="badge badge-accent"><%= post.category %></span>
+        <time><%= formatDate(post.createdAt) %></time>
+        <span>By <%= post.author %></span>
+      </div>
+      <h1 class="post-title"><%= post.title %></h1>
+      <% if (post.excerpt) { %>
+        <p class="post-lead"><%= post.excerpt %></p>
+      <% } %>
+    </div>
+  </header>
+
+  <div class="container post-container">
+    <% if (post.featuredImage) { %>
+      <div class="post-hero-image">
+        <img src="<%= post.featuredImage %>" alt="<%= post.title %>">
+      </div>
+    <% } %>
+
+    <div class="cms-rendered-content">
+      <%- renderContent(post.content) %>
+    </div>
+
+    <% if (post.tags && post.tags.length > 0) { %>
+      <div class="post-tags-wrap">
+        <span class="tags-label">Tags:</span>
+        <div class="tags-list">
+          <% post.tags.forEach(function(t) { %>
+            <a href="/blog/tag/<%= t %>" class="tag-pill">#<%= t %></a>
+          <% }); %>
+        </div>
+      </div>
+    <% } %>
+  </div>
+
+  <% if (posts && posts.length > 0) { %>
+    <section class="related-posts bg-alt">
+      <div class="container">
+        <h3 class="section-title">Related Articles</h3>
+        <div class="grid grid-posts">
+          <% posts.forEach(function(p) { %>
+            <article class="card post-card">
+              <div class="card-body">
+                <div class="post-meta">
+                  <span class="badge"><%= p.category %></span>
+                  <time><%= formatDate(p.createdAt) %></time>
+                </div>
+                <h4 class="card-title"><a href="<%= p.url || ('/blog/' + p.slug) %>"><%= p.title %></a></h4>
+                <p class="card-desc"><%= p.excerpt %></p>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      </div>
+    </section>
+  <% } %>
+</article>

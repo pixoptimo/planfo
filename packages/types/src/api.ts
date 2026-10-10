@@ -49,5 +49,11 @@ export interface PublishResult {
     robotsGenerated: boolean;
   };
   outputPath: string;
+  deployment?: {
+    target: string;
+    branch?: string;
+    commitSha?: string;
+    cname?: string;
+  };
   errors?: string[];
 }

@@ -1,0 +1,49 @@
+{
+  "id": "page_1789826651114_2lmy9",
+  "title": "farm",
+  "slug": "farm",
+  "status": "published",
+  "template": "landing",
+  "content": {
+    "blocks": [
+      {
+        "id": "block_1789826547493_nj1j",
+        "type": "heading",
+        "level": 2,
+        "text": "farm land"
+      },
+      {
+        "id": "block_1789826555019_md2p",
+        "type": "paragraph",
+        "text": "hcfjgkhjbl jhghgohn; hgigk"
+      },
+      {
+        "id": "block_1789826560916_gptz",
+        "type": "image",
+        "url": "/media/3D_Button_-_Cover-1789560634314.png",
+        "alt": "3D Button - Cover",
+        "caption": ""
+      },
+      {
+        "id": "block_1791408165713_hkwa",
+        "type": "image",
+        "url": "/media/Screenshot_2026-10-06_at_7.33.55___PM__2_-1791408184741.webp",
+        "alt": "Screenshot 2026-10-06 at 7.33.55 PM (2)",
+        "caption": ""
+      }
+    ]
+  },
+  "featuredImage": "/media/3D_Button_-_Cover-1789560634314.png",
+  "seo": {
+    "title": "",
+    "description": "",
+    "canonical": "",
+    "ogTitle": "",
+    "ogDescription": "",
+    "ogImage": "/media/3D_Button_-_Cover-1789560634314.png",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-09-19T14:04:11.114Z",
+  "updatedAt": "2026-10-07T21:23:17.917Z",
+  "publishedAt": "2026-09-19T14:04:11.114Z"
+}

@@ -3,7 +3,7 @@
   "title": "Contact",
   "slug": "contact",
   "status": "published",
-  "template": "default",
+  "template": "contact",
   "content": {
     "blocks": [
       {
@@ -31,7 +31,7 @@
   "seo": {
     "title": "Contact - Aero Static CMS",
     "description": "Get in touch with our team.",
-    "canonical": "http://localhost:3000/contact",
+    "canonical": "http://localhost:4000/contact",
     "ogTitle": "Contact",
     "ogDescription": "Get in touch with our team.",
     "ogImage": "",

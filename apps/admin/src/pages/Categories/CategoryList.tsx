@@ -8,6 +8,7 @@ export const CategoryList: React.FC = () => {
   const { can } = useAuth();
   const [categories, setCategories] = useState<Category[]>([]);
   const [tags, setTags] = useState<string[]>([]);
+  const [isCatalogEnabled, setIsCatalogEnabled] = useState(false);
   const [loading, setLoading] = useState(true);
 
   // Modal / Form state
@@ -24,12 +25,16 @@ export const CategoryList: React.FC = () => {
 
   const loadData = async () => {
     try {
-      const [catsData, tagsData] = await Promise.all([
+      const [catsData, tagsData, settingsData] = await Promise.all([
         api.get<Category[]>('/api/categories'),
-        api.get<string[]>('/api/categories/tags/all')
+        api.get<string[]>('/api/categories/tags/all'),
+        api.get<{ featurePacks?: { catalog?: boolean } }>('/api/settings').catch(() => null)
       ]);
       setCategories(catsData);
       setTags(tagsData);
+      if (settingsData?.featurePacks?.catalog) {
+        setIsCatalogEnabled(true);
+      }
     } catch {
       //
     } finally {
@@ -97,7 +102,11 @@ export const CategoryList: React.FC = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Categories & Tags</h1>
-          <p className="text-xs text-slate-400 mt-1">Organize posts and products into structured taxonomy archives</p>
+          <p className="text-xs text-slate-400 mt-1">
+            {isCatalogEnabled
+              ? 'Organize articles and products into structured category archives'
+              : 'Organize articles and content into structured category archives'}
+          </p>
         </div>
 
         {can('categories.create') && (
@@ -114,12 +123,12 @@ export const CategoryList: React.FC = () => {
 
       {/* Categories Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Post Categories */}
+        {/* Article Categories */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
           <div className="p-4 border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center space-x-2">
               <FolderTree className="w-4 h-4 text-emerald-400" />
-              <h2 className="text-sm font-bold text-white">Post Categories</h2>
+              <h2 className="text-sm font-bold text-white">Article Categories</h2>
             </div>
             <span className="text-xs text-slate-500 font-mono">
               {categories.filter((c) => c.type === 'post').length} Total
@@ -128,7 +137,7 @@ export const CategoryList: React.FC = () => {
 
           <div className="divide-y divide-slate-800">
             {categories.filter((c) => c.type === 'post').length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-500">No post categories yet.</div>
+              <div className="p-6 text-center text-xs text-slate-500">No article categories yet.</div>
             ) : (
               categories.filter((c) => c.type === 'post').map((cat) => (
                 <div key={cat.id} className="p-4 flex items-center justify-between hover:bg-slate-800/40 transition">
@@ -139,12 +148,12 @@ export const CategoryList: React.FC = () => {
                   </div>
                   <div className="flex items-center space-x-1">
                     {can('categories.update') && (
-                      <button onClick={() => openModal(cat)} className="p-1 text-slate-400 hover:text-white">
+                      <button onClick={() => openModal(cat)} className="p-1 text-slate-400 hover:text-white" title="Edit">
                         <Edit className="w-3.5 h-3.5" />
                       </button>
                     )}
                     {can('categories.delete') && (
-                      <button onClick={() => handleDelete(cat.id, cat.name)} className="p-1 text-slate-400 hover:text-red-400">
+                      <button onClick={() => handleDelete(cat.id, cat.name)} className="p-1 text-slate-400 hover:text-red-400" title="Delete">
                         <Trash2 className="w-3.5 h-3.5" />
                       </button>
                     )}
@@ -155,66 +164,96 @@ export const CategoryList: React.FC = () => {
           </div>
         </div>
 
-        {/* Product Categories */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
-          <div className="p-4 border-b border-slate-800 flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <FolderTree className="w-4 h-4 text-purple-400" />
-              <h2 className="text-sm font-bold text-white">Product Categories</h2>
-            </div>
-            <span className="text-xs text-slate-500 font-mono">
-              {categories.filter((c) => c.type === 'product').length} Total
-            </span>
-          </div>
-
-          <div className="divide-y divide-slate-800">
-            {categories.filter((c) => c.type === 'product').length === 0 ? (
-              <div className="p-6 text-center text-xs text-slate-500">No product categories yet.</div>
-            ) : (
-              categories.filter((c) => c.type === 'product').map((cat) => (
-                <div key={cat.id} className="p-4 flex items-center justify-between hover:bg-slate-800/40 transition">
-                  <div>
-                    <h3 className="text-sm font-semibold text-white">{cat.name}</h3>
-                    <p className="text-xs text-slate-400 font-mono mt-0.5">/products/category/{cat.slug}</p>
-                    {cat.description && <p className="text-xs text-slate-400 mt-1">{cat.description}</p>}
-                  </div>
-                  <div className="flex items-center space-x-1">
-                    {can('categories.update') && (
-                      <button onClick={() => openModal(cat)} className="p-1 text-slate-400 hover:text-white">
-                        <Edit className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                    {can('categories.delete') && (
-                      <button onClick={() => handleDelete(cat.id, cat.name)} className="p-1 text-slate-400 hover:text-red-400">
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Aggregated Tags Section */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
-        <div className="flex items-center space-x-2 mb-4">
-          <TagIcon className="w-4 h-4 text-cyan-400" />
-          <h2 className="text-sm font-bold text-white">Active Content Tags</h2>
-        </div>
-        {tags.length === 0 ? (
-          <p className="text-xs text-slate-500">No tags used yet. Add tags when editing posts or products.</p>
-        ) : (
-          <div className="flex flex-wrap gap-2">
-            {tags.map((tag) => (
-              <span key={tag} className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-cyan-400">
-                #{tag}
+        {/* Product Categories (Only shown when catalog feature pack is enabled) */}
+        {isCatalogEnabled ? (
+          <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+            <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+              <div className="flex items-center space-x-2">
+                <FolderTree className="w-4 h-4 text-purple-400" />
+                <h2 className="text-sm font-bold text-white">Product Categories</h2>
+              </div>
+              <span className="text-xs text-slate-500 font-mono">
+                {categories.filter((c) => c.type === 'product').length} Total
               </span>
-            ))}
+            </div>
+
+            <div className="divide-y divide-slate-800">
+              {categories.filter((c) => c.type === 'product').length === 0 ? (
+                <div className="p-6 text-center text-xs text-slate-500">No product categories yet.</div>
+              ) : (
+                categories.filter((c) => c.type === 'product').map((cat) => (
+                  <div key={cat.id} className="p-4 flex items-center justify-between hover:bg-slate-800/40 transition">
+                    <div>
+                      <h3 className="text-sm font-semibold text-white">{cat.name}</h3>
+                      <p className="text-xs text-slate-400 font-mono mt-0.5">/products/category/{cat.slug}</p>
+                      {cat.description && <p className="text-xs text-slate-400 mt-1">{cat.description}</p>}
+                    </div>
+                    <div className="flex items-center space-x-1">
+                      {can('categories.update') && (
+                        <button onClick={() => openModal(cat)} className="p-1 text-slate-400 hover:text-white" title="Edit">
+                          <Edit className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                      {can('categories.delete') && (
+                        <button onClick={() => handleDelete(cat.id, cat.name)} className="p-1 text-slate-400 hover:text-red-400" title="Delete">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+            </div>
+          </div>
+        ) : (
+          /* Active Content Tags placed in 2nd column when Catalog is disabled */
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 flex flex-col justify-between">
+            <div>
+              <div className="flex items-center space-x-2 mb-4">
+                <TagIcon className="w-4 h-4 text-cyan-400" />
+                <h2 className="text-sm font-bold text-white">Active Content Tags</h2>
+              </div>
+              {tags.length === 0 ? (
+                <p className="text-xs text-slate-500">No tags used yet. Add tags when editing articles.</p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag) => (
+                    <span key={tag} className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-cyan-400">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+            <div className="pt-6 border-t border-slate-800/60 mt-6">
+              <span className="text-[11px] text-slate-500">
+                Tip: Storefront Product categories can be enabled in Site Settings &rarr; Feature Packs.
+              </span>
+            </div>
           </div>
         )}
       </div>
+
+      {/* Aggregated Tags Section (Only shown below when catalog is enabled) */}
+      {isCatalogEnabled && (
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+          <div className="flex items-center space-x-2 mb-4">
+            <TagIcon className="w-4 h-4 text-cyan-400" />
+            <h2 className="text-sm font-bold text-white">Active Content Tags</h2>
+          </div>
+          {tags.length === 0 ? (
+            <p className="text-xs text-slate-500">No tags used yet. Add tags when editing articles or products.</p>
+          ) : (
+            <div className="flex flex-wrap gap-2">
+              {tags.map((tag) => (
+                <span key={tag} className="px-3 py-1 bg-slate-950 border border-slate-800 rounded-lg text-xs font-mono text-cyan-400">
+                  #{tag}
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Add / Edit Category Modal */}
       {showModal && (
@@ -257,19 +296,21 @@ export const CategoryList: React.FC = () => {
                 />
               </div>
 
-              <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Applies To
-                </label>
-                <select
-                  value={type}
-                  onChange={(e) => setType(e.target.value as any)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
-                >
-                  <option value="post">Blog Posts</option>
-                  <option value="product">Products</option>
-                </select>
-              </div>
+              {isCatalogEnabled && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Applies To
+                  </label>
+                  <select
+                    value={type}
+                    onChange={(e) => setType(e.target.value as any)}
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                  >
+                    <option value="post">Articles (Posts)</option>
+                    <option value="product">Storefront Catalog (Products)</option>
+                  </select>
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">

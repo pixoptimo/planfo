@@ -1,0 +1,35 @@
+{
+  "name": "create-planfo",
+  "version": "0.1.0",
+  "description": "Scaffold a new Planfo CMS project — Database-free static website builder",
+  "type": "module",
+  "bin": {
+    "create-planfo": "./bin/create-planfo.js",
+    "planfo": "./bin/planfo.js"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "cms",
+    "planfo",
+    "static-site-generator",
+    "static-cms",
+    "database-free"
+  ],
+  "author": "Planfo Team",
+  "license": "MIT",
+  "dependencies": {
+    "commander": "^12.1.0",
+    "picocolors": "^1.1.1",
+    "prompts": "^2.4.2"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "@types/prompts": "^2.4.9",
+    "typescript": "^5.7.2"
+  }
+}

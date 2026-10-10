@@ -3,6 +3,7 @@ import fs from 'node:fs/promises';
 import { readJson, writeJsonAtomic, deleteFileSafe, safeResolvePath, sanitizeFilename } from '@cms/utils';
 import { MediaManifestSchema, MediaItemSchema, type MediaItem, type MediaManifest } from '@cms/schemas';
 import { config } from '../config/env.js';
+import { optimizeImage } from './imageOptimizer.js';
 
 export class MediaStore {
   private static getManifestPath(): string {
@@ -62,21 +63,24 @@ export class MediaStore {
   }
 
   static async saveUpload(file: Express.Multer.File, alt = ''): Promise<MediaItem> {
-    const ext = path.extname(file.originalname).toLowerCase();
-    const cleanBaseName = sanitizeFilename(path.basename(file.originalname, ext));
-    const uniqueFilename = `${cleanBaseName}-${Date.now()}${ext}`;
-    const destinationPath = safeResolvePath(config.MEDIA_PATH, uniqueFilename);
+    const optimized = await optimizeImage(file.buffer, file.originalname, file.mimetype);
+    const destinationPath = safeResolvePath(config.MEDIA_PATH, optimized.filename);
 
-    await fs.writeFile(destinationPath, file.buffer);
+    await fs.writeFile(destinationPath, optimized.buffer);
 
     const mediaItem: MediaItem = {
       id: `media_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
-      filename: uniqueFilename,
-      originalName: file.originalname,
-      mimeType: file.mimetype,
-      size: file.size,
+      filename: optimized.filename,
+      originalName: optimized.originalName,
+      mimeType: optimized.mimeType,
+      size: optimized.size,
+      originalSize: optimized.originalSize,
+      compressionRatio: optimized.compressionRatio,
+      format: optimized.format,
+      width: optimized.width,
+      height: optimized.height,
       alt,
-      url: `/media/${uniqueFilename}`,
+      url: `/media/${optimized.filename}`,
       createdAt: new Date().toISOString()
     };
 

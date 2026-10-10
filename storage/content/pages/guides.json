@@ -1,0 +1,23 @@
+{
+  "id": "page_guides",
+  "title": "Guides",
+  "slug": "guides",
+  "status": "published",
+  "template": "guides",
+  "content": {
+    "blocks": []
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "Guides - Aero CMS",
+    "description": "Information about Guides",
+    "canonical": "http://localhost:4000/guides",
+    "ogTitle": "Guides",
+    "ogDescription": "Information about Guides",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-10-07T22:50:39.407Z",
+  "updatedAt": "2026-10-07T22:50:39.407Z",
+  "publishedAt": "2026-10-07T22:50:39.407Z"
+}

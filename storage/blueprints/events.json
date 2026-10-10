@@ -1,0 +1,66 @@
+{
+  "id": "bp_1790342168109_pn9of",
+  "name": "Events",
+  "singularName": "Event",
+  "slug": "events",
+  "icon": "Calendar",
+  "description": "Conferences, webinars, meetups, and schedules",
+  "hasCategories": true,
+  "hasTags": true,
+  "hasContentEditor": true,
+  "isBuiltIn": false,
+  "fields": [
+    {
+      "id": "fld_event_date",
+      "name": "start_date",
+      "label": "Start Date & Time",
+      "type": "date",
+      "required": true,
+      "options": [],
+      "placeholder": "",
+      "description": ""
+    },
+    {
+      "id": "fld_end_date",
+      "name": "end_date",
+      "label": "End Date",
+      "type": "date",
+      "required": false,
+      "options": [],
+      "placeholder": "",
+      "description": ""
+    },
+    {
+      "id": "fld_venue",
+      "name": "venue",
+      "label": "Venue or Meeting URL",
+      "type": "text",
+      "required": true,
+      "options": [],
+      "placeholder": "e.g. Moscone Center, SF or Zoom Link",
+      "description": ""
+    },
+    {
+      "id": "fld_tickets",
+      "name": "registration_url",
+      "label": "Tickets / Registration URL",
+      "type": "url",
+      "required": false,
+      "options": [],
+      "placeholder": "https://eventbrite.com/...",
+      "description": ""
+    },
+    {
+      "id": "fld_banner",
+      "name": "event_banner",
+      "label": "Event Poster / Banner",
+      "type": "image",
+      "required": false,
+      "options": [],
+      "placeholder": "",
+      "description": ""
+    }
+  ],
+  "createdAt": "2026-09-25T13:16:08.109Z",
+  "updatedAt": "2026-09-25T13:16:08.109Z"
+}

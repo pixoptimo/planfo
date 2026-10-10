@@ -1,4 +1,4 @@
-import type { Page, Post, Product, Category, Menu, SiteSettings, StructuredContent } from '@cms/schemas';
+import type { Page, Post, Product, Category, Menu, SiteSettings, StructuredContent, Blueprint, BlueprintEntry } from '@cms/schemas';
 
 export interface TemplateContext {
   site: SiteSettings;
@@ -10,6 +10,9 @@ export interface TemplateContext {
   products?: Product[];
   categories?: Category[];
   category?: Category;
+  blueprint?: Blueprint;
+  entry?: BlueprintEntry;
+  entries?: BlueprintEntry[];
   tag?: string;
   renderContent: (content: StructuredContent) => string;
   formatDate: (dateStr: string) => string;

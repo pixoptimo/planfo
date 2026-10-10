@@ -16,6 +16,9 @@
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start --workspace=@cms/server",
     "generate": "npx tsx apps/generator/src/cli.ts",
+    "create-planfo": "node packages/create-planfo/bin/create-planfo.js",
+    "planfo": "node packages/create-planfo/bin/planfo.js",
+    "planfo:build": "node packages/create-planfo/bin/planfo.js build",
     "seed": "npx tsx scripts/seed-sample-content.ts",
     "create-admin": "npx tsx scripts/create-admin.ts",
     "test": "vitest run"

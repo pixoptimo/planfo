@@ -30,7 +30,7 @@
   "seo": {
     "title": "Building Resilience with Atomic File Operations",
     "description": "How temporary files and atomic renames protect data.",
-    "canonical": "http://localhost:3000/blog/building-resilience-with-atomic-file-operations",
+    "canonical": "http://localhost:4000/blog/building-resilience-with-atomic-file-operations",
     "ogTitle": "Building Resilience with Atomic File Operations",
     "ogDescription": "How temporary files and atomic renames protect data.",
     "ogImage": "",

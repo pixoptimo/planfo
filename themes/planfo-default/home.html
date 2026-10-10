@@ -1,0 +1,48 @@
+<!-- Planfo Default Theme — Home Page Template -->
+<div class="hero">
+  <div class="container">
+    <div class="hero-badge">⚡ Static &bull; Database-Free &bull; Fast</div>
+    <h1 class="hero-title"><%= (page && page.title) ? page.title : (site.siteName || 'Welcome to My Website') %></h1>
+    <p class="hero-lead">
+      <%= (page && page.seo && page.seo.description) ? page.seo.description : (site.description || 'This website was created with Planfo CMS — the simple, stable static website builder.') %>
+    </p>
+    <div class="hero-actions">
+      <a href="./about/index.html" class="btn btn-primary">Learn More</a>
+      <a href="./contact/index.html" class="btn btn-secondary">Get in Touch</a>
+    </div>
+  </div>
+</div>
+
+<% if (page && page.featuredImage) { %>
+  <div class="container">
+    <div class="featured-image-wrap">
+      <img src="<%= page.featuredImage %>" alt="<%= page.title %>" loading="lazy">
+    </div>
+  </div>
+<% } %>
+
+<% if (page && page.content) { %>
+  <section class="container page-content prose">
+    <%- renderContent(page.content) %>
+  </section>
+<% } %>
+
+<section class="container">
+  <div class="features-grid">
+    <div class="feature-card">
+      <div class="feature-icon">🚀</div>
+      <h3>Zero Database</h3>
+      <p>Content is stored as clean JSON files on your filesystem. No database setup, maintenance, or connection errors.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">🛡️</div>
+      <h3>Ultimate Security</h3>
+      <p>Static HTML generation leaves zero backend attack surface. No SQL injections, no server exploits.</p>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚡</div>
+      <h3>Free Static Hosting</h3>
+      <p>Publish straight to GitHub Pages, Cloudflare Pages, or any standard web server in seconds.</p>
+    </div>
+  </div>
+</section>

@@ -1,5 +1,5 @@
 import React from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
 import { AdminLayout } from './components/Layout/AdminLayout.js';
 import { Login } from './pages/Login.js';
@@ -17,16 +17,40 @@ import { SiteSettingsPage } from './pages/Settings/SiteSettingsPage.js';
 import { UserManagement } from './pages/Users/UserManagement.js';
 import { BackupsPage } from './pages/Backups/BackupsPage.js';
 import { RevisionsPage } from './pages/Revisions/RevisionsPage.js';
+import { ThemesPage } from './pages/Themes/ThemesPage.js';
+import { SetupWizard } from './pages/Setup/SetupWizard.js';
+import { BlueprintStudio } from './pages/Blueprints/BlueprintStudio.js';
+import { FeaturePacksPage } from './pages/Blueprints/FeaturePacksPage.js';
+import { DynamicEntryList } from './pages/Blueprints/DynamicEntryList.js';
+import { DynamicEntryEdit } from './pages/Blueprints/DynamicEntryEdit.js';
+import { api } from './api/client.js';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { user, loading } = useAuth();
+  const [checkingSetup, setCheckingSetup] = React.useState(true);
+  const [isSetupRequired, setIsSetupRequired] = React.useState(false);
 
-  if (loading) {
+  React.useEffect(() => {
+    api.get<{ isSetupRequired: boolean }>('/api/auth/setup-status')
+      .then((res) => {
+        if (res?.isSetupRequired) {
+          setIsSetupRequired(true);
+        }
+      })
+      .catch(() => {})
+      .finally(() => setCheckingSetup(false));
+  }, []);
+
+  if (loading || checkingSetup) {
     return (
       <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 font-mono text-xs">
         Verifying authenticated session...
       </div>
     );
+  }
+
+  if (isSetupRequired) {
+    return <Navigate to="/setup" replace />;
   }
 
   if (!user) {
@@ -36,11 +60,51 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
   return <>{children}</>;
 };
 
+const SmartProductRoute: React.FC = () => {
+  const [isCatalog, setIsCatalog] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    api.get<{ featurePacks?: { catalog?: boolean } }>('/api/settings')
+      .then((data) => {
+        setIsCatalog(!!data?.featurePacks?.catalog);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return null;
+  if (isCatalog) return <ProductList />;
+  return <Navigate to="/blueprints/products" replace />;
+};
+
+const SmartProductEditRoute: React.FC = () => {
+  const { slug } = useParams<{ slug: string }>();
+  const [isCatalog, setIsCatalog] = React.useState(false);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    api.get<{ featurePacks?: { catalog?: boolean } }>('/api/settings')
+      .then((data) => {
+        setIsCatalog(!!data?.featurePacks?.catalog);
+      })
+      .catch(() => {})
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return null;
+  if (isCatalog) return <ProductEdit />;
+  return <Navigate to={`/blueprints/products/${slug || 'new'}`} replace />;
+};
+
 export const App: React.FC = () => {
+  const basename = import.meta.env.BASE_URL ? import.meta.env.BASE_URL.replace(/\/$/, '') : '/admin';
+
   return (
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={basename}>
         <Routes>
+          <Route path="/setup" element={<SetupWizard />} />
           <Route path="/login" element={<Login />} />
 
           <Route
@@ -56,15 +120,22 @@ export const App: React.FC = () => {
             <Route path="pages/:slug" element={<PageEdit />} />
             <Route path="posts" element={<PostList />} />
             <Route path="posts/:slug" element={<PostEdit />} />
-            <Route path="products" element={<ProductList />} />
-            <Route path="products/:slug" element={<ProductEdit />} />
+            <Route path="products" element={<SmartProductRoute />} />
+            <Route path="products/:slug" element={<SmartProductEditRoute />} />
             <Route path="categories" element={<CategoryList />} />
             <Route path="media" element={<MediaLibrary />} />
             <Route path="navigation" element={<NavigationManager />} />
+            <Route path="themes" element={<ThemesPage />} />
             <Route path="settings" element={<SiteSettingsPage />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="backups" element={<BackupsPage />} />
             <Route path="revisions" element={<RevisionsPage />} />
+            <Route path="blueprints" element={<Navigate to="/blueprints/studio" replace />} />
+            <Route path="blueprints/studio" element={<BlueprintStudio />} />
+            <Route path="blueprints/feature-packs" element={<FeaturePacksPage />} />
+            <Route path="blueprints/:blueprintSlug" element={<DynamicEntryList />} />
+            <Route path="blueprints/:blueprintSlug/new" element={<DynamicEntryEdit />} />
+            <Route path="blueprints/:blueprintSlug/:entrySlug" element={<DynamicEntryEdit />} />
           </Route>
 
           <Route path="*" element={<Navigate to="/" replace />} />

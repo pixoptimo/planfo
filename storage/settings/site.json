@@ -1,13 +1,13 @@
 {
   "siteName": "Aero Static CMS",
-  "siteUrl": "http://localhost:3000",
+  "siteUrl": "http://localhost:4000",
   "tagline": "Modern, high-performance static website powered by a file-based CMS.",
   "logo": "",
   "favicon": "",
   "defaultSEO": {
     "title": "Aero Static CMS - Blazing Fast Content Management",
     "description": "Manage rich content with zero database overhead and deploy lightning-fast static HTML.",
-    "canonical": "http://localhost:3000",
+    "canonical": "http://localhost:4000",
     "ogTitle": "Aero Static CMS",
     "ogDescription": "Manage rich content with zero database overhead.",
     "ogImage": "",
@@ -15,11 +15,33 @@
   },
   "socialLinks": {
     "twitter": "https://twitter.com",
-    "github": "https://github.com"
+    "facebook": "",
+    "instagram": "",
+    "github": "https://github.com",
+    "linkedin": ""
   },
   "analyticsId": "",
   "timezone": "UTC",
   "language": "en",
   "footerText": "© 2026 Aero Static CMS. Built with TypeScript and React.",
-  "updatedAt": "2026-09-15T17:40:34.642Z"
+  "featurePacks": {
+    "catalog": true,
+    "portfolio": true,
+    "team": false,
+    "testimonials": true,
+    "events": true,
+    "faqs": true
+  },
+  "activeTheme": "aero-modern",
+  "deployment": {
+    "target": "local",
+    "gitRepo": "",
+    "gitBranch": "gh-pages",
+    "gitUsername": "",
+    "gitToken": "",
+    "cname": "",
+    "customDomain": "",
+    "autoPublishOnSave": false
+  },
+  "updatedAt": "2026-10-10T09:58:53.470Z"
 }

@@ -1,0 +1,23 @@
+{
+  "id": "page_login",
+  "title": "Login",
+  "slug": "login",
+  "status": "published",
+  "template": "login",
+  "content": {
+    "blocks": []
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "Login - Aero CMS",
+    "description": "Information about Login",
+    "canonical": "http://localhost:4000/login",
+    "ogTitle": "Login",
+    "ogDescription": "Information about Login",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-10-07T22:50:39.409Z",
+  "updatedAt": "2026-10-07T22:50:39.409Z",
+  "publishedAt": "2026-10-07T22:50:39.409Z"
+}

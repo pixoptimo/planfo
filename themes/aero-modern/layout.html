@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="<%= site.language || 'en' %>">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <%- metaTags %>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/assets/style.css">
+  <% if (site.favicon) { %>
+    <link rel="icon" href="<%= site.favicon %>">
+  <% } %>
+</head>
+<body>
+  <!-- Header / Navigation -->
+  <header class="site-header">
+    <div class="container header-container">
+      <a href="/" class="site-logo">
+        <% if (site.logo) { %>
+          <img src="<%= site.logo %>" alt="<%= site.siteName %>" class="logo-img">
+        <% } else { %>
+          <span class="logo-text"><%= site.siteName %></span>
+        <% } %>
+      </a>
+
+      <nav class="site-nav">
+        <% if (menu && menu.items && menu.items.length > 0) { %>
+          <ul class="nav-list">
+            <% menu.items.forEach(function(item) { %>
+              <li class="nav-item <%= (item.children && item.children.length > 0) ? 'has-dropdown' : '' %>">
+                <a href="<%= item.url %>" target="<%= item.target || '_self' %>" class="nav-link">
+                  <%= item.label %>
+                </a>
+                <% if (item.children && item.children.length > 0) { %>
+                  <ul class="dropdown-menu">
+                    <% item.children.forEach(function(child) { %>
+                      <li>
+                        <a href="<%= child.url %>" target="<%= child.target || '_self' %>" class="dropdown-link">
+                          <%= child.label %>
+                        </a>
+                      </li>
+                    <% }); %>
+                  </ul>
+                <% } %>
+              </li>
+            <% }); %>
+          </ul>
+        <% } %>
+      </nav>
+
+      <div class="header-actions">
+        <a href="/products" class="btn btn-primary btn-sm">Explore Store</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Body Content -->
+  <main class="site-main">
+    <%- body %>
+  </main>
+
+  <!-- Footer -->
+  <footer class="site-footer">
+    <div class="container footer-container">
+      <div class="footer-col brand-col">
+        <h3 class="footer-brand"><%= site.siteName %></h3>
+        <p class="footer-tagline"><%= site.tagline %></p>
+        <div class="footer-socials">
+          <% if (site.socialLinks?.twitter) { %><a href="<%= site.socialLinks.twitter %>" target="_blank" rel="noopener" aria-label="Twitter">Twitter</a><% } %>
+          <% if (site.socialLinks?.github) { %><a href="<%= site.socialLinks.github %>" target="_blank" rel="noopener" aria-label="GitHub">GitHub</a><% } %>
+          <% if (site.socialLinks?.linkedin) { %><a href="<%= site.socialLinks.linkedin %>" target="_blank" rel="noopener" aria-label="LinkedIn">LinkedIn</a><% } %>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul>
+          <li><a href="/">Home</a></li>
+          <li><a href="/about-us">About Us</a></li>
+          <li><a href="/products">Products</a></li>
+          <li><a href="/blog">Blog</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Quick Links</h4>
+        <ul>
+          <li><a href="/sitemap.xml">Sitemap</a></li>
+          <li><a href="/robots.txt">Robots.txt</a></li>
+          <li><a href="/contact">Contact</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <p><%= site.footerText %> | Static Site Generated at <%= new Date().getFullYear() %></p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+  "id": "page_about",
+  "title": "About",
+  "slug": "about",
+  "status": "published",
+  "template": "page",
+  "content": {
+    "blocks": [
+      {
+        "id": "ab_1",
+        "type": "heading",
+        "level": 2,
+        "text": "About Our Website"
+      },
+      {
+        "id": "ab_2",
+        "type": "paragraph",
+        "text": "This website was created with Planfo CMS — a simple, database-free CMS built for static and self-hosted websites."
+      },
+      {
+        "id": "ab_3",
+        "type": "list",
+        "style": "unordered",
+        "items": [
+          "Zero database overhead",
+          "Production quality static HTML generation",
+          "Fast publishing to GitHub Pages",
+          "Clean, human-readable file storage"
+        ]
+      }
+    ]
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "About - Planfo Website",
+    "description": "Learn more about this website created with Planfo CMS.",
+    "canonical": "http://localhost:3000/about",
+    "ogTitle": "About",
+    "ogDescription": "Learn more about this website created with Planfo CMS.",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-10-10T10:00:00.000Z",
+  "updatedAt": "2026-10-10T10:00:00.000Z",
+  "publishedAt": "2026-10-10T10:00:00.000Z"
+}

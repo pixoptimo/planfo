@@ -3,7 +3,7 @@
   "title": "About Us",
   "slug": "about-us",
   "status": "published",
-  "template": "default",
+  "template": "about",
   "content": {
     "blocks": [
       {
@@ -34,7 +34,7 @@
   "seo": {
     "title": "About Us - Aero Static CMS",
     "description": "Learn about the philosophy and engineering behind Aero Static CMS.",
-    "canonical": "http://localhost:3000/about-us",
+    "canonical": "http://localhost:4000/about-us",
     "ogTitle": "About Us",
     "ogDescription": "Philosophy and engineering behind Aero Static CMS.",
     "ogImage": "",

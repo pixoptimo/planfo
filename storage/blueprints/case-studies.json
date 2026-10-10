@@ -1,0 +1,66 @@
+{
+  "id": "bp_1790341943070_l95bj",
+  "name": "Case Studies",
+  "singularName": "Case Study",
+  "slug": "case-studies",
+  "icon": "Briefcase",
+  "description": "Client work, portfolios, and measurable project outcomes",
+  "hasCategories": true,
+  "hasTags": true,
+  "hasContentEditor": true,
+  "isBuiltIn": false,
+  "fields": [
+    {
+      "id": "fld_client",
+      "name": "client_name",
+      "label": "Client / Brand",
+      "type": "text",
+      "required": true,
+      "options": [],
+      "placeholder": "e.g. Acme Corp",
+      "description": ""
+    },
+    {
+      "id": "fld_project_url",
+      "name": "project_url",
+      "label": "Live Project URL",
+      "type": "url",
+      "required": false,
+      "options": [],
+      "placeholder": "https://client-site.com",
+      "description": ""
+    },
+    {
+      "id": "fld_year",
+      "name": "completion_year",
+      "label": "Completion Year",
+      "type": "number",
+      "required": false,
+      "options": [],
+      "placeholder": "2026",
+      "description": ""
+    },
+    {
+      "id": "fld_metric",
+      "name": "impact_metric",
+      "label": "Key Result / Impact Metric",
+      "type": "text",
+      "required": false,
+      "options": [],
+      "placeholder": "+240% Speed Increase",
+      "description": ""
+    },
+    {
+      "id": "fld_screenshot",
+      "name": "hero_screenshot",
+      "label": "Project Screenshot",
+      "type": "image",
+      "required": false,
+      "options": [],
+      "placeholder": "",
+      "description": ""
+    }
+  ],
+  "createdAt": "2026-09-25T13:12:23.070Z",
+  "updatedAt": "2026-09-25T13:12:23.070Z"
+}

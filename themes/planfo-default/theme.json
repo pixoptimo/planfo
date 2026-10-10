@@ -1,0 +1,10 @@
+{
+  "id": "planfo-default",
+  "name": "Planfo Default",
+  "version": "1.0.0",
+  "author": "Planfo CMS Team",
+  "description": "Clean, responsive, modern default theme for Planfo CMS Beta v0.1.",
+  "thumbnail": "assets/thumbnail.svg",
+  "supportedPacks": ["pages", "articles"],
+  "templates": ["default", "landing", "page"]
+}

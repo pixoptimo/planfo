@@ -1,0 +1,23 @@
+{
+  "id": "page_help",
+  "title": "Help",
+  "slug": "help",
+  "status": "published",
+  "template": "help",
+  "content": {
+    "blocks": []
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "Help - Aero CMS",
+    "description": "Information about Help",
+    "canonical": "http://localhost:4000/help",
+    "ogTitle": "Help",
+    "ogDescription": "Information about Help",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-10-07T22:50:39.408Z",
+  "updatedAt": "2026-10-07T22:50:39.408Z",
+  "publishedAt": "2026-10-07T22:50:39.408Z"
+}

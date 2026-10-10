@@ -1,0 +1,72 @@
+<div class="homepage">
+  <div class="container">
+    <!-- Lead Editorial Hero -->
+    <section class="editorial-hero">
+      <span class="hero-kicker">Featured Editorial &bull; <%= site.siteName %></span>
+      <h1 class="hero-title"><%= site.siteName %></h1>
+      <p class="hero-excerpt"><%= site.tagline || 'A quiet, distraction-free digital publication curated with care.' %></p>
+      <div class="hero-meta">
+        <span class="hero-author">Curated by <%= site.author || 'Editorial Team' %></span>
+        <span>&bull;</span>
+        <span><%= new Date().toLocaleDateString('en-US', { month: 'long', year: 'numeric' }) %> Edition</span>
+      </div>
+    </section>
+
+    <!-- Latest Dispatches / Articles -->
+    <% if (posts && posts.length > 0) { %>
+      <section style="margin-bottom: 64px;">
+        <div class="section-header-editorial">
+          <h2 class="section-title-editorial">Dispatches & Essays</h2>
+          <a href="/blog" class="section-link">View All Dispatches &rarr;</a>
+        </div>
+
+        <div class="editorial-grid">
+          <% posts.forEach(function(post) { %>
+            <article class="editorial-card">
+              <span class="card-category"><%= post.category %></span>
+              <h3 class="card-title">
+                <a href="/blog/<%= post.slug %>"><%= post.title %></a>
+              </h3>
+              <p class="card-excerpt"><%= post.excerpt %></p>
+              <div class="card-footer">
+                <span>By <%= post.author %></span>
+                <time><%= formatDate(post.createdAt) %></time>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      </section>
+    <% } %>
+
+    <!-- Optional Storefront Catalog -->
+    <% if (products && products.length > 0) { %>
+      <section style="margin-bottom: 64px;">
+        <div class="section-header-editorial">
+          <h2 class="section-title-editorial">Curated Goods</h2>
+          <a href="/products" class="section-link">All Products &rarr;</a>
+        </div>
+
+        <div class="editorial-grid">
+          <% products.forEach(function(prod) { %>
+            <article class="editorial-card">
+              <span class="card-category"><%= prod.category %></span>
+              <% if (prod.images && prod.images.length > 0) { %>
+                <div style="margin-bottom: 16px; overflow: hidden; max-height: 200px;">
+                  <img src="<%= prod.images[0] %>" alt="<%= prod.name %>" style="width: 100%; height: 100%; object-fit: cover;">
+                </div>
+              <% } %>
+              <h3 class="card-title">
+                <a href="/products/<%= prod.slug %>"><%= prod.name %></a>
+              </h3>
+              <p class="card-excerpt"><%= prod.shortDescription %></p>
+              <div class="card-footer">
+                <span style="font-weight: 700; color: var(--color-primary);"><%= formatPrice(prod.price, prod.currency) %></span>
+                <a href="/products/<%= prod.slug %>" style="color: var(--color-primary); font-weight: 600;">View &rarr;</a>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      </section>
+    <% } %>
+  </div>
+</div>

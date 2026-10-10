@@ -11,7 +11,8 @@ export function generateSitemapXml(
   siteUrl: string,
   pages: Page[],
   posts: Post[],
-  products: Product[]
+  products: Product[],
+  customBlueprints: Array<{ blueprint: { slug: string }; entries: Array<{ slug: string; status: string; updatedAt?: string; createdAt?: string }> }> = []
 ): string {
   const normalizedSiteUrl = siteUrl.replace(/\/+$/, '');
   const entries: SitemapEntry[] = [];
@@ -77,6 +78,27 @@ export function generateSitemapXml(
         changefreq: 'weekly',
         priority: 0.8
       });
+    }
+  }
+
+  // Custom Blueprints
+  for (const { blueprint: bp, entries: bpEntries } of customBlueprints) {
+    if (bp.slug === 'products' && products.length > 0) continue; // Avoid duplicate if standard products exist
+    entries.push({
+      loc: `${normalizedSiteUrl}/${bp.slug}`,
+      lastmod: new Date().toISOString(),
+      changefreq: 'daily',
+      priority: 0.8
+    });
+    for (const entry of bpEntries) {
+      if (entry.status === 'published') {
+        entries.push({
+          loc: `${normalizedSiteUrl}/${bp.slug}/${entry.slug}`,
+          lastmod: entry.updatedAt || entry.createdAt || new Date().toISOString(),
+          changefreq: 'weekly',
+          priority: 0.8
+        });
+      }
     }
   }
 

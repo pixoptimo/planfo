@@ -1,0 +1,33 @@
+{
+  "id": "rev_page_home_v009",
+  "contentType": "page",
+  "contentId": "page_home",
+  "slug": "home",
+  "version": 9,
+  "createdAt": "2026-10-07T22:33:46.702Z",
+  "authorEmail": "admin@example.com",
+  "data": {
+    "id": "page_home",
+    "title": "Home",
+    "slug": "home",
+    "status": "published",
+    "template": "landing",
+    "content": {
+      "blocks": []
+    },
+    "featuredImage": "",
+    "seo": {
+      "title": "Home - Aero Static CMS",
+      "description": "Modern, high-performance static website powered by a file-based CMS.",
+      "canonical": "http://localhost:4000/",
+      "ogTitle": "Aero Static CMS",
+      "ogDescription": "Manage content effortlessly on the filesystem.",
+      "ogImage": "",
+      "robots": "index,follow"
+    },
+    "createdAt": "2026-09-15T17:41:29.424Z",
+    "updatedAt": "2026-10-07T22:33:46.699Z",
+    "publishedAt": "2026-09-15T17:41:29.424Z"
+  },
+  "summary": "Updated and published"
+}

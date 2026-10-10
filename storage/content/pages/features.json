@@ -3,7 +3,7 @@
   "title": "Features",
   "slug": "features",
   "status": "published",
-  "template": "default",
+  "template": "features",
   "content": {
     "blocks": [
       {

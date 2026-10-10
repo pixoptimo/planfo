@@ -53,6 +53,19 @@ export const PageEdit: React.FC = () => {
   const [revisions, setRevisions] = useState<RevisionMeta[]>([]);
   const [showRevisions, setShowRevisions] = useState(false);
   const [loadingRevisions, setLoadingRevisions] = useState(false);
+  const [availableTemplates, setAvailableTemplates] = useState<string[]>(['default', 'landing']);
+
+  useEffect(() => {
+    api.get<{ templates: string[]; activeTheme: string }>('/api/themes/templates')
+      .then((data) => {
+        if (data?.templates && Array.isArray(data.templates) && data.templates.length > 0) {
+          setAvailableTemplates(data.templates);
+        }
+      })
+      .catch(() => {
+        // Fallback silently to default
+      });
+  }, []);
 
   useEffect(() => {
     if (!isNew && slug) {
@@ -265,10 +278,13 @@ export const PageEdit: React.FC = () => {
             <select
               value={page.template || 'default'}
               onChange={(e) => setPage({ ...page, template: e.target.value })}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 capitalize"
             >
-              <option value="default">Default Page Layout</option>
-              <option value="landing">Landing Page Layout</option>
+              {Array.from(new Set(['default', ...availableTemplates, page.template || 'default'])).map((tpl) => (
+                <option key={tpl} value={tpl}>
+                  {tpl.replace(/-/g, ' ')} {tpl === 'default' ? '(Standard)' : ''}
+                </option>
+              ))}
             </select>
           </div>
 
@@ -310,7 +326,11 @@ export const PageEdit: React.FC = () => {
           Structured Page Content
         </label>
         <StructuredEditor
-          content={page.content || { blocks: [] }}
+          content={
+            page.content && typeof page.content === 'object' && 'blocks' in page.content
+              ? (page.content as any)
+              : { blocks: [] }
+          }
           onChange={(newContent) => setPage({ ...page, content: newContent })}
         />
       </div>

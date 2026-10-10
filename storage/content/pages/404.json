@@ -1,0 +1,23 @@
+{
+  "id": "page_404",
+  "title": "404",
+  "slug": "404",
+  "status": "published",
+  "template": "404",
+  "content": {
+    "blocks": []
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "404 - Aero CMS",
+    "description": "Information about 404",
+    "canonical": "http://localhost:4000/404",
+    "ogTitle": "404",
+    "ogDescription": "Information about 404",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-10-07T22:50:39.395Z",
+  "updatedAt": "2026-10-07T22:50:39.395Z",
+  "publishedAt": "2026-10-07T22:50:39.395Z"
+}

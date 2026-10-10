@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
+import { api } from '../api/client.js';
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
@@ -11,6 +12,16 @@ export const Login: React.FC = () => {
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    api.get<{ isSetupRequired: boolean }>('/api/auth/setup-status')
+      .then((res) => {
+        if (res?.isSetupRequired) {
+          navigate('/setup', { replace: true });
+        }
+      })
+      .catch(() => {});
+  }, [navigate]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

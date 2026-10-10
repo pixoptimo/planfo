@@ -7,57 +7,29 @@
   "content": {
     "blocks": [
       {
-        "id": "b1",
+        "id": "hm_1",
         "type": "heading",
         "level": 2,
-        "text": "Welcome to the Future of File-Based Static Content Management"
+        "text": "Welcome to My Website"
       },
       {
-        "id": "b2",
+        "id": "hm_2",
         "type": "paragraph",
-        "text": "Aero CMS eliminates database overhead, vulnerability surfaces, and complex infrastructure. All content is stored as clean JSON files on disk and compiled into pure static HTML/CSS."
-      },
-      {
-        "id": "b3",
-        "type": "callout",
-        "variant": "success",
-        "title": "Zero Database Runtime",
-        "text": "Visitors load pure pre-rendered static files at maximum edge speed without hitting an API or database."
-      },
-      {
-        "id": "block_1789544924105_7qfd",
-        "type": "blockquote",
-        "text": "",
-        "citation": ""
-      },
-      {
-        "id": "block_1789544926473_ia7v",
-        "type": "button",
-        "text": "Learn More",
-        "url": "#",
-        "variant": "outline",
-        "target": "_self"
-      },
-      {
-        "id": "block_1789560620074_bwum",
-        "type": "image",
-        "url": "/media/3D_Button_-_Cover-1789560634314.png",
-        "alt": "3D Button - Cover",
-        "caption": ""
+        "text": "This website was created with Planfo CMS — the simple, database-free website builder."
       }
     ]
   },
   "featuredImage": "",
   "seo": {
-    "title": "Home - Aero Static CMS",
-    "description": "Modern, high-performance static website powered by a file-based CMS.",
+    "title": "Home - Planfo Website",
+    "description": "Welcome to our website created with Planfo CMS.",
     "canonical": "http://localhost:3000/",
-    "ogTitle": "Aero Static CMS",
-    "ogDescription": "Manage content effortlessly on the filesystem.",
+    "ogTitle": "Home - Planfo Website",
+    "ogDescription": "Welcome to our website created with Planfo CMS.",
     "ogImage": "",
     "robots": "index,follow"
   },
   "createdAt": "2026-09-15T17:41:29.424Z",
-  "updatedAt": "2026-09-16T12:14:27.997Z",
+  "updatedAt": "2026-10-10T10:00:00.000Z",
   "publishedAt": "2026-09-15T17:41:29.424Z"
 }

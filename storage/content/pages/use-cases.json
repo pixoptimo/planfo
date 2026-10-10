@@ -1,0 +1,23 @@
+{
+  "id": "page_use_cases",
+  "title": "Use Cases",
+  "slug": "use-cases",
+  "status": "published",
+  "template": "use-cases",
+  "content": {
+    "blocks": []
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "Use Cases - Aero CMS",
+    "description": "Information about Use Cases",
+    "canonical": "http://localhost:4000/use-cases",
+    "ogTitle": "Use Cases",
+    "ogDescription": "Information about Use Cases",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-10-07T22:50:39.411Z",
+  "updatedAt": "2026-10-07T22:50:39.411Z",
+  "publishedAt": "2026-10-07T22:50:39.411Z"
+}

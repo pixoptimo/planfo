@@ -14,7 +14,9 @@ publishRouter.post('/', requirePermission('publish.all'), async (req: Request, r
     const generator = new StaticSiteGenerator({
       storagePath: config.STORAGE_PATH,
       templatesPath: config.TEMPLATES_PATH,
-      outputPath: config.OUTPUT_PATH
+      outputPath: config.OUTPUT_PATH,
+      publisherType: req.body?.target,
+      publisherOptions: req.body?.options
     });
 
     const result = await generator.build();

@@ -129,10 +129,19 @@ export function renderBlockToHtml(block: ContentBlock): string {
 }
 
 /**
- * Converts structured content object into full sanitized HTML.
+ * Converts structured content object or clean HTML string into full sanitized HTML.
  */
-export function renderStructuredContent(content: StructuredContent): string {
-  if (!content || !Array.isArray(content.blocks)) {
+export function renderStructuredContent(content: StructuredContent | string | any): string {
+  if (!content) {
+    return '';
+  }
+  if (typeof content === 'string') {
+    return sanitize(content);
+  }
+  if (typeof content === 'object' && typeof content.html === 'string') {
+    return sanitize(content.html);
+  }
+  if (!Array.isArray(content.blocks)) {
     return '';
   }
   const rawHtml = content.blocks.map(renderBlockToHtml).join('\n\n');

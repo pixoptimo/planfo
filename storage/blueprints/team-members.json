@@ -1,0 +1,74 @@
+{
+  "id": "bp_1790342119106_1t2mx",
+  "name": "Team Members",
+  "singularName": "Team Member",
+  "slug": "team-members",
+  "icon": "Users",
+  "description": "Staff directory, executive leadership, and bios",
+  "hasCategories": true,
+  "hasTags": false,
+  "hasContentEditor": true,
+  "isBuiltIn": false,
+  "fields": [
+    {
+      "id": "fld_job_title",
+      "name": "job_title",
+      "label": "Job Title / Position",
+      "type": "text",
+      "required": true,
+      "options": [],
+      "placeholder": "e.g. Head of Engineering",
+      "description": ""
+    },
+    {
+      "id": "fld_department",
+      "name": "department",
+      "label": "Department",
+      "type": "select",
+      "required": false,
+      "options": [
+        "Executive",
+        "Engineering",
+        "Product",
+        "Design",
+        "Marketing",
+        "Sales",
+        "Operations"
+      ],
+      "placeholder": "",
+      "description": ""
+    },
+    {
+      "id": "fld_email",
+      "name": "direct_email",
+      "label": "Direct Email",
+      "type": "email",
+      "required": false,
+      "options": [],
+      "placeholder": "name@company.com",
+      "description": ""
+    },
+    {
+      "id": "fld_linkedin",
+      "name": "linkedin_profile",
+      "label": "LinkedIn URL",
+      "type": "url",
+      "required": false,
+      "options": [],
+      "placeholder": "https://linkedin.com/in/...",
+      "description": ""
+    },
+    {
+      "id": "fld_avatar",
+      "name": "avatar",
+      "label": "Profile Photo",
+      "type": "image",
+      "required": false,
+      "options": [],
+      "placeholder": "",
+      "description": ""
+    }
+  ],
+  "createdAt": "2026-09-25T13:15:19.106Z",
+  "updatedAt": "2026-09-25T13:15:19.106Z"
+}

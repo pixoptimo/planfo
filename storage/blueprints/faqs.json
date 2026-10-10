@@ -1,0 +1,46 @@
+{
+  "id": "bp_1790342180975_6bdiz",
+  "name": "FAQs",
+  "singularName": "FAQ",
+  "slug": "faqs",
+  "icon": "HelpCircle",
+  "description": "Frequently asked questions, answers, and help guides",
+  "hasCategories": true,
+  "hasTags": true,
+  "hasContentEditor": true,
+  "isBuiltIn": false,
+  "fields": [
+    {
+      "id": "fld_question",
+      "name": "question",
+      "label": "Question Headline",
+      "type": "text",
+      "required": true,
+      "options": [],
+      "placeholder": "e.g. How does static site deployment work?",
+      "description": ""
+    },
+    {
+      "id": "fld_target_audience",
+      "name": "target_audience",
+      "label": "Target Audience",
+      "type": "text",
+      "required": false,
+      "options": [],
+      "placeholder": "e.g. Beginners, Developers, Enterprise",
+      "description": ""
+    },
+    {
+      "id": "fld_short_answer",
+      "name": "short_answer",
+      "label": "Quick Summary Answer",
+      "type": "textarea",
+      "required": false,
+      "options": [],
+      "placeholder": "A concise 1-2 sentence answer...",
+      "description": ""
+    }
+  ],
+  "createdAt": "2026-09-25T13:16:20.975Z",
+  "updatedAt": "2026-09-25T13:16:20.975Z"
+}

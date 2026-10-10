@@ -1,0 +1,23 @@
+{
+  "id": "page_pricing",
+  "title": "Pricing",
+  "slug": "pricing",
+  "status": "published",
+  "template": "pricing",
+  "content": {
+    "blocks": []
+  },
+  "featuredImage": "",
+  "seo": {
+    "title": "Pricing - Aero CMS",
+    "description": "Information about Pricing",
+    "canonical": "http://localhost:4000/pricing",
+    "ogTitle": "Pricing",
+    "ogDescription": "Information about Pricing",
+    "ogImage": "",
+    "robots": "index,follow"
+  },
+  "createdAt": "2026-10-07T22:50:39.409Z",
+  "updatedAt": "2026-10-07T22:50:39.409Z",
+  "publishedAt": "2026-10-07T22:50:39.409Z"
+}

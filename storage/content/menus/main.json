@@ -18,13 +18,6 @@
       "children": []
     },
     {
-      "id": "m_products",
-      "label": "Products",
-      "url": "/products",
-      "target": "_self",
-      "children": []
-    },
-    {
       "id": "m_blog",
       "label": "Blog",
       "url": "/blog",
@@ -51,7 +44,21 @@
       "url": "/testing",
       "target": "_self",
       "children": []
+    },
+    {
+      "id": "item_1789826673314_fzbs",
+      "label": "farm",
+      "url": "/farm",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "item_1789826674252_9duq",
+      "label": "Products",
+      "url": "/products",
+      "target": "_self",
+      "children": []
     }
   ],
-  "updatedAt": "2026-09-15T18:04:26.342Z"
+  "updatedAt": "2026-09-25T10:43:48.405Z"
 }
