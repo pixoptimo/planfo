@@ -5,6 +5,7 @@ import { api } from '../../api/client.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
+import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 import { getTemplatePreset, TEMPLATE_PRESETS } from '../../data/templatePresets.js';
 import { getMediaUrl } from '../../utils/media.js';
 
@@ -651,11 +652,9 @@ export const PageEdit: React.FC = () => {
           <Link
             to="/"
             title="Planfo CMS Home"
-            className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-surface-container transition-colors group"
+            className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-surface-container transition-transform hover:scale-105"
           >
-            <div className="w-8 h-8 rounded-lg bg-primary text-on-primary flex items-center justify-center font-serif font-black text-xl shadow-xs group-hover:scale-105 transition-transform">
-              P
-            </div>
+            <PlanfoLogo variant="icon" className="w-7 h-7" />
           </Link>
           <nav className="flex flex-col items-center gap-space-sm w-full px-space-xs">
             <Link
@@ -724,7 +723,7 @@ export const PageEdit: React.FC = () => {
         <div className="h-16 w-full px-space-lg flex items-center justify-between gap-space-md">
           {/* Left: Branding & Breadcrumbs */}
           <div className="flex items-center gap-space-md min-w-0">
-            <span className="font-serif font-black text-xl tracking-tight text-primary">PLANFO</span>
+            <PlanfoLogo variant="full" className="h-5 w-auto" />
             <span className="text-outline-variant font-body-sm text-body-sm select-none">/</span>
             <div className="flex items-center gap-space-xs min-w-0 text-on-surface-variant">
               <Link

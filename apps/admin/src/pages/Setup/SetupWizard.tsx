@@ -12,6 +12,7 @@ import {
   Sparkles
 } from 'lucide-react';
 import { api } from '../../api/client.js';
+import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 import type { User } from '@cms/schemas';
 
 export const SetupWizard: React.FC = () => {
@@ -109,9 +110,9 @@ export const SetupWizard: React.FC = () => {
     <div className="min-h-screen bg-surface flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 text-on-surface font-body-md antialiased">
       <div className="relative max-w-xl w-full mx-auto space-y-8">
         {/* Brand Header */}
-        <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-container text-on-primary-container font-black text-2xl shadow-sm mb-1">
-            <span className="material-symbols-outlined text-[28px]">auto_stories</span>
+        <div className="text-center space-y-3">
+          <div className="flex justify-center mb-1">
+            <PlanfoLogo variant="full" className="h-10 w-auto" />
           </div>
           <h1 className="font-headline-lg text-headline-lg font-serif text-on-surface tracking-tight">
             Welcome to Planfo CMS

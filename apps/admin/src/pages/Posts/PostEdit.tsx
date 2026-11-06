@@ -5,6 +5,7 @@ import { api } from '../../api/client.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
+import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 
 // Default block templates for all supported ContentBlock types
 const createDefaultBlock = (type: string): ContentBlock => {
@@ -596,10 +597,10 @@ export const PostEdit: React.FC = () => {
         <div className="flex flex-col items-center gap-6 w-full">
           <Link
             to="/"
-            className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-surface-container transition-colors"
-            title="Editorial Studio"
+            className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-surface-container transition-transform hover:scale-105"
+            title="Planfo Editorial Studio"
           >
-            <span className="material-symbols-outlined text-primary text-[24px]">auto_stories</span>
+            <PlanfoLogo variant="icon" className="w-7 h-7" />
           </Link>
 
           <nav className="flex flex-col items-center gap-2 w-full px-2">

@@ -26,6 +26,7 @@ import {
 import { useAuth } from '../../context/AuthContext.js';
 import { api } from '../../api/client.js';
 import { getBlueprintIcon } from '../../utils/blueprintIcons.js';
+import { PlanfoLogo } from '../UI/PlanfoLogo.js';
 import type { PublishResult } from '@cms/types';
 
 export const AdminLayout: React.FC = () => {
@@ -46,6 +47,15 @@ export const AdminLayout: React.FC = () => {
     location.pathname.startsWith('/blueprints/') &&
     !isBlueprintStudio &&
     (location.pathname.endsWith('/new') || location.pathname.split('/').filter(Boolean).length === 3);
+
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try {
+      return localStorage.getItem('planfo_sidebar_collapsed') === 'true';
+    } catch {
+      return false;
+    }
+  });
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
@@ -110,6 +120,10 @@ export const AdminLayout: React.FC = () => {
     };
   }, []);
 
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [location.pathname]);
+
   const handlePublish = async () => {
     setIsPublishing(true);
     setPublishError(null);
@@ -173,29 +187,49 @@ export const AdminLayout: React.FC = () => {
   ];
 
   return (
-    <div className="flex h-screen bg-surface text-on-surface overflow-hidden font-body-md antialiased">
+    <div className="flex h-screen bg-surface text-on-surface overflow-hidden font-body-md antialiased relative">
+      {/* Mobile Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div
+          onClick={() => setMobileMenuOpen(false)}
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-xs md:hidden"
+        />
+      )}
+
       {/* Editorial Studio Sidebar */}
-      <aside className="w-72 bg-surface-container-low border-r border-outline-variant/30 flex flex-col justify-between py-6 px-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-30 shrink-0">
-        <div className="flex flex-col gap-5 overflow-hidden">
+      <aside
+        className={`fixed md:static inset-y-0 left-0 z-50 md:z-30 bg-surface-container-low border-r border-outline-variant/30 flex flex-col justify-between py-6 shadow-[0_1px_8px_rgba(0,0,0,0.04)] transition-all duration-300 ease-in-out shrink-0 ${
+          sidebarCollapsed ? 'w-20 px-2.5 items-center' : 'w-72 px-4'
+        } ${mobileMenuOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}
+      >
+        <div className={`flex flex-col gap-5 overflow-hidden w-full ${sidebarCollapsed ? 'items-center' : ''}`}>
           {/* Studio Brand Header */}
-          <Link to="/" className="flex items-center gap-3 px-3 group">
-            <div className="w-9 h-9 rounded-lg bg-primary-container flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
-              <span className="material-symbols-outlined text-on-primary-container text-[20px]">auto_stories</span>
-            </div>
-            <div className="min-w-0">
-              <span className="font-headline-sm text-headline-sm text-on-surface tracking-tight block leading-tight truncate">
-                Editorial
-              </span>
-              <span className="font-label-xs text-label-xs text-primary font-bold uppercase tracking-wider block">
-                {projectName || 'Studio Design'}
-              </span>
-            </div>
+          <Link
+            to="/"
+            className={`group transition-transform flex items-center ${
+              sidebarCollapsed ? 'justify-center p-1.5 hover:scale-105' : 'px-3 justify-start'
+            }`}
+            title="Planfo CMS Home"
+          >
+            {sidebarCollapsed ? (
+              <PlanfoLogo variant="icon" className="h-8 w-auto shrink-0" />
+            ) : (
+              <div className="flex flex-col gap-1 min-w-0">
+                <PlanfoLogo variant="full" className="h-6 w-auto shrink-0 group-hover:scale-102 transition-transform" />
+                <span className="font-label-xs text-[10px] text-primary font-bold uppercase tracking-wider block truncate">
+                  {projectName || 'Studio Design'}
+                </span>
+              </div>
+            )}
           </Link>
 
           {/* Categorized Navigation */}
-          <nav className="flex flex-col gap-1 overflow-y-auto px-1 pr-1 max-h-[calc(100vh-220px)]">
+          <nav className="flex flex-col gap-1 overflow-y-auto px-1 pr-1 max-h-[calc(100vh-220px)] w-full">
             {navItems.map((item, idx) => {
               if (item.section) {
+                if (sidebarCollapsed) {
+                  return <div key={idx} className="h-px bg-outline-variant/30 my-2 mx-2" title={item.section} />;
+                }
                 return (
                   <span
                     key={idx}
@@ -213,22 +247,47 @@ export const AdminLayout: React.FC = () => {
                   key={item.to}
                   to={item.to!}
                   end={item.exact}
+                  title={sidebarCollapsed ? item.label : undefined}
                   className={({ isActive }) =>
-                    `flex items-center justify-between px-3 py-2 rounded-lg font-label-md text-label-md transition-all ${
-                      isActive
-                        ? 'bg-surface-container-highest text-primary font-semibold shadow-xs'
-                        : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
-                    }`
+                    sidebarCollapsed
+                      ? `flex items-center justify-center w-11 h-11 mx-auto rounded-xl transition-all relative group ${
+                          isActive
+                            ? 'bg-surface-container-highest text-primary font-semibold shadow-xs'
+                            : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
+                        }`
+                      : `flex items-center justify-between px-3 py-2 rounded-xl font-label-md text-label-md transition-all ${
+                          isActive
+                            ? 'bg-surface-container-highest text-primary font-semibold shadow-xs'
+                            : 'text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface'
+                        }`
                   }
                 >
-                  <div className="flex items-center gap-3 truncate">
-                    <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
-                    <span className="truncate">{item.label}</span>
-                  </div>
-                  {item.badge && (
-                    <span className="font-label-xs text-label-xs px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-semibold">
-                      {item.badge}
-                    </span>
+                  {sidebarCollapsed ? (
+                    <>
+                      <span className="material-symbols-outlined text-[22px]">{item.icon}</span>
+                      {item.badge && (
+                        <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
+                      )}
+                      {/* Floating tooltip on hover */}
+                      <div className="absolute left-full ml-3 px-3 py-1.5 bg-surface-container-highest text-on-surface font-label-sm text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+                        {item.label}
+                        {item.badge && (
+                          <span className="ml-2 font-code text-[10px] text-primary font-bold">({item.badge})</span>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center gap-3 truncate">
+                        <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+                        <span className="truncate">{item.label}</span>
+                      </div>
+                      {item.badge && (
+                        <span className="font-label-xs text-label-xs px-2 py-0.5 rounded-full bg-surface-container text-on-surface font-semibold">
+                          {item.badge}
+                        </span>
+                      )}
+                    </>
                   )}
                 </NavLink>
               );
@@ -237,56 +296,105 @@ export const AdminLayout: React.FC = () => {
         </div>
 
         {/* Studio System Status & User Profile */}
-        <div className="px-2 flex flex-col gap-3 pt-3 border-t border-outline-variant/20">
-          <div className="p-2.5 rounded-lg bg-surface-container-lowest flex items-center justify-between shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
-              <span className="font-label-xs text-label-xs text-on-surface-variant font-medium">Design Sync</span>
+        <div
+          className={`flex flex-col gap-3 pt-3 border-t border-outline-variant/20 w-full ${
+            sidebarCollapsed ? 'items-center px-1' : 'px-2'
+          }`}
+        >
+          {!sidebarCollapsed && (
+            <div className="p-2.5 rounded-lg bg-surface-container-lowest flex items-center justify-between shadow-[0_1px_4px_rgba(0,0,0,0.03)]">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                <span className="font-label-xs text-label-xs text-on-surface-variant font-medium">Design Sync</span>
+              </div>
+              <span className="font-label-xs text-label-xs text-primary font-bold">v2.4</span>
             </div>
-            <span className="font-label-xs text-label-xs text-primary font-bold">v2.4</span>
-          </div>
+          )}
 
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2.5 min-w-0">
-              <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-xs shrink-0 shadow-sm">
+          {sidebarCollapsed ? (
+            <div className="flex flex-col items-center gap-2">
+              <div
+                className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-xs shadow-sm"
+                title={`${user?.name || 'Lead Architect'} (${user?.email || ''})`}
+              >
                 {user?.name?.[0]?.toUpperCase() || 'E'}
               </div>
-              <div className="flex flex-col min-w-0">
-                <span className="font-label-md text-label-md text-on-surface font-semibold truncate leading-tight">
-                  {user?.name || 'Lead Architect'}
-                </span>
-                <span className="font-label-xs text-label-xs text-on-surface-variant truncate">
-                  {user?.email || 'system@editorial.studio'}
-                </span>
-              </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="p-2 rounded-xl text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
             </div>
-            <button
-              type="button"
-              onClick={handleLogout}
-              className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors"
-              title="Sign Out"
-            >
-              <LogOut className="w-4 h-4" />
-            </button>
-          </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-xs shrink-0 shadow-sm">
+                  {user?.name?.[0]?.toUpperCase() || 'E'}
+                </div>
+                <div className="flex flex-col min-w-0">
+                  <span className="font-label-md text-label-md text-on-surface font-semibold truncate leading-tight">
+                    {user?.name || 'Lead Architect'}
+                  </span>
+                  <span className="font-label-xs text-label-xs text-on-surface-variant truncate">
+                    {user?.email || 'system@editorial.studio'}
+                  </span>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="p-1.5 rounded-lg text-on-surface-variant hover:text-error hover:bg-error-container/40 transition-colors"
+                title="Sign Out"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            </div>
+          )}
         </div>
       </aside>
 
       {/* Main Content Stage */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top Header Bar */}
-        <header className="h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex items-center justify-between px-8 z-20 shrink-0">
-          {/* Breadcrumbs & Status */}
-          <div className="flex items-center gap-4 min-w-0">
+        <header className="h-16 bg-surface/80 backdrop-blur-xl border-b border-outline-variant/30 flex items-center justify-between px-4 sm:px-8 z-20 shrink-0">
+          {/* Menu Hamburger Toggle & Breadcrumbs */}
+          <div className="flex items-center gap-3 min-w-0">
+            <button
+              type="button"
+              onClick={() => {
+                if (window.innerWidth < 768) {
+                  setMobileMenuOpen(!mobileMenuOpen);
+                } else {
+                  setSidebarCollapsed((prev) => {
+                    const next = !prev;
+                    try {
+                      localStorage.setItem('planfo_sidebar_collapsed', String(next));
+                    } catch {}
+                    return next;
+                  });
+                }
+              }}
+              className="p-2 -ml-2 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors flex items-center justify-center shrink-0 cursor-pointer"
+              title={sidebarCollapsed ? 'Expand sidebar (icon + text)' : 'Collapse sidebar (icons only)'}
+              aria-label="Toggle navigation menu"
+            >
+              <span className="material-symbols-outlined text-[22px]">
+                {sidebarCollapsed ? 'menu' : 'menu_open'}
+              </span>
+            </button>
+
             <div className="flex items-center gap-2 font-label-md text-label-md text-on-surface-variant shrink-0">
-              <span className="hover:text-on-surface cursor-pointer">Editorial Studio</span>
-              <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-              <span className="text-on-surface font-semibold capitalize">
+              <span className="hover:text-on-surface cursor-pointer hidden sm:inline">Editorial Studio</span>
+              <span className="material-symbols-outlined text-[16px] hidden sm:inline">chevron_right</span>
+              <span className="text-on-surface font-semibold capitalize truncate max-w-[150px] sm:max-w-none">
                 {location.pathname.replace(/^\//, '').split('/')[0] || 'Overview'}
               </span>
             </div>
             <div className="h-4 w-px bg-outline-variant hidden sm:block" />
-            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container font-label-xs text-label-xs text-primary font-semibold shrink-0">
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-surface-container font-label-xs text-label-xs text-primary font-semibold shrink-0 hidden sm:inline-flex">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
               v2.4 Live Tokens
             </span>

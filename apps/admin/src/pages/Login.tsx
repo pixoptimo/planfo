@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Lock, Mail, AlertCircle, Loader2 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.js';
 import { api } from '../api/client.js';
+import { PlanfoLogo } from '../components/UI/PlanfoLogo.js';
 
 export const Login: React.FC = () => {
   const { login } = useAuth();
@@ -42,8 +43,8 @@ export const Login: React.FC = () => {
     <div className="min-h-screen bg-surface flex items-center justify-center p-4 font-body-md text-on-surface antialiased">
       <div className="w-full max-w-md bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-xl p-8 backdrop-blur-sm relative">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container mx-auto flex items-center justify-center font-bold text-2xl shadow-sm mb-3">
-            <span className="material-symbols-outlined text-[26px]">auto_stories</span>
+          <div className="flex justify-center mb-3">
+            <PlanfoLogo variant="full" className="h-8 w-auto" />
           </div>
           <h1 className="font-headline-sm text-headline-sm text-on-surface tracking-tight">Editorial Studio</h1>
           <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Sign in to your Planfo website manager</p>

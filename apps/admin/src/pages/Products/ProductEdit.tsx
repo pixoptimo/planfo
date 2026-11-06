@@ -8,6 +8,7 @@ import { CategorySelector } from '../../components/Taxonomy/CategorySelector.js'
 import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
+import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 
 // Default block templates for Product Specifications & Content
 const createDefaultBlock = (type: string): ContentBlock => {
@@ -363,6 +364,14 @@ export const ProductEdit: React.FC = () => {
       <header className="h-14 bg-surface-container-lowest border-b border-surface-container-high/40 px-5 flex items-center justify-between sticky top-0 z-40 shadow-xs">
         {/* Left: Brand / breadcrumb / auto-synced */}
         <div className="flex items-center gap-3 min-w-0">
+          <Link
+            to="/"
+            title="Planfo CMS Home"
+            className="hidden sm:flex items-center justify-center p-1 rounded-lg hover:bg-surface-container transition-transform hover:scale-105 shrink-0"
+          >
+            <PlanfoLogo variant="icon" className="h-6 w-auto" />
+          </Link>
+
           <Link
             to="/products"
             className="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 hover:scale-105 transition-transform"
