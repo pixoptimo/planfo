@@ -36,7 +36,11 @@ export const AdminLayout: React.FC = () => {
   // If in the post editor, page editor, or blueprints studio route, let the studio handle its custom stage
   const isPostEditor = location.pathname.startsWith('/posts/') && location.pathname !== '/posts';
   const isPageEditor = location.pathname.startsWith('/pages/') && location.pathname !== '/pages';
-  const isBlueprintStudio = location.pathname === '/blueprints/studio' || location.pathname === '/blueprints';
+  const isBlueprintStudio =
+    location.pathname === '/blueprints/studio' ||
+    location.pathname === '/blueprints' ||
+    location.pathname === '/blueprints/new' ||
+    location.pathname.startsWith('/blueprints/edit');
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState<PublishResult | null>(null);

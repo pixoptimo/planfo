@@ -66,27 +66,27 @@ export const SiteSettingsPage: React.FC = () => {
   };
 
   if (loading || !settings) {
-    return <div className="text-center py-20 text-slate-500 font-mono text-xs">Loading site configuration...</div>;
+    return <div className="text-center py-20 text-on-surface-variant font-mono text-xs">Loading site configuration...</div>;
   }
 
   return (
     <div className="space-y-6 w-full pb-20">
       <form onSubmit={handleSave} className="space-y-6">
-        <div className="border-b border-slate-800 pb-4">
+        <div className="border-b border-surface-container-high/40 pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
-                <Sliders className="w-6 h-6 text-brand-400" />
+              <h1 className="font-headline-lg text-headline-lg font-serif text-on-surface tracking-tight flex items-center space-x-2">
+                <Sliders className="w-6 h-6 text-primary" />
                 <span>Settings</span>
               </h1>
-              <p className="text-xs text-slate-400 mt-1">Manage website branding, SEO directives, feature packs, and hosting configuration</p>
+              <p className="text-xs text-on-surface-variant mt-1">Manage website branding, SEO directives, feature packs, and hosting configuration</p>
             </div>
 
             {can('settings.update') && activeTab !== 'tools' && (
               <button
                 type="submit"
                 disabled={saving}
-                className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50 self-start"
+                className="px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-semibold text-xs rounded-lg flex items-center space-x-1.5 shadow-sm transition disabled:opacity-50 self-start"
               >
                 {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
                 <span>{saving ? 'Saving...' : 'Save Settings'}</span>
@@ -101,8 +101,8 @@ export const SiteSettingsPage: React.FC = () => {
               onClick={() => setActiveTab('general')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
                 activeTab === 'general'
-                  ? 'bg-brand-600 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-primary text-on-primary shadow-sm'
+                  : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high/60'
               }`}
             >
               <Sliders className="w-3.5 h-3.5" />
@@ -111,7 +111,7 @@ export const SiteSettingsPage: React.FC = () => {
 
             <Link
               to="/settings/seo"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 flex items-center space-x-1.5 transition"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-white hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
             >
               <Globe className="w-3.5 h-3.5" />
               <span>SEO & Indexing</span>
@@ -122,8 +122,8 @@ export const SiteSettingsPage: React.FC = () => {
               onClick={() => setActiveTab('deployment')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
                 activeTab === 'deployment'
-                  ? 'bg-brand-600 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-primary text-on-primary shadow-sm'
+                  : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high/60'
               }`}
             >
               <Cloud className="w-3.5 h-3.5" />
@@ -135,8 +135,8 @@ export const SiteSettingsPage: React.FC = () => {
               onClick={() => setActiveTab('features')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
                 activeTab === 'features'
-                  ? 'bg-brand-600 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-primary text-on-primary shadow-sm'
+                  : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high/60'
               }`}
             >
               <Package className="w-3.5 h-3.5" />
@@ -148,8 +148,8 @@ export const SiteSettingsPage: React.FC = () => {
               onClick={() => setActiveTab('tools')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
                 activeTab === 'tools'
-                  ? 'bg-brand-600 text-slate-950 shadow-sm'
-                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+                  ? 'bg-primary text-on-primary shadow-sm'
+                  : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high/60'
               }`}
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
@@ -173,20 +173,20 @@ export const SiteSettingsPage: React.FC = () => {
 
         {/* Feature Packs Section */}
         {activeTab === 'features' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-            <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-              <Package className="w-4 h-4 text-brand-400" />
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
+            <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
+              <Package className="w-4 h-4 text-primary" />
               <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
                 Planfo Feature Packs
               </h2>
             </div>
-            <p className="text-xs text-slate-400">
+            <p className="text-xs text-on-surface-variant">
               Activate or deactivate modular capabilities for your site. Deactivated packs remain hidden to keep your CMS interface and static output lightweight.
             </p>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
               {/* Pages & Articles (Core - Always Active) */}
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 flex items-start justify-between">
+              <div className="p-4 rounded-xl bg-surface-container-low border border-surface-container-high/40 flex items-start justify-between">
                 <div>
                   <div className="flex items-center space-x-2">
                     <span className="text-xs font-bold text-white">Pages & Articles Blueprint</span>
@@ -194,28 +194,28 @@ export const SiteSettingsPage: React.FC = () => {
                       Core Active
                     </span>
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-on-surface-variant mt-1">
                     Manage static pages, blog articles, hierarchical categories, and menus.
                   </p>
                 </div>
               </div>
 
               {/* Storefront Catalog Pack (Toggleable) */}
-              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 flex items-start justify-between">
+              <div className="p-4 rounded-xl bg-surface-container-low border border-surface-container-high/40 flex items-start justify-between">
                 <div className="pr-4">
                   <div className="flex items-center space-x-2">
                     <span className="text-xs font-bold text-white">Storefront Catalog Pack</span>
                     {settings.featurePacks?.catalog ? (
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 font-mono border border-brand-500/20 font-semibold">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-mono border border-primary/20 font-semibold">
                         Enabled
                       </span>
                     ) : (
-                      <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono border border-slate-700 font-semibold">
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono border border-surface-container-high/50 font-semibold">
                         Disabled
                       </span>
                     )}
                   </div>
-                  <p className="text-[11px] text-slate-400 mt-1">
+                  <p className="text-[11px] text-on-surface-variant mt-1">
                     Enables product catalog, pricing, SKU tracking, and product category pages.
                   </p>
                 </div>
@@ -235,7 +235,7 @@ export const SiteSettingsPage: React.FC = () => {
                     }
                     className="sr-only peer"
                   />
-                  <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
+                  <div className="w-11 h-6 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>
             </div>
@@ -244,14 +244,14 @@ export const SiteSettingsPage: React.FC = () => {
 
         {/* Deployment & Hosting Section */}
         {activeTab === 'deployment' && (
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-          <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-            <GitBranch className="w-4 h-4 text-brand-400" />
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
+          <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
+            <GitBranch className="w-4 h-4 text-primary" />
             <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
               Deployment & Hosting Architecture
             </h2>
           </div>
-          <p className="text-xs text-slate-400">
+          <p className="text-xs text-on-surface-variant">
             Configure how and where your static website is published. Planfo runs with zero database, compiling clean static assets.
           </p>
 
@@ -259,8 +259,8 @@ export const SiteSettingsPage: React.FC = () => {
             <label
               className={`p-3 rounded-xl border cursor-pointer flex flex-col justify-between transition ${
                 (settings.deployment?.target ?? 'local') === 'github-pages'
-                  ? 'bg-brand-500/10 border-brand-500 text-white'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-primary/10 border-primary text-white'
+                  : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
               }`}
             >
               <div className="flex items-center space-x-2 mb-1.5">
@@ -282,7 +282,7 @@ export const SiteSettingsPage: React.FC = () => {
                 />
                 <span className="text-xs font-bold text-white">Git & Cloud Hosting (GitHub Pages, Cloudflare, Netlify, Vercel)</span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-on-surface-variant">
                 1-click push to Git repositories, Cloudflare Pages, Netlify, Vercel, or GitHub Pages. Zero database costs.
               </p>
             </label>
@@ -290,8 +290,8 @@ export const SiteSettingsPage: React.FC = () => {
             <label
               className={`p-3 rounded-xl border cursor-pointer flex flex-col justify-between transition ${
                 (settings.deployment?.target ?? 'local') === 'server'
-                  ? 'bg-brand-500/10 border-brand-500 text-white'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                  ? 'bg-primary/10 border-primary text-white'
+                  : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
               }`}
             >
               <div className="flex items-center space-x-2 mb-1.5">
@@ -313,16 +313,16 @@ export const SiteSettingsPage: React.FC = () => {
                 />
                 <span className="text-xs font-bold text-white">Own Server (Self-Hosted)</span>
               </div>
-              <p className="text-[11px] text-slate-400">
+              <p className="text-[11px] text-on-surface-variant">
                 Atomic zero-downtime directory swap to web root on VPS, Hostinger, or cPanel.
               </p>
             </label>
           </div>
 
           {(settings.deployment?.target ?? 'local') === 'github-pages' && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-slate-800">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2 border-t border-surface-container-high/40">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                   GitHub Repository (owner/repo)
                 </label>
                 <input
@@ -339,12 +339,12 @@ export const SiteSettingsPage: React.FC = () => {
                       }
                     })
                   }
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                   Custom Domain / CNAME (optional)
                 </label>
                 <input
@@ -362,7 +362,7 @@ export const SiteSettingsPage: React.FC = () => {
                       }
                     })
                   }
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -373,12 +373,12 @@ export const SiteSettingsPage: React.FC = () => {
         {/* General Info */}
         {activeTab === 'general' && (
           <div className="space-y-6">
-            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
+            <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
               <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">General Website Information</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                 Site Name *
               </label>
               <input
@@ -386,12 +386,12 @@ export const SiteSettingsPage: React.FC = () => {
                 required
                 value={settings.siteName}
                 onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                 Public Site URL *
               </label>
               <input
@@ -400,13 +400,13 @@ export const SiteSettingsPage: React.FC = () => {
                 value={settings.siteUrl}
                 onChange={(e) => setSettings({ ...settings, siteUrl: e.target.value })}
                 placeholder="https://example.com"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
               Site Tagline / Headline
             </label>
             <input
@@ -414,13 +414,13 @@ export const SiteSettingsPage: React.FC = () => {
               value={settings.tagline}
               onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
               placeholder="e.g. Blazing fast static websites"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
             />
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                 Logo URL
               </label>
               <div className="flex gap-2">
@@ -429,12 +429,12 @@ export const SiteSettingsPage: React.FC = () => {
                   value={settings.logo || ''}
                   onChange={(e) => setSettings({ ...settings, logo: e.target.value })}
                   placeholder="/media/logo.png"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-primary"
                 />
                 <button
                   type="button"
                   onClick={() => setActiveMediaTarget('logo')}
-                  className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs"
+                  className="p-2 bg-surface-container hover:bg-surface-container-highest text-white rounded-lg text-xs"
                 >
                   <ImageIcon className="w-4 h-4" />
                 </button>
@@ -442,7 +442,7 @@ export const SiteSettingsPage: React.FC = () => {
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                 Favicon URL
               </label>
               <div className="flex gap-2">
@@ -451,12 +451,12 @@ export const SiteSettingsPage: React.FC = () => {
                   value={settings.favicon || ''}
                   onChange={(e) => setSettings({ ...settings, favicon: e.target.value })}
                   placeholder="/media/favicon.ico"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-primary"
                 />
                 <button
                   type="button"
                   onClick={() => setActiveMediaTarget('favicon')}
-                  className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs"
+                  className="p-2 bg-surface-container hover:bg-surface-container-highest text-white rounded-lg text-xs"
                 >
                   <ImageIcon className="w-4 h-4" />
                 </button>
@@ -466,12 +466,12 @@ export const SiteSettingsPage: React.FC = () => {
         </div>
 
         {/* Social Links & Analytics */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
+        <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
           <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">Social Links & Integrations</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                 Twitter / X Profile
               </label>
               <input
@@ -484,12 +484,12 @@ export const SiteSettingsPage: React.FC = () => {
                   })
                 }
                 placeholder="https://twitter.com/..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                 GitHub Repository
               </label>
               <input
@@ -502,14 +502,14 @@ export const SiteSettingsPage: React.FC = () => {
                   })
                 }
                 placeholder="https://github.com/..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                 Google Analytics / Tracking ID
               </label>
               <input
@@ -517,45 +517,45 @@ export const SiteSettingsPage: React.FC = () => {
                 value={settings.analyticsId || ''}
                 onChange={(e) => setSettings({ ...settings, analyticsId: e.target.value })}
                 placeholder="G-XXXXXXXXXX"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-primary"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
                 Footer Copyright Text
               </label>
               <input
                 type="text"
                 value={settings.footerText}
                 onChange={(e) => setSettings({ ...settings, footerText: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
               />
             </div>
           </div>
         </div>
 
         {/* Dedicated SEO Settings Shortcut Card */}
-        <div className="p-5 rounded-xl bg-gradient-to-r from-brand-950/40 via-slate-900 to-slate-900 border border-brand-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="p-5 rounded-2xl bg-surface-container-low border border-primary/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-start space-x-3.5">
-            <div className="p-2.5 rounded-lg bg-brand-500/10 text-brand-400 border border-brand-500/20 flex-shrink-0 mt-0.5">
+            <div className="p-2.5 rounded-lg bg-primary/10 text-primary border border-primary/20 flex-shrink-0 mt-0.5">
               <Globe className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-sm font-bold text-white flex items-center space-x-2">
                 <span>SEO & Search Engine Indexing Settings</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 font-mono border border-brand-500/20 font-semibold">
+                <span className="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-mono border border-primary/20 font-semibold">
                   Dedicated Tab
                 </span>
               </h3>
-              <p className="text-xs text-slate-400 mt-1 max-w-xl leading-relaxed">
+              <p className="text-xs text-on-surface-variant mt-1 max-w-xl leading-relaxed">
                 Configure search engine visibility directives, fallback meta descriptions, social graph Open Graph banners, and preview live Google SERP snippets.
               </p>
             </div>
           </div>
           <Link
             to="/settings/seo"
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition flex-shrink-0 self-start sm:self-auto border border-slate-700 hover:border-slate-600 shadow-sm"
+            className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition flex-shrink-0 self-start sm:self-auto border border-surface-container-high/50 hover:border-primary/40 shadow-sm"
           >
             <span>Open SEO Settings</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -629,15 +629,15 @@ const UrlRewriterCard: React.FC = () => {
   };
 
   return (
-    <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-5">
-      <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-        <RefreshCw className="w-4 h-4 text-brand-400" />
+    <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-5">
+      <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
+        <RefreshCw className="w-4 h-4 text-primary" />
         <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
           Global URL & Permalink Search-and-Replace
         </h2>
       </div>
 
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-on-surface-variant">
         Safely migrate domain names, ports (e.g. <code className="text-brand-300">http://localhost:3000</code> to <code className="text-brand-300">http://localhost:4000</code>), or URL prefixes across all JSON storage files (pages, blog posts, blueprints, products, and navigation menus) with atomic file writes and automatic site regeneration.
       </p>
 
@@ -650,7 +650,7 @@ const UrlRewriterCard: React.FC = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
             Search String / Old URL
           </label>
           <input
@@ -658,12 +658,12 @@ const UrlRewriterCard: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="e.g. http://localhost:3000 or /blog/hoodie"
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono"
+            className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary font-mono"
           />
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+          <label className="block text-xs font-semibold text-on-surface uppercase tracking-wider mb-1">
             Replace With / New URL
           </label>
           <input
@@ -671,7 +671,7 @@ const UrlRewriterCard: React.FC = () => {
             value={replace}
             onChange={(e) => setReplace(e.target.value)}
             placeholder="e.g. http://localhost:4000 or /products/hoodie"
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 font-mono"
+            className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary font-mono"
           />
         </div>
       </div>
@@ -681,7 +681,7 @@ const UrlRewriterCard: React.FC = () => {
           type="button"
           disabled={loading || !search.trim()}
           onClick={() => handleRewrite(true)}
-          className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
+          className="px-3.5 py-2 bg-surface-container hover:bg-surface-container-highest text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
           <span>Dry Run Preview</span>
@@ -691,7 +691,7 @@ const UrlRewriterCard: React.FC = () => {
           type="button"
           disabled={loading || !search.trim()}
           onClick={() => handleRewrite(false)}
-          className="px-3.5 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+          className="px-3.5 py-2 bg-primary hover:bg-primary-container text-on-primary font-semibold text-xs rounded-lg flex items-center space-x-1.5 shadow-sm transition disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
           <span>Run Global Replace & Regenerate</span>
@@ -714,18 +714,18 @@ const UrlRewriterCard: React.FC = () => {
           </div>
 
           {report.files.length > 0 ? (
-            <div className="mt-2 space-y-1 pt-2 border-t border-slate-800/60 font-mono text-[11px]">
+            <div className="mt-2 space-y-1 pt-2 border-t border-surface-container-high/30 font-mono text-[11px]">
               {report.files.map((item, idx) => (
-                <div key={idx} className="flex justify-between items-center text-slate-300">
+                <div key={idx} className="flex justify-between items-center text-on-surface">
                   <span className="truncate pr-2">{item.file}</span>
-                  <span className="px-1.5 py-0.5 rounded bg-slate-800 text-white text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded bg-surface-container text-white text-[10px]">
                     {item.matches} {item.matches === 1 ? 'match' : 'matches'}
                   </span>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-slate-400 text-xs italic">No matching instances found in any storage files.</p>
+            <p className="text-on-surface-variant text-xs italic">No matching instances found in any storage files.</p>
           )}
         </div>
       )}

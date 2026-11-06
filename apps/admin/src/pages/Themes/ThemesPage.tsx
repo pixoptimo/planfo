@@ -143,7 +143,7 @@ export const ThemesPage: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-slate-500">
+      <div className="flex items-center justify-center py-20 text-on-surface-variant">
         <Loader2 className="w-6 h-6 animate-spin mr-2" />
         <span>Loading design themes...</span>
       </div>
@@ -155,13 +155,13 @@ export const ThemesPage: React.FC = () => {
   return (
     <div className="space-y-6 w-full pb-20">
       {/* Header bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-container-high/40 pb-4">
         <div>
           <div className="flex items-center space-x-2">
-            <Palette className="w-5 h-5 text-brand-400" />
-            <h1 className="text-2xl font-bold text-white tracking-tight">Design Themes & Layouts</h1>
+            <Palette className="w-5 h-5 text-primary" />
+            <h1 className="font-headline-lg text-headline-lg font-serif text-on-surface tracking-tight">Design Themes & Layouts</h1>
           </div>
-          <p className="text-xs text-slate-400 mt-1">
+          <p className="text-xs text-on-surface-variant mt-1">
             Choose the presentation layout for your static website.
           </p>
         </div>
@@ -173,7 +173,7 @@ export const ThemesPage: React.FC = () => {
                 type="button"
                 disabled={cleaningAll || installing}
                 onClick={() => setConfirmCleanAll(true)}
-                className="px-3.5 py-2 bg-slate-900 hover:bg-red-500/10 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/30 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50 shadow-sm"
+                className="px-3.5 py-2 bg-surface-container-lowest hover:bg-red-500/10 text-on-surface-variant hover:text-red-400 border border-surface-container-high/40 hover:border-red-500/30 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50 shadow-sm"
               >
                 {cleaningAll ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin text-red-400" />
@@ -195,12 +195,12 @@ export const ThemesPage: React.FC = () => {
               type="button"
               disabled={installing || cleaningAll}
               onClick={() => fileInputRef.current?.click()}
-              className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 transition shadow-lg shadow-brand-500/20 disabled:opacity-50"
+              className="px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-semibold text-xs rounded-lg flex items-center space-x-2 transition shadow-sm disabled:opacity-50"
             >
               {installing ? (
-                <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
+                <Loader2 className="w-4 h-4 animate-spin text-on-primary" />
               ) : (
-                <Upload className="w-4 h-4 text-slate-950" />
+                <Upload className="w-4 h-4 text-on-primary" />
               )}
               <span>{installing ? 'Installing Theme...' : 'Upload Theme (.zip)'}</span>
             </button>
@@ -238,9 +238,9 @@ export const ThemesPage: React.FC = () => {
 
       {/* Active Theme Highlight Banner */}
       {activeTheme && (
-        <div className="p-5 rounded-xl bg-gradient-to-r from-slate-900 to-slate-950 border border-brand-500/30 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+        <div className="p-5 rounded-xl bg-surface-container-low border border-primary/30 shadow-lg flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-lg bg-brand-500/10 border border-brand-500/20 flex items-center justify-center text-brand-400">
+            <div className="w-12 h-12 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center text-primary">
               <Sparkles className="w-6 h-6" />
             </div>
             <div>
@@ -248,15 +248,15 @@ export const ThemesPage: React.FC = () => {
                 <span className="text-xs uppercase font-mono font-bold text-emerald-400 tracking-wider">
                   Active Design Theme
                 </span>
-                <span className="text-[11px] font-mono text-slate-500">v{activeTheme.version}</span>
+                <span className="text-[11px] font-mono text-on-surface-variant">v{activeTheme.version}</span>
               </div>
               <h2 className="text-lg font-bold text-white">{activeTheme.name}</h2>
-              <p className="text-xs text-slate-400 mt-0.5">{activeTheme.description}</p>
+              <p className="text-xs text-on-surface-variant mt-0.5">{activeTheme.description}</p>
             </div>
           </div>
 
-          <div className="flex items-center space-x-2 text-xs font-mono text-slate-400 bg-slate-950/80 px-3 py-1.5 rounded-lg border border-slate-800">
-            <Layers className="w-3.5 h-3.5 text-slate-500" />
+          <div className="flex items-center space-x-2 text-xs font-mono text-on-surface-variant bg-surface-container-low/80 px-3 py-1.5 rounded-lg border border-surface-container-high/40">
+            <Layers className="w-3.5 h-3.5 text-on-surface-variant" />
             <span>Theme ID: {activeTheme.id}</span>
           </div>
         </div>
@@ -270,14 +270,14 @@ export const ThemesPage: React.FC = () => {
           return (
             <div
               key={theme.id}
-              className={`flex flex-col rounded-xl overflow-hidden bg-slate-900 transition duration-200 border ${
+              className={`flex flex-col rounded-xl overflow-hidden bg-surface-container-lowest transition duration-200 border ${
                 isActive
                   ? 'border-emerald-500/50 shadow-xl shadow-emerald-500/5 ring-1 ring-emerald-500/30'
-                  : 'border-slate-800 hover:border-slate-700'
+                  : 'border-surface-container-high/40 hover:border-surface-container-high/50'
               }`}
             >
               {/* Preview Thumbnail */}
-              <div className="relative aspect-[16/10] bg-slate-950 overflow-hidden flex items-center justify-center border-b border-slate-800">
+              <div className="relative aspect-[16/10] bg-surface-container-low overflow-hidden flex items-center justify-center border-b border-surface-container-high/40">
                 {theme.thumbnail ? (
                   <img
                     src={theme.thumbnail}
@@ -285,14 +285,14 @@ export const ThemesPage: React.FC = () => {
                     className="w-full h-full object-cover object-top"
                   />
                 ) : (
-                  <div className="text-center p-6 text-slate-600">
+                  <div className="text-center p-6 text-outline-variant">
                     <Palette className="w-12 h-12 mx-auto mb-2 opacity-30" />
                     <span className="text-xs font-mono">No Preview Available</span>
                   </div>
                 )}
 
                 {isActive && (
-                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-emerald-500/90 text-slate-950 text-[10px] font-mono font-bold uppercase shadow-md flex items-center space-x-1 backdrop-blur-sm">
+                  <div className="absolute top-3 right-3 px-2.5 py-1 rounded-full bg-emerald-500/90 text-on-primary text-[10px] font-mono font-bold uppercase shadow-md flex items-center space-x-1 backdrop-blur-sm">
                     <CheckCircle2 className="w-3 h-3" />
                     <span>Active Theme</span>
                   </div>
@@ -307,7 +307,7 @@ export const ThemesPage: React.FC = () => {
                       e.stopPropagation();
                       setConfirmDeleteTheme(theme);
                     }}
-                    className="absolute top-3 left-3 p-1.5 rounded-lg bg-slate-950/80 hover:bg-red-500/30 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/40 transition backdrop-blur-sm shadow-md"
+                    className="absolute top-3 left-3 p-1.5 rounded-lg bg-surface-container-low/80 hover:bg-red-500/30 text-on-surface-variant hover:text-red-400 border border-surface-container-high/40 hover:border-red-500/40 transition backdrop-blur-sm shadow-md"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>
@@ -319,14 +319,14 @@ export const ThemesPage: React.FC = () => {
                 <div>
                   <div className="flex items-center justify-between">
                     <h3 className="text-base font-bold text-white">{theme.name}</h3>
-                    <span className="text-xs font-mono text-slate-500">v{theme.version}</span>
+                    <span className="text-xs font-mono text-on-surface-variant">v{theme.version}</span>
                   </div>
 
-                  <p className="text-xs text-slate-400 mt-1 line-clamp-2">
+                  <p className="text-xs text-on-surface-variant mt-1 line-clamp-2">
                     {theme.description || 'Custom theme for Planfo CMS.'}
                   </p>
 
-                  <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
+                  <div className="mt-3 flex items-center justify-between text-[11px] text-on-surface-variant">
                     <span>By {theme.author || 'Planfo Community'}</span>
                   </div>
 
@@ -336,7 +336,7 @@ export const ThemesPage: React.FC = () => {
                       {theme.supportedPacks.map((pack) => (
                         <span
                           key={pack}
-                          className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-slate-950 text-slate-400 border border-slate-800"
+                          className="px-2 py-0.5 rounded text-[10px] font-mono uppercase bg-surface-container-low text-on-surface-variant border border-surface-container-high/40"
                         >
                           {pack}
                         </span>
@@ -346,7 +346,7 @@ export const ThemesPage: React.FC = () => {
                 </div>
 
                 {/* Actions */}
-                <div className="pt-3 border-t border-slate-800 flex items-center justify-between gap-2">
+                <div className="pt-3 border-t border-surface-container-high/40 flex items-center justify-between gap-2">
                   {isActive ? (
                     <>
                       <div className="text-xs font-semibold text-emerald-400 flex items-center space-x-1.5">
@@ -359,7 +359,7 @@ export const ThemesPage: React.FC = () => {
                           title="Remove Theme"
                           disabled={deletingId === theme.id}
                           onClick={() => setConfirmDeleteTheme(theme)}
-                          className="px-2.5 py-1.5 bg-slate-950 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/30 text-xs rounded-lg transition flex items-center space-x-1"
+                          className="px-2.5 py-1.5 bg-surface-container-low hover:bg-red-500/20 text-on-surface-variant hover:text-red-400 border border-surface-container-high/40 hover:border-red-500/30 text-xs rounded-lg transition flex items-center space-x-1"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span className="text-[11px]">Remove</span>
@@ -373,11 +373,11 @@ export const ThemesPage: React.FC = () => {
                           type="button"
                           disabled={activatingId === theme.id || deletingId === theme.id}
                           onClick={() => handleActivate(theme.id)}
-                          className="flex-1 py-2 bg-slate-800 hover:bg-slate-700 text-white font-medium text-xs rounded-lg flex items-center justify-center space-x-1.5 transition border border-slate-700 disabled:opacity-50"
+                          className="flex-1 py-2 bg-surface-container hover:bg-surface-container-highest text-white font-medium text-xs rounded-lg flex items-center justify-center space-x-1.5 transition border border-surface-container-high/50 disabled:opacity-50"
                         >
                           {activatingId === theme.id ? (
                             <>
-                              <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-400" />
+                              <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
                               <span>Activating...</span>
                             </>
                           ) : (
@@ -394,7 +394,7 @@ export const ThemesPage: React.FC = () => {
                             title="Delete Theme"
                             disabled={deletingId === theme.id}
                             onClick={() => setConfirmDeleteTheme(theme)}
-                            className="p-2 bg-slate-950 hover:bg-red-500/20 text-slate-400 hover:text-red-400 border border-slate-800 hover:border-red-500/40 rounded-lg text-xs transition"
+                            className="p-2 bg-surface-container-low hover:bg-red-500/20 text-on-surface-variant hover:text-red-400 border border-surface-container-high/40 hover:border-red-500/40 rounded-lg text-xs transition"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -412,13 +412,13 @@ export const ThemesPage: React.FC = () => {
       {/* Delete Single Theme Confirmation Modal */}
       {confirmDeleteTheme && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="text-center space-y-1.5">
               <h3 className="text-lg font-bold text-white">Delete Theme</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-on-surface-variant leading-relaxed">
                 Are you sure you want to permanently delete{' '}
                 <span className="font-semibold text-white">"{confirmDeleteTheme.name}"</span>?
                 {confirmDeleteTheme.isActive && (
@@ -433,7 +433,7 @@ export const ThemesPage: React.FC = () => {
                 type="button"
                 disabled={deletingId === confirmDeleteTheme.id}
                 onClick={() => setConfirmDeleteTheme(null)}
-                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl transition"
+                className="flex-1 py-2.5 bg-surface-container hover:bg-surface-container-highest text-on-surface font-semibold text-xs rounded-xl transition"
               >
                 Cancel
               </button>
@@ -463,13 +463,13 @@ export const ThemesPage: React.FC = () => {
       {/* Remove All Uploaded Themes Confirmation Modal */}
       {confirmCleanAll && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
             <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="text-center space-y-1.5">
               <h3 className="text-lg font-bold text-white">Remove All Uploaded Themes</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-on-surface-variant leading-relaxed">
                 This will permanently delete all custom and uploaded theme folders from the filesystem.
                 The active theme will immediately revert to the default <span className="text-white font-semibold">Planfo Default</span> theme and the static website will be regenerated.
               </p>
@@ -479,7 +479,7 @@ export const ThemesPage: React.FC = () => {
                 type="button"
                 disabled={cleaningAll}
                 onClick={() => setConfirmCleanAll(false)}
-                className="flex-1 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl transition"
+                className="flex-1 py-2.5 bg-surface-container hover:bg-surface-container-highest text-on-surface font-semibold text-xs rounded-xl transition"
               >
                 Cancel
               </button>

@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Plus, Search, Eye, Edit, Trash2, ShoppingBag, Star } from 'lucide-react';
 import type { Product } from '@cms/schemas';
 import { api } from '../../api/client.js';
 import { StatusBadge } from '../../components/UI/StatusBadge.js';
@@ -39,50 +38,65 @@ export const ProductList: React.FC = () => {
   };
 
   const filtered = products.filter((p) => {
-    const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
-                          p.slug.includes(search.toLowerCase()) ||
-                          p.sku.toLowerCase().includes(search.toLowerCase());
+    const matchesSearch =
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.slug.includes(search.toLowerCase()) ||
+      p.sku.toLowerCase().includes(search.toLowerCase());
     const matchesStatus = statusFilter === 'all' || p.status === statusFilter;
     return matchesSearch && matchesStatus;
   });
 
   return (
-    <div className="space-y-6">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 w-full max-w-7xl mx-auto font-body-md text-on-surface antialiased">
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Products Catalog</h1>
-          <p className="text-xs text-slate-400 mt-1">Manage e-commerce products, pricing, SKU codes, and specifications</p>
+          <div className="flex items-center gap-2">
+            <span className="font-label-xs text-label-xs uppercase tracking-widest text-primary font-bold">
+              05 / Storefront Catalog
+            </span>
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          </div>
+          <h1 className="font-headline-lg text-headline-lg font-serif text-on-surface tracking-tight">
+            Products Catalog
+          </h1>
+          <p className="font-body-md text-body-md text-on-surface-variant pt-1">
+            Manage e-commerce products, pricing, SKU inventory, and specifications.
+          </p>
         </div>
 
         {can('products.create') && (
           <Link
             to="/products/new"
-            className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition self-start"
+            className="px-5 py-2.5 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all hover:scale-[1.01] self-start sm:self-center"
           >
-            <Plus className="w-4 h-4" />
+            <span className="material-symbols-outlined text-[18px]">add</span>
             <span>Add New Product</span>
           </Link>
         )}
       </div>
 
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-slate-900 border border-slate-800 p-4 rounded-xl">
-        <div className="relative flex-1 min-w-[240px]">
-          <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+      {/* Filter and Search Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-4 bg-surface-container-lowest border border-surface-container-high/40 p-4 rounded-2xl shadow-sm">
+        <div className="relative flex-1 min-w-[260px]">
+          <span className="material-symbols-outlined text-[18px] absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant">
+            search
+          </span>
           <input
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search products by name, slug or SKU..."
-            className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-9 pr-4 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+            className="w-full bg-surface-container-low border border-surface-container-high/30 rounded-xl pl-10 pr-4 py-2 font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-1 focus:ring-primary"
           />
         </div>
 
-        <div className="flex items-center space-x-2">
-          <span className="text-xs text-slate-400">Status:</span>
+        <div className="flex items-center gap-2">
+          <span className="font-label-sm text-label-sm text-on-surface-variant font-medium">Status:</span>
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
-            className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none"
+            className="bg-surface-container-low border border-surface-container-high/30 rounded-xl px-3.5 py-1.5 font-label-sm text-label-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
           >
             <option value="all">All Statuses</option>
             <option value="published">Published</option>
@@ -92,86 +106,110 @@ export const ProductList: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+      {/* Products Table Card */}
+      <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase font-mono border-b border-slate-800">
+          <table className="w-full text-left font-body-sm text-body-sm">
+            <thead className="bg-surface-container-low text-on-surface-variant font-label-xs text-label-xs uppercase tracking-wider border-b border-surface-container-high/40">
               <tr>
-                <th className="px-6 py-3">Product Name</th>
-                <th className="px-6 py-3">SKU</th>
-                <th className="px-6 py-3">Price</th>
-                <th className="px-6 py-3">Category</th>
-                <th className="px-6 py-3">Status</th>
-                <th className="px-6 py-3 text-right">Actions</th>
+                <th className="px-6 py-3.5">Product Name</th>
+                <th className="px-6 py-3.5">SKU</th>
+                <th className="px-6 py-3.5">Price</th>
+                <th className="px-6 py-3.5">Category</th>
+                <th className="px-6 py-3.5">Status</th>
+                <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-surface-container-high/30 text-on-surface">
               {loading ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">Loading products...</td>
+                  <td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant font-body-sm">
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                      <span>Loading products...</span>
+                    </div>
+                  </td>
                 </tr>
               ) : filtered.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={6} className="px-6 py-12 text-center text-on-surface-variant font-body-sm">
                     No products found. Add your first store product!
                   </td>
                 </tr>
               ) : (
                 filtered.map((prod) => (
-                  <tr key={prod.id} className="hover:bg-slate-800/40 transition">
-                    <td className="px-6 py-3.5 font-semibold text-white">
-                      <Link to={`/products/${prod.slug}`} className="hover:text-brand-400 transition flex items-center space-x-3">
+                  <tr key={prod.id} className="hover:bg-surface-container-low/40 transition-colors group">
+                    <td className="px-6 py-4">
+                      <Link
+                        to={`/products/${prod.slug}`}
+                        className="hover:text-primary transition-colors flex items-center gap-3"
+                      >
                         {prod.images?.[0] ? (
-                          <img src={prod.images[0]} alt="" className="w-8 h-8 rounded object-cover border border-slate-800" />
+                          <img
+                            src={prod.images[0]}
+                            alt=""
+                            className="w-9 h-9 rounded-lg object-cover border border-surface-container-high/40 shrink-0 shadow-2xs"
+                          />
                         ) : (
-                          <div className="w-8 h-8 rounded bg-slate-800 flex items-center justify-center text-slate-500">
-                            <ShoppingBag className="w-4 h-4" />
+                          <div className="w-9 h-9 rounded-lg bg-surface-container border border-surface-container-high/40 flex items-center justify-center text-primary shrink-0">
+                            <span className="material-symbols-outlined text-[18px]">shopping_bag</span>
                           </div>
                         )}
-                        <div className="flex items-center space-x-2">
-                          <span>{prod.name}</span>
-                          {prod.featured && <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />}
+                        <div className="flex items-center gap-1.5 min-w-0">
+                          <span className="font-title-sm text-title-sm font-semibold text-on-surface truncate">
+                            {prod.name}
+                          </span>
+                          {prod.featured && (
+                            <span className="material-symbols-outlined text-amber-500 text-[16px] shrink-0 fill-current">
+                              star
+                            </span>
+                          )}
                         </div>
                       </Link>
                     </td>
-                    <td className="px-6 py-3.5 text-xs text-slate-400 font-mono">
+                    <td className="px-6 py-4 text-xs text-on-surface-variant font-mono">
                       {prod.sku || '—'}
                     </td>
-                    <td className="px-6 py-3.5 text-xs font-mono font-bold text-emerald-400">
-                      {new Intl.NumberFormat('en-US', { style: 'currency', currency: prod.currency || 'USD' }).format(prod.price)}
+                    <td className="px-6 py-4 text-xs font-mono font-bold text-primary">
+                      {new Intl.NumberFormat('en-US', {
+                        style: 'currency',
+                        currency: prod.currency || 'USD'
+                      }).format(prod.price)}
                     </td>
-                    <td className="px-6 py-3.5 text-xs text-slate-300 font-mono">
-                      <span className="bg-slate-800 px-2 py-0.5 rounded text-[11px]">{prod.category}</span>
+                    <td className="px-6 py-4 text-xs">
+                      <span className="bg-surface-container px-2.5 py-0.5 rounded-full font-label-xs text-label-xs font-medium text-on-surface">
+                        {prod.category}
+                      </span>
                     </td>
-                    <td className="px-6 py-3.5">
+                    <td className="px-6 py-4">
                       <StatusBadge status={prod.status} />
                     </td>
-                    <td className="px-6 py-3.5 text-right">
-                      <div className="flex items-center justify-end space-x-2">
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
                         <a
                           href={`/api/preview/product/${prod.slug}`}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="p-1.5 text-slate-400 hover:text-brand-400 hover:bg-slate-800 rounded transition"
+                          className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors"
                           title="Live Preview"
                         >
-                          <Eye className="w-4 h-4" />
+                          <span className="material-symbols-outlined text-[18px]">visibility</span>
                         </a>
                         <Link
                           to={`/products/${prod.slug}`}
-                          className="p-1.5 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition"
+                          className="p-1.5 text-on-surface-variant hover:text-on-surface hover:bg-surface-container rounded-lg transition-colors"
                           title="Edit Product"
                         >
-                          <Edit className="w-4 h-4" />
+                          <span className="material-symbols-outlined text-[18px]">edit</span>
                         </Link>
                         {can('products.delete') && (
                           <button
                             type="button"
                             onClick={() => handleDelete(prod.slug, prod.name)}
-                            className="p-1.5 text-slate-400 hover:text-red-400 hover:bg-slate-800 rounded transition"
+                            className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg transition-colors"
                             title="Delete Product"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
                           </button>
                         )}
                       </div>

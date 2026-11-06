@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Users, Trash2, Edit, Check, X, Shield, Lock, Mail } from 'lucide-react';
 import type { User, UserRole } from '@cms/schemas';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.js';
@@ -92,109 +91,129 @@ export const UserManagement: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 w-full">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-6 w-full max-w-7xl mx-auto font-body-md text-on-surface antialiased">
+      {/* Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">User Management</h1>
-          <p className="text-xs text-slate-400 mt-1">Manage team members, roles (Admin, Editor, Author), and access credentials</p>
+          <div className="flex items-center gap-2">
+            <span className="font-label-xs text-label-xs uppercase tracking-widest text-primary font-bold">
+              07 / Access & Security
+            </span>
+            <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+          </div>
+          <h1 className="font-headline-lg text-headline-lg font-serif text-on-surface tracking-tight">
+            User Management
+          </h1>
+          <p className="font-body-md text-body-md text-on-surface-variant pt-1">
+            Manage team members, roles (Admin, Editor, Author), and authentication credentials.
+          </p>
         </div>
 
         {can('users.create') && (
           <button
             type="button"
             onClick={() => openModal()}
-            className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition self-start"
+            className="px-5 py-2.5 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold rounded-xl flex items-center gap-2 shadow-sm transition-all hover:scale-[1.01] self-start sm:self-center"
           >
-            <Plus className="w-4 h-4" />
+            <span className="material-symbols-outlined text-[18px]">person_add</span>
             <span>Create New User</span>
           </button>
         )}
       </div>
 
-      {/* Users Table */}
-      <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden">
+      {/* Users Table Card */}
+      <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl overflow-hidden shadow-sm">
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase font-mono border-b border-slate-800">
+          <table className="w-full text-left font-body-sm text-body-sm">
+            <thead className="bg-surface-container-low text-on-surface-variant font-label-xs text-label-xs uppercase tracking-wider border-b border-surface-container-high/40">
               <tr>
-                <th className="px-6 py-3">User / Email</th>
-                <th className="px-6 py-3">Role</th>
-                <th className="px-6 py-3">Status</th>
-                <th className="px-6 py-3">Created</th>
-                <th className="px-6 py-3 text-right">Actions</th>
+                <th className="px-6 py-3.5">User / Email</th>
+                <th className="px-6 py-3.5">Role</th>
+                <th className="px-6 py-3.5">Status</th>
+                <th className="px-6 py-3.5">Created</th>
+                <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-surface-container-high/30 text-on-surface">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500">Loading users...</td>
-                </tr>
-              ) : users.map((u) => (
-                <tr key={u.id} className="hover:bg-slate-800/40 transition">
-                  <td className="px-6 py-3.5">
-                    <div className="flex items-center space-x-3">
-                      <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-brand-400 uppercase">
-                        {u.name?.[0] || u.email[0]}
-                      </div>
-                      <div>
-                        <p className="text-sm font-semibold text-white">{u.name || u.email}</p>
-                        <p className="text-xs text-slate-400 font-mono">{u.email}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-3.5">
-                    <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-mono font-semibold uppercase ${
-                      u.role === 'admin'
-                        ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20'
-                        : u.role === 'editor'
-                        ? 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                        : 'bg-slate-800 text-slate-400'
-                    }`}>
-                      {u.role}
-                    </span>
-                  </td>
-                  <td className="px-6 py-3.5">
-                    {u.active ? (
-                      <span className="inline-flex items-center text-xs text-emerald-400">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5"></span>
-                        Active
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center text-xs text-slate-500">
-                        <span className="w-1.5 h-1.5 rounded-full bg-slate-500 mr-1.5"></span>
-                        Inactive
-                      </span>
-                    )}
-                  </td>
-                  <td className="px-6 py-3.5 text-xs text-slate-400 font-mono">
-                    {new Date(u.createdAt).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-3.5 text-right">
-                    <div className="flex items-center justify-end space-x-2">
-                      {can('users.update') && (
-                        <button
-                          type="button"
-                          onClick={() => openModal(u)}
-                          className="p-1.5 text-slate-400 hover:text-white rounded transition"
-                          title="Edit User"
-                        >
-                          <Edit className="w-4 h-4" />
-                        </button>
-                      )}
-                      {can('users.delete') && u.id !== currentUser?.id && (
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(u)}
-                          className="p-1.5 text-slate-400 hover:text-red-400 rounded transition"
-                          title="Delete User"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      )}
+                  <td colSpan={5} className="px-6 py-12 text-center text-on-surface-variant font-body-sm">
+                    <div className="flex flex-col items-center gap-2">
+                      <span className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+                      <span>Loading team users...</span>
                     </div>
                   </td>
                 </tr>
-              ))}
+              ) : (
+                users.map((u) => (
+                  <tr key={u.id} className="hover:bg-surface-container-low/40 transition-colors group">
+                    <td className="px-6 py-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-9 h-9 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs uppercase shadow-2xs">
+                          {u.name?.[0] || u.email[0]}
+                        </div>
+                        <div>
+                          <p className="font-title-sm text-title-sm font-semibold text-on-surface">{u.name || u.email}</p>
+                          <p className="font-code text-code text-[11px] text-on-surface-variant">{u.email}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full font-label-xs text-label-xs font-semibold uppercase ${
+                          u.role === 'admin'
+                            ? 'bg-surface-container-highest text-primary'
+                            : u.role === 'editor'
+                            ? 'bg-surface-container text-primary'
+                            : 'bg-surface-container text-on-surface-variant'
+                        }`}
+                      >
+                        {u.role}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      {u.active ? (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container-highest text-primary font-label-xs text-label-xs font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+                          Active
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-xs text-label-xs font-medium">
+                          <span className="w-1.5 h-1.5 rounded-full bg-on-surface-variant" />
+                          Inactive
+                        </span>
+                      )}
+                    </td>
+                    <td className="px-6 py-4 text-xs text-on-surface-variant font-mono">
+                      {new Date(u.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-right">
+                      <div className="flex items-center justify-end gap-1.5">
+                        {can('users.update') && (
+                          <button
+                            type="button"
+                            onClick={() => openModal(u)}
+                            className="p-1.5 text-on-surface-variant hover:text-primary hover:bg-surface-container rounded-lg transition-colors"
+                            title="Edit User"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">edit</span>
+                          </button>
+                        )}
+                        {can('users.delete') && u.id !== currentUser?.id && (
+                          <button
+                            type="button"
+                            onClick={() => handleDelete(u)}
+                            className="p-1.5 text-on-surface-variant hover:text-error hover:bg-error-container/40 rounded-lg transition-colors"
+                            title="Delete User"
+                          >
+                            <span className="material-symbols-outlined text-[18px]">delete</span>
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>
@@ -202,20 +221,24 @@ export const UserManagement: React.FC = () => {
 
       {/* Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-xl w-full max-w-md p-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
-              <h3 className="font-bold text-white text-base">
-                {editingUser ? 'Edit User' : 'Create New User'}
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl w-full max-w-md p-6 shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="flex items-center justify-between border-b border-surface-container-high/40 pb-3 mb-4">
+              <h3 className="font-headline-sm text-headline-sm font-serif text-on-surface">
+                {editingUser ? 'Edit User Account' : 'Create New User'}
               </h3>
-              <button onClick={() => setShowModal(false)} className="text-slate-400 hover:text-white">
-                <X className="w-5 h-5" />
+              <button
+                type="button"
+                onClick={() => setShowModal(false)}
+                className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+              >
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
 
             <form onSubmit={handleSave} className="space-y-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
                   Full Name
                 </label>
                 <input
@@ -223,12 +246,12 @@ export const UserManagement: React.FC = () => {
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="e.g. Jane Doe"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
                   Email Address *
                 </label>
                 <input
@@ -237,12 +260,12 @@ export const UserManagement: React.FC = () => {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="user@example.com"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
                   {editingUser ? 'New Password (leave blank to keep existing)' : 'Password (min 8 chars) *'}
                 </label>
                 <input
@@ -251,18 +274,18 @@ export const UserManagement: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
                   Assigned Role
                 </label>
                 <select
                   value={role}
                   onChange={(e) => setRole(e.target.value as any)}
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                 >
                   <option value="admin">Admin (Full Access & Publishing)</option>
                   <option value="editor">Editor (Create, Edit & Publish Content)</option>
@@ -271,28 +294,28 @@ export const UserManagement: React.FC = () => {
               </div>
 
               <div className="pt-2">
-                <label className="flex items-center space-x-2 text-xs font-semibold text-slate-300 cursor-pointer">
+                <label className="flex items-center gap-2.5 font-label-sm text-label-sm font-semibold text-on-surface cursor-pointer py-1">
                   <input
                     type="checkbox"
                     checked={active}
                     onChange={(e) => setActive(e.target.checked)}
-                    className="rounded bg-slate-950 border-slate-800 text-brand-500"
+                    className="w-4 h-4 text-primary rounded border-surface-container-high focus:ring-primary"
                   />
                   <span>User Account Active</span>
                 </label>
               </div>
 
-              <div className="flex justify-end space-x-2 pt-4">
+              <div className="flex justify-end gap-2.5 pt-4 border-t border-surface-container-high/40">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs font-semibold"
+                  className="px-4 py-2 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-xl font-label-md text-label-md font-semibold transition-colors"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold rounded-lg text-xs"
+                  className="px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold rounded-xl shadow-sm transition-all"
                 >
                   {editingUser ? 'Save Changes' : 'Create User'}
                 </button>

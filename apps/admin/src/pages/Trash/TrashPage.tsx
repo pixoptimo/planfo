@@ -170,7 +170,7 @@ export const TrashPage: React.FC = () => {
       default:
         return {
           label: type,
-          bg: 'bg-slate-500/10 text-slate-400 border-slate-500/20',
+          bg: 'bg-surface-container text-on-surface-variant border-surface-container-high/40',
           icon: Trash2
         };
     }
@@ -211,13 +211,13 @@ export const TrashPage: React.FC = () => {
   return (
     <div className="space-y-6 w-full pb-20">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-container-high/40 pb-5">
         <div>
           <div className="inline-flex items-center space-x-1.5 text-xs font-mono text-rose-400 mb-1">
             <Trash2 className="w-3.5 h-3.5" />
             <span>Soft Delete Recovery & System Trash</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
+          <h1 className="font-headline-lg text-headline-lg font-serif text-on-surface tracking-tight flex items-center gap-2">
             <span>Trash</span>
             {items.length > 0 && (
               <span className="text-xs px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 border border-rose-500/30 font-mono">
@@ -225,7 +225,7 @@ export const TrashPage: React.FC = () => {
               </span>
             )}
           </h1>
-          <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
+          <p className="text-xs text-on-surface-variant mt-1 max-w-2xl leading-relaxed">
             All deleted items are stored in Trash before permanent filesystem removal. You can safely restore any item back to drafts or wipe items permanently.
           </p>
         </div>
@@ -234,7 +234,7 @@ export const TrashPage: React.FC = () => {
           <button
             onClick={loadTrashItems}
             disabled={loading}
-            className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-lg flex items-center space-x-1.5 border border-slate-700/80 transition"
+            className="px-3 py-2 bg-surface-container hover:bg-surface-container-highest text-on-surface font-semibold text-xs rounded-lg flex items-center space-x-1.5 border border-surface-container-high/50/80 transition"
             title="Refresh Trash"
           >
             <RotateCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
@@ -247,7 +247,7 @@ export const TrashPage: React.FC = () => {
               disabled={items.length === 0 || loading}
               className={`px-4 py-2 font-bold text-xs rounded-lg flex items-center space-x-2 transition ${
                 items.length === 0
-                  ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-800'
+                  ? 'bg-surface-container text-on-surface-variant cursor-not-allowed border border-surface-container-high/40'
                   : 'bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-600/20'
               }`}
             >
@@ -284,10 +284,10 @@ export const TrashPage: React.FC = () => {
       )}
 
       {/* Info notice about safe restoration */}
-      <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-3.5 flex items-start space-x-3 text-xs text-slate-300">
-        <ShieldAlert className="w-4 h-4 text-brand-400 mt-0.5 flex-shrink-0" />
+      <div className="bg-surface-container-low/60 border border-surface-container-high/40 rounded-xl p-3.5 flex items-start space-x-3 text-xs text-on-surface">
+        <ShieldAlert className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
         <div className="leading-relaxed">
-          <span className="font-semibold text-slate-200">Safe Restore Guarantee: </span>
+          <span className="font-semibold text-on-surface">Safe Restore Guarantee: </span>
           Restoring any item automatically resets its publishing status to <span className="text-amber-400 font-semibold font-mono">draft</span>. This guarantees that accidentally restored items will not immediately overwrite your public website until you review and publish them.
         </div>
       </div>
@@ -307,15 +307,15 @@ export const TrashPage: React.FC = () => {
                 onClick={() => setActiveFilter(tab.id)}
                 className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition border ${
                   isActive
-                    ? 'bg-slate-800 text-white border-slate-700 shadow-sm'
-                    : 'bg-slate-900/40 text-slate-400 border-transparent hover:bg-slate-800/60 hover:text-slate-300'
+                    ? 'bg-surface-container text-white border-surface-container-high/50 shadow-sm'
+                    : 'bg-surface-container-high/40 text-on-surface-variant border-transparent hover:bg-surface-container-high/60 hover:text-on-surface'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-brand-400' : 'text-slate-500'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-primary' : 'text-on-surface-variant'}`} />
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                    isActive ? 'bg-slate-700 text-slate-200' : 'bg-slate-800/80 text-slate-500'
+                    isActive ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container text-on-surface-variant'
                   }`}
                 >
                   {count}
@@ -327,40 +327,40 @@ export const TrashPage: React.FC = () => {
 
         {/* Search */}
         <div className="relative min-w-[240px] max-w-sm">
-          <Search className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+          <Search className="w-3.5 h-3.5 text-on-surface-variant absolute left-3 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             placeholder="Search by title, slug, or user..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-slate-900/80 border border-slate-800 rounded-lg pl-8 pr-3 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition"
+            className="w-full bg-surface-container-lowest/80 border border-surface-container-high/40 rounded-lg pl-8 pr-3 py-1.5 text-xs text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:border-primary transition"
           />
         </div>
       </div>
 
       {/* Main Content Area */}
       {loading ? (
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl p-12 text-center">
-          <Loader2 className="w-6 h-6 text-brand-500 animate-spin mx-auto mb-3" />
-          <p className="text-xs text-slate-400 font-mono">Loading trash contents...</p>
+        <div className="bg-surface-container-low/60 border border-surface-container-high/40 rounded-xl p-12 text-center">
+          <Loader2 className="w-6 h-6 text-primary animate-spin mx-auto mb-3" />
+          <p className="text-xs text-on-surface-variant font-mono">Loading trash contents...</p>
         </div>
       ) : filteredItems.length === 0 ? (
-        <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-16 text-center">
-          <div className="w-16 h-16 rounded-2xl bg-slate-800/60 border border-slate-700/50 flex items-center justify-center text-slate-500 mx-auto mb-4 shadow-inner">
-            <Trash2 className="w-8 h-8 opacity-40 text-slate-400" />
+        <div className="bg-surface-container-high/40 border border-surface-container-high/40 rounded-2xl p-16 text-center">
+          <div className="w-16 h-16 rounded-2xl bg-surface-container-high/60 border border-surface-container-high/50/50 flex items-center justify-center text-on-surface-variant mx-auto mb-4 shadow-inner">
+            <Trash2 className="w-8 h-8 opacity-40 text-on-surface-variant" />
           </div>
           <h3 className="text-base font-semibold text-white mb-1">
             {items.length === 0 ? 'Trash is empty' : 'No matching items in trash'}
           </h3>
-          <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+          <p className="text-xs text-on-surface-variant max-w-md mx-auto leading-relaxed">
             {items.length === 0
               ? 'When you delete pages, posts, blueprints, or entries, they will be kept here safely so you can restore them anytime.'
               : 'Try clearing your search query or selecting another item filter tab above.'}
           </p>
         </div>
       ) : (
-        <div className="bg-slate-900/60 border border-slate-800/80 rounded-xl overflow-hidden shadow-sm">
-          <div className="divide-y divide-slate-800/80">
+        <div className="bg-surface-container-low/60 border border-surface-container-high/40 rounded-xl overflow-hidden shadow-sm">
+          <div className="divide-y divide-surface-container-high/30">
             {filteredItems.map((item) => {
               const badge = getEntityBadge(item.entityType);
               const BadgeIcon = badge.icon;
@@ -369,11 +369,11 @@ export const TrashPage: React.FC = () => {
               return (
                 <div
                   key={item.trashId}
-                  className="p-4 sm:p-4.5 hover:bg-slate-800/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                  className="p-4 sm:p-4.5 hover:bg-surface-container-high/40 transition flex flex-col sm:flex-row sm:items-center justify-between gap-4"
                 >
                   <div className="flex items-start space-x-3.5 min-w-0 flex-1">
-                    <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700/80 flex items-center justify-center text-slate-400 flex-shrink-0 mt-0.5">
-                      <BadgeIcon className="w-5 h-5 text-slate-300" />
+                    <div className="w-10 h-10 rounded-xl bg-surface-container border border-surface-container-high/50/80 flex items-center justify-center text-on-surface-variant flex-shrink-0 mt-0.5">
+                      <BadgeIcon className="w-5 h-5 text-on-surface" />
                     </div>
 
                     <div className="min-w-0 flex-1">
@@ -388,27 +388,27 @@ export const TrashPage: React.FC = () => {
                           <span>{badge.label}</span>
                         </span>
                         {item.blueprintSlug && (
-                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-slate-800 text-slate-400 border border-slate-700">
+                          <span className="text-[10px] font-mono px-2 py-0.5 rounded-md bg-surface-container text-on-surface-variant border border-surface-container-high/50">
                             blueprint: {item.blueprintSlug}
                           </span>
                         )}
                       </div>
 
-                      <div className="flex items-center space-x-3 text-[11px] text-slate-400 mt-1.5 flex-wrap gap-y-1">
-                        <div className="flex items-center space-x-1 font-mono text-slate-400">
-                          <FolderOpen className="w-3 h-3 text-slate-500" />
+                      <div className="flex items-center space-x-3 text-[11px] text-on-surface-variant mt-1.5 flex-wrap gap-y-1">
+                        <div className="flex items-center space-x-1 font-mono text-on-surface-variant">
+                          <FolderOpen className="w-3 h-3 text-on-surface-variant" />
                           <span>{item.originalSlug}</span>
                         </div>
-                        <span className="text-slate-600">&bull;</span>
+                        <span className="text-outline-variant">&bull;</span>
                         <div className="flex items-center space-x-1">
-                          <Clock className="w-3 h-3 text-slate-500" />
+                          <Clock className="w-3 h-3 text-on-surface-variant" />
                           <span>Deleted: {formatDate(item.deletedAt)}</span>
                         </div>
                         {item.deletedBy && (
                           <>
-                            <span className="text-slate-600">&bull;</span>
+                            <span className="text-outline-variant">&bull;</span>
                             <div className="flex items-center space-x-1">
-                              <User className="w-3 h-3 text-slate-500" />
+                              <User className="w-3 h-3 text-on-surface-variant" />
                               <span>By: {item.deletedBy}</span>
                             </div>
                           </>
@@ -454,8 +454,8 @@ export const TrashPage: React.FC = () => {
 
       {/* Confirmation Modal: Single Item Permanent Delete */}
       {itemToDeletePermanently && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-slate-900 border border-rose-500/30 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-container-low/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-surface-container-lowest border border-rose-500/30 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center space-x-3 text-rose-400">
               <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center flex-shrink-0">
                 <AlertTriangle className="w-5 h-5 text-rose-400" />
@@ -466,21 +466,21 @@ export const TrashPage: React.FC = () => {
               </div>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-on-surface leading-relaxed">
               Are you sure you want to permanently delete <span className="font-bold text-white font-mono">"{itemToDeletePermanently.title}"</span>?
               The item file will be purged from the filesystem permanently and cannot be recovered.
             </p>
 
-            <div className="bg-slate-950/60 p-3 rounded-lg border border-slate-800 text-[11px] font-mono text-slate-400 space-y-1">
-              <div>Type: <span className="text-slate-200">{itemToDeletePermanently.entityType}</span></div>
-              <div>Slug: <span className="text-slate-200">{itemToDeletePermanently.originalSlug}</span></div>
+            <div className="bg-surface-container-low/60 p-3 rounded-lg border border-surface-container-high/40 text-[11px] font-mono text-on-surface-variant space-y-1">
+              <div>Type: <span className="text-on-surface">{itemToDeletePermanently.entityType}</span></div>
+              <div>Slug: <span className="text-on-surface">{itemToDeletePermanently.originalSlug}</span></div>
             </div>
 
             <div className="flex items-center justify-end space-x-2 pt-2">
               <button
                 onClick={() => setItemToDeletePermanently(null)}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-lg transition"
+                className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-on-surface font-semibold text-xs rounded-lg transition"
               >
                 Cancel
               </button>
@@ -499,8 +499,8 @@ export const TrashPage: React.FC = () => {
 
       {/* Confirmation Modal: Empty All Trash */}
       {showEmptyModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-150">
-          <div className="bg-slate-900 border border-rose-500/30 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-container-low/80 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-surface-container-lowest border border-rose-500/30 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
             <div className="flex items-center space-x-3 text-rose-400">
               <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center flex-shrink-0">
                 <Trash2 className="w-5 h-5 text-rose-400" />
@@ -511,7 +511,7 @@ export const TrashPage: React.FC = () => {
               </div>
             </div>
 
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-on-surface leading-relaxed">
               Are you sure you want to completely empty the Trash? All <span className="font-bold text-white">{items.length}</span> items currently in the trash directory will be wiped from disk permanently.
             </p>
 
@@ -519,7 +519,7 @@ export const TrashPage: React.FC = () => {
               <button
                 onClick={() => setShowEmptyModal(false)}
                 disabled={isDeleting}
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-lg transition"
+                className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-on-surface font-semibold text-xs rounded-lg transition"
               >
                 Cancel
               </button>

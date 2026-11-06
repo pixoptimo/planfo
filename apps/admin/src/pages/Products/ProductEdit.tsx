@@ -1,19 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  ArrowLeft,
-  Save,
-  Send,
-  Eye,
-  History,
-  Image as ImageIcon,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  Plus,
-  Trash2,
-  Star
-} from 'lucide-react';
 import type { Product, Category, RevisionMeta } from '@cms/schemas';
 import { api } from '../../api/client.js';
 import { StructuredEditor } from '../../components/Editor/StructuredEditor.js';
@@ -118,34 +104,23 @@ export const ProductEdit: React.FC = () => {
       if (isNew) {
         const created = await api.post<Product>('/api/products', payload);
         navigate(`/products/${created.slug}`, { replace: true });
-        setSuccess('Product created successfully!');
       } else {
         const updated = await api.put<Product>(`/api/products/${slug}`, payload);
         setProduct(updated);
-        setSuccess(publish ? 'Product published successfully!' : 'Product saved successfully!');
+        setSuccess('Product saved successfully!');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Save failed');
+      setError(err instanceof Error ? err.message : 'Failed to save product');
     } finally {
       setSaving(false);
     }
-  };
-
-  const addImageToGallery = (url: string) => {
-    if (!product.images?.includes(url)) {
-      setProduct({ ...product, images: [...(product.images || []), url] });
-    }
-  };
-
-  const removeImage = (urlToRemove: string) => {
-    setProduct({ ...product, images: product.images?.filter((u) => u !== urlToRemove) });
   };
 
   const loadRevisions = async () => {
     if (isNew || !slug) return;
     setLoadingRevisions(true);
     try {
-      const data = await api.get<RevisionMeta[]>(`/api/products/${slug}/revisions`);
+      const data = await api.get<RevisionMeta[]>(`/api/revisions/product/${slug}`);
       setRevisions(data);
     } catch {
       //
@@ -154,49 +129,63 @@ export const ProductEdit: React.FC = () => {
     }
   };
 
-  const restoreRevision = async (revId: string) => {
+  const handleRestoreRevision = async (revId: string) => {
     if (!slug) return;
-    if (!confirm('Restore this revision?')) return;
-
+    if (!confirm('Restore this snapshot? Unsaved changes will be replaced.')) return;
     try {
-      const restored = await api.post<Product>(`/api/products/${slug}/revisions/${revId}/restore`);
+      const restored = await api.post<Product>(`/api/revisions/product/${slug}/${revId}/restore`);
       setProduct(restored);
       setShowRevisions(false);
-      setSuccess('Restored revision successfully!');
+      setSuccess('Snapshot restored successfully!');
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Restore failed');
     }
   };
 
+  const removeImage = (urlToRemove: string) => {
+    setProduct((prev) => ({
+      ...prev,
+      images: (prev.images || []).filter((u) => u !== urlToRemove)
+    }));
+  };
+
   if (loading) {
-    return <div className="text-center py-20 text-slate-400">Loading product data...</div>;
+    return (
+      <div className="min-h-[400px] flex flex-col items-center justify-center gap-3 text-on-surface-variant font-body-sm">
+        <span className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <span>Loading product editor...</span>
+      </div>
+    );
   }
 
   return (
-    <div className="space-y-6 pb-20 w-full">
-      {/* Top action bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div className="flex items-center space-x-3">
+    <div className="space-y-6 w-full max-w-7xl mx-auto font-body-md text-on-surface antialiased pb-20">
+      {/* Header Bar */}
+      <div className="w-full bg-surface-container-lowest px-6 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-sm border border-surface-container-high/40 rounded-2xl">
+        <div className="flex items-center gap-3 min-w-0">
           <Link
             to="/products"
-            className="p-2 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+            className="p-2 text-on-surface-variant hover:text-primary bg-surface-container rounded-xl transition-colors shrink-0"
+            title="Back to Products"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <span className="material-symbols-outlined text-[20px]">arrow_back</span>
           </Link>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-bold text-white tracking-tight">
-                {isNew ? 'Add New Product' : `Edit: ${product.name}`}
+
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="font-headline-sm text-headline-sm font-serif text-on-surface truncate">
+                {isNew ? 'New Product' : `Edit: ${product.name || 'Untitled'}`}
               </h1>
-              {!isNew && product.status && <StatusBadge status={product.status} />}
+              {!isNew && <StatusBadge status={product.status || 'draft'} />}
             </div>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">
+            <p className="font-code text-code text-on-surface-variant text-[11px] truncate mt-0.5">
               URL: /products/{product.slug || 'slug-preview'}
             </p>
           </div>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        {/* Top actions */}
+        <div className="flex items-center gap-2.5">
           {!isNew && (
             <>
               <button
@@ -205,9 +194,9 @@ export const ProductEdit: React.FC = () => {
                   setShowRevisions(true);
                   loadRevisions();
                 }}
-                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
+                className="px-3.5 py-2 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-xl font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-colors"
               >
-                <History className="w-3.5 h-3.5" />
+                <span className="material-symbols-outlined text-[18px]">history</span>
                 <span>Revisions</span>
               </button>
 
@@ -215,9 +204,9 @@ export const ProductEdit: React.FC = () => {
                 href={`/api/preview/product/${product.slug}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-brand-400 border border-slate-800 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
+                className="px-3.5 py-2 bg-surface-container hover:bg-surface-container-high text-primary rounded-xl font-label-md text-label-md font-semibold flex items-center gap-1.5 transition-colors"
               >
-                <Eye className="w-3.5 h-3.5" />
+                <span className="material-symbols-outlined text-[18px]">visibility</span>
                 <span>Live Preview</span>
               </a>
             </>
@@ -227,9 +216,13 @@ export const ProductEdit: React.FC = () => {
             type="button"
             onClick={() => handleSave(false)}
             disabled={saving}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
+            className="px-4 py-2 bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold rounded-xl flex items-center gap-1.5 transition-colors disabled:opacity-50"
           >
-            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            {saving ? (
+              <span className="w-4 h-4 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+            ) : (
+              <span className="material-symbols-outlined text-[18px]">save</span>
+            )}
             <span>Save Draft</span>
           </button>
 
@@ -238,277 +231,318 @@ export const ProductEdit: React.FC = () => {
               type="button"
               onClick={() => handleSave(true)}
               disabled={saving}
-              className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+              className="px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold rounded-xl flex items-center gap-1.5 shadow-sm transition-all hover:scale-[1.01] disabled:opacity-50"
             >
-              <Send className="w-3.5 h-3.5" />
+              {saving ? (
+                <span className="w-4 h-4 rounded-full border-2 border-on-primary border-t-transparent animate-spin" />
+              ) : (
+                <span className="material-symbols-outlined text-[18px]">send</span>
+              )}
               <span>{product.status === 'published' ? 'Update Product' : 'Publish Product'}</span>
             </button>
           )}
         </div>
       </div>
 
+      {/* Notifications */}
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+        <div className="p-4 bg-error-container/40 border border-error/20 rounded-2xl flex items-center gap-3 text-error font-body-sm">
+          <span className="material-symbols-outlined text-[20px] shrink-0">error</span>
           <span>{error}</span>
         </div>
       )}
+
       {success && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+        <div className="p-4 bg-surface-container-highest border border-primary/20 rounded-2xl flex items-center gap-3 text-primary font-body-sm font-semibold">
+          <span className="material-symbols-outlined text-[20px] shrink-0">check_circle</span>
           <span>{success}</span>
         </div>
       )}
 
-      {/* Main Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Product Name *
-            </label>
-            <input
-              type="text"
-              required
-              value={product.name || ''}
-              onChange={(e) => {
-                const newName = e.target.value;
-                setProduct((prev) => {
-                  const next = { ...prev, name: newName };
-                  if (!slugManuallyEdited || !prev.slug) {
-                    next.slug = slugify(newName);
-                  }
-                  return next;
-                });
-              }}
-              placeholder="e.g. Wireless Noise-Cancelling Headphones"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-base font-semibold text-white focus:outline-none focus:border-brand-500"
-            />
-          </div>
-
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                URL Slug
+      {/* Main 12-Column Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        {/* Left Column (8 cols): Title, Pricing, Specs */}
+        <div className="lg:col-span-8 space-y-6">
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl p-6 shadow-sm space-y-5">
+            <div>
+              <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Product Name *
               </label>
-              {product.name && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    const auto = slugify(product.name || '');
-                    setProduct((prev) => ({ ...prev, slug: auto }));
-                    setSlugManuallyEdited(false);
-                  }}
-                  className="text-[11px] text-brand-400 hover:text-brand-300 font-medium transition"
-                >
-                  Regenerate from Name
-                </button>
-              )}
-            </div>
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-mono text-slate-500 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800">
-                /products/
-              </span>
               <input
                 type="text"
-                value={product.slug || ''}
+                required
+                value={product.name || ''}
                 onChange={(e) => {
-                  const val = e.target.value;
-                  setSlugManuallyEdited(val.trim().length > 0);
-                  setProduct((prev) => ({ ...prev, slug: val }));
+                  const newName = e.target.value;
+                  setProduct((prev) => {
+                    const next = { ...prev, name: newName };
+                    if (!slugManuallyEdited || !prev.slug) {
+                      next.slug = slugify(newName);
+                    }
+                    return next;
+                  });
                 }}
-                placeholder="auto-generated-from-name"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
-              />
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Price *
-              </label>
-              <input
-                type="number"
-                step="0.01"
-                min="0"
-                value={product.price ?? 0}
-                onChange={(e) => setProduct({ ...product, price: parseFloat(e.target.value) || 0 })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm font-mono font-bold text-emerald-400 focus:outline-none focus:border-brand-500"
+                placeholder="e.g. Wireless Noise-Cancelling Headphones"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-4 py-2.5 font-headline-sm text-headline-sm font-serif text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary"
               />
             </div>
 
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                Currency
-              </label>
-              <select
-                value={product.currency || 'USD'}
-                onChange={(e) => setProduct({ ...product, currency: e.target.value })}
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
-              >
-                <option value="USD">USD ($)</option>
-                <option value="EUR">EUR (€)</option>
-                <option value="GBP">GBP (£)</option>
-                <option value="INR">INR (₹)</option>
-                <option value="CAD">CAD ($)</option>
-                <option value="AUD">AUD ($)</option>
-              </select>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                SKU / Code
-              </label>
-              <input
-                type="text"
-                value={product.sku || ''}
-                onChange={(e) => setProduct({ ...product, sku: e.target.value })}
-                placeholder="PROD-001"
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Short Description / Summary
-            </label>
-            <textarea
-              rows={2}
-              value={product.shortDescription || ''}
-              onChange={(e) => setProduct({ ...product, shortDescription: e.target.value })}
-              placeholder="Brief summary displayed on product cards..."
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
-            />
-          </div>
-        </div>
-
-        {/* Sidebar Controls */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-          <CategorySelector
-            value={product.category || 'general'}
-            onChange={(slug) => setProduct({ ...product, category: slug })}
-            type="product"
-            label="Product Category"
-          />
-
-          <div className="pt-2">
-            <label className="flex items-center space-x-2 text-xs font-semibold text-slate-300 cursor-pointer">
-              <input
-                type="checkbox"
-                checked={product.featured || false}
-                onChange={(e) => setProduct({ ...product, featured: e.target.checked })}
-                className="rounded bg-slate-950 border-slate-800 text-brand-500 focus:ring-0"
-              />
-              <span className="flex items-center space-x-1">
-                <Star className="w-3.5 h-3.5 text-amber-400" />
-                <span>Feature on Homepage</span>
-              </span>
-            </label>
-          </div>
-
-          {/* Product Gallery Images */}
-          <div>
-            <div className="flex items-center justify-between mb-2">
-              <label className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
-                Product Gallery
-              </label>
-              <button
-                type="button"
-                onClick={() => setShowMediaPicker(true)}
-                className="text-xs text-brand-400 hover:underline flex items-center space-x-1"
-              >
-                <Plus className="w-3.5 h-3.5" />
-                <span>Add Image</span>
-              </button>
-            </div>
-
-            <div className="grid grid-cols-3 gap-2">
-              {(product.images || []).map((img, idx) => (
-                <div key={idx} className="relative aspect-square bg-slate-950 rounded border border-slate-800 overflow-hidden group">
-                  <img src={img} alt="" className="w-full h-full object-cover" />
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  URL Slug
+                </label>
+                {product.name && (
                   <button
                     type="button"
-                    onClick={() => removeImage(img)}
-                    className="absolute top-1 right-1 bg-black/70 hover:bg-red-600 text-white p-1 rounded opacity-0 group-hover:opacity-100 transition"
+                    onClick={() => {
+                      const auto = slugify(product.name || '');
+                      setProduct((prev) => ({ ...prev, slug: auto }));
+                      setSlugManuallyEdited(false);
+                    }}
+                    className="font-label-xs text-label-xs text-primary hover:underline font-semibold"
                   >
-                    <Trash2 className="w-3 h-3" />
+                    Regenerate from Name
                   </button>
-                </div>
-              ))}
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="font-code text-code text-on-surface-variant bg-surface-container-low px-3 py-2 rounded-xl border border-surface-container-high/40 text-xs shrink-0">
+                  /products/
+                </span>
+                <input
+                  type="text"
+                  value={product.slug || ''}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSlugManuallyEdited(val.trim().length > 0);
+                    setProduct((prev) => ({ ...prev, slug: val }));
+                  }}
+                  placeholder="auto-generated-from-name"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-code text-code text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div>
+                <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                  Price *
+                </label>
+                <input
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  value={product.price ?? 0}
+                  onChange={(e) => setProduct({ ...product, price: parseFloat(e.target.value) || 0 })}
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-code text-code text-sm font-bold text-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+
+              <div>
+                <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                  Currency
+                </label>
+                <select
+                  value={product.currency || 'USD'}
+                  onChange={(e) => setProduct({ ...product, currency: e.target.value })}
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                >
+                  <option value="USD">USD ($)</option>
+                  <option value="EUR">EUR (€)</option>
+                  <option value="GBP">GBP (£)</option>
+                  <option value="INR">INR (₹)</option>
+                  <option value="CAD">CAD ($)</option>
+                  <option value="AUD">AUD ($)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                  SKU / Code
+                </label>
+                <input
+                  type="text"
+                  value={product.sku || ''}
+                  onChange={(e) => setProduct({ ...product, sku: e.target.value })}
+                  placeholder="PROD-001"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-code text-code text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Short Description / Summary
+              </label>
+              <textarea
+                rows={2}
+                value={product.shortDescription || ''}
+                onChange={(e) => setProduct({ ...product, shortDescription: e.target.value })}
+                placeholder="Brief summary displayed on product cards..."
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl p-3 font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant/50 focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+              />
+            </div>
+          </div>
+
+          {/* Structured Content Block Editor for Specifications & Full Details */}
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl p-6 shadow-sm space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-surface-container-high/40">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[20px]">article</span>
+                <h2 className="font-title-md text-title-md font-semibold text-on-surface">
+                  Product Details & Specifications
+                </h2>
+              </div>
+              <span className="font-label-xs text-label-xs text-on-surface-variant font-medium">
+                Structured Block Canvas
+              </span>
+            </div>
+            <StructuredEditor
+              content={product.description || { blocks: [] }}
+              onChange={(description) => setProduct((prev) => ({ ...prev, description }))}
+            />
+          </div>
+
+          {/* SEO Metadata */}
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl p-6 shadow-sm">
+            <SEOFields
+              seo={
+                product.seo || {
+                  title: '',
+                  description: '',
+                  canonical: '',
+                  ogTitle: '',
+                  ogDescription: '',
+                  ogImage: '',
+                  robots: 'index,follow',
+                  noIndex: false
+                }
+              }
+              onChange={(seo) => setProduct((prev) => ({ ...prev, seo }))}
+            />
+          </div>
+        </div>
+
+        {/* Right Column (4 cols): Category, Featured, Gallery */}
+        <div className="lg:col-span-4 space-y-6">
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl p-5 shadow-sm space-y-4">
+            <CategorySelector
+              value={product.category || 'general'}
+              onChange={(slug) => setProduct({ ...product, category: slug })}
+              type="product"
+              label="Product Category"
+            />
+
+            <div className="pt-2 border-t border-surface-container-high/40">
+              <label className="flex items-center gap-2.5 font-label-sm text-label-sm font-semibold text-on-surface cursor-pointer py-1">
+                <input
+                  type="checkbox"
+                  checked={product.featured || false}
+                  onChange={(e) => setProduct({ ...product, featured: e.target.checked })}
+                  className="w-4 h-4 text-primary rounded border-surface-container-high focus:ring-primary"
+                />
+                <span className="flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-amber-500 text-[18px] fill-current">star</span>
+                  <span>Feature on Homepage</span>
+                </span>
+              </label>
+            </div>
+
+            {/* Product Gallery Images */}
+            <div className="pt-3 border-t border-surface-container-high/40">
+              <div className="flex items-center justify-between mb-3">
+                <label className="font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider">
+                  Product Gallery ({product.images?.length || 0})
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowMediaPicker(true)}
+                  className="font-label-xs text-label-xs text-primary hover:underline font-semibold flex items-center gap-1"
+                >
+                  <span className="material-symbols-outlined text-[16px]">add</span>
+                  <span>Add Image</span>
+                </button>
+              </div>
+
+              <div className="grid grid-cols-3 gap-2">
+                {(product.images || []).map((img, idx) => (
+                  <div
+                    key={idx}
+                    className="relative aspect-square bg-surface-container rounded-xl border border-surface-container-high/40 overflow-hidden group shadow-2xs"
+                  >
+                    <img src={img} alt="" className="w-full h-full object-cover" />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(img)}
+                      className="absolute top-1.5 right-1.5 bg-black/70 hover:bg-error text-white p-1 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <span className="material-symbols-outlined text-[14px]">close</span>
+                    </button>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Structured Content Block Editor for Specifications & Full Details */}
-      <div className="space-y-2">
-        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
-          Product Details & Specifications
-        </label>
-        <StructuredEditor
-          content={product.description || { blocks: [] }}
-          onChange={(newContent) => setProduct({ ...product, description: newContent })}
-        />
-      </div>
-
-      {/* SEO Accordion */}
-      <SEOFields
-        seo={product.seo || ({} as any)}
-        onChange={(newSeo) => setProduct({ ...product, seo: newSeo })}
-        defaultTitle={product.name}
-        defaultDescription={product.shortDescription}
-      />
-
       {/* Media Picker Modal */}
-      <MediaPickerModal
-        isOpen={showMediaPicker}
-        onClose={() => setShowMediaPicker(false)}
-        onSelect={(url) => addImageToGallery(url)}
-      />
+      {showMediaPicker && (
+        <MediaPickerModal
+          isOpen={showMediaPicker}
+          onClose={() => setShowMediaPicker(false)}
+          onSelect={(url) => {
+            setProduct((prev) => ({
+              ...prev,
+              images: [...(prev.images || []), url]
+            }));
+            setShowMediaPicker(false);
+          }}
+        />
+      )}
 
-      {/* Revisions Drawer */}
+      {/* Revisions History Modal */}
       {showRevisions && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
-          <div className="bg-slate-900 border-l border-slate-800 w-full max-w-md h-full flex flex-col p-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-              <div className="flex items-center space-x-2">
-                <History className="w-5 h-5 text-brand-400" />
-                <h3 className="font-bold text-white text-base">Revision History</h3>
-              </div>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-xs p-4">
+          <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl w-full max-w-lg overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-4 border-b border-surface-container-high/40 flex items-center justify-between bg-surface-container-low/40">
+              <h3 className="font-headline-sm text-headline-sm font-serif text-on-surface">Product Revisions</h3>
               <button
                 type="button"
                 onClick={() => setShowRevisions(false)}
-                className="text-slate-400 hover:text-white text-sm"
+                className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
               >
-                Close ✕
+                <span className="material-symbols-outlined text-[20px]">close</span>
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-3">
+            <div className="p-4 max-h-96 overflow-y-auto space-y-2">
               {loadingRevisions ? (
-                <div className="text-center py-10 text-slate-400">Loading revisions...</div>
+                <div className="p-8 text-center text-on-surface-variant font-body-sm">Loading revisions...</div>
               ) : revisions.length === 0 ? (
-                <div className="text-center py-10 text-slate-500">No revisions found.</div>
+                <div className="p-8 text-center text-on-surface-variant font-body-sm">No revisions recorded yet.</div>
               ) : (
                 revisions.map((rev) => (
-                  <div key={rev.id} className="p-4 bg-slate-950 border border-slate-800 rounded-lg space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold font-mono text-emerald-400">Version {rev.version}</span>
-                      <span className="text-[11px] text-slate-500 font-mono">{new Date(rev.createdAt).toLocaleString()}</span>
+                  <div
+                    key={rev.id}
+                    className="p-3 bg-surface-container-low border border-surface-container-high/40 rounded-xl flex items-center justify-between"
+                  >
+                    <div>
+                      <p className="font-label-sm text-label-sm font-semibold text-on-surface">
+                        {new Date(rev.createdAt).toLocaleString()}
+                      </p>
+                      <p className="font-body-sm text-[11px] text-on-surface-variant">
+                        Author: {rev.authorEmail || 'Lead Architect'}
+                      </p>
                     </div>
-                    <p className="text-xs text-slate-300">{rev.summary}</p>
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                      <span className="text-[11px] text-slate-400">By {rev.authorEmail}</span>
-                      <button
-                        type="button"
-                        onClick={() => restoreRevision(rev.id)}
-                        className="px-2.5 py-1 bg-brand-600/20 hover:bg-brand-600/40 text-brand-400 rounded text-xs font-semibold"
-                      >
-                        Restore
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleRestoreRevision(rev.id)}
+                      className="px-3 py-1 bg-surface-container hover:bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold rounded-lg transition-colors"
+                    >
+                      Restore
+                    </button>
                   </div>
                 ))
               )}

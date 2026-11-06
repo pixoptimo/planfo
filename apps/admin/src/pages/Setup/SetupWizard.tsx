@@ -98,48 +98,45 @@ export const SetupWizard: React.FC = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 font-mono text-xs">
-        <Loader2 className="w-5 h-5 animate-spin mr-2 text-cyan-400" />
+      <div className="min-h-screen bg-surface flex items-center justify-center text-on-surface-variant font-mono text-xs">
+        <Loader2 className="w-5 h-5 animate-spin mr-2 text-primary" />
         Checking installation state...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 text-slate-100 font-sans">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-cyan-950/20 via-slate-950 to-slate-950 pointer-events-none"></div>
-
+    <div className="min-h-screen bg-surface flex flex-col justify-center py-12 px-4 sm:px-6 lg:px-8 text-on-surface font-body-md antialiased">
       <div className="relative max-w-xl w-full mx-auto space-y-8">
         {/* Brand Header */}
         <div className="text-center space-y-2">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-slate-950 font-black text-2xl shadow-xl shadow-cyan-500/20 mb-1">
-            ⚡
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-primary-container text-on-primary-container font-black text-2xl shadow-sm mb-1">
+            <span className="material-symbols-outlined text-[28px]">auto_stories</span>
           </div>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight">
+          <h1 className="font-headline-lg text-headline-lg font-serif text-on-surface tracking-tight">
             Welcome to Planfo CMS
           </h1>
-          <p className="text-sm text-slate-400 max-w-md mx-auto">
+          <p className="font-body-md text-body-md text-on-surface-variant max-w-md mx-auto">
             Welcome to the installation process. Just fill in the information below and you'll be on your way to managing and publishing your static website.
           </p>
         </div>
 
         {/* Error Alert */}
         {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+          <div className="p-4 bg-error-container/40 border border-error/20 rounded-2xl text-xs text-error flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
 
-        {/* WordPress-style Installation Card */}
-        <div className="bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 backdrop-blur-sm">
-          <div className="border-b border-slate-800 pb-4 mb-6">
-            <h2 className="text-base font-bold text-white flex items-center space-x-2">
-              <Sparkles className="w-4 h-4 text-cyan-400" />
-              <span>Information needed</span>
+        {/* Installation Card */}
+        <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl shadow-xl p-6 sm:p-8">
+          <div className="border-b border-surface-container-high/40 pb-4 mb-6">
+            <h2 className="font-title-md text-title-md font-semibold text-on-surface flex items-center gap-2">
+              <span className="material-symbols-outlined text-primary text-[20px]">tune</span>
+              <span>Information Needed</span>
             </h2>
-            <p className="text-xs text-slate-400 mt-1">
+            <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">
               Please provide the following details. You can always change these settings later in your Planfo dashboard.
             </p>
           </div>
@@ -147,25 +144,25 @@ export const SetupWizard: React.FC = () => {
           <form onSubmit={handleSubmit} className="space-y-5">
             {/* Project / Site Name */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Site Title / Project Name <span className="text-cyan-400">*</span>
+              <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Site Title / Project Name <span className="text-primary">*</span>
               </label>
               <div className="relative">
-                <Globe className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Globe className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant" />
                 <input
                   type="text"
                   required
                   value={siteName}
                   onChange={(e) => setSiteName(e.target.value)}
                   placeholder="e.g. My Website"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl pl-10 pr-4 py-2.5 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary transition"
                 />
               </div>
             </div>
 
             {/* Tagline / Summary */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+              <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
                 Tagline
               </label>
               <input
@@ -173,58 +170,58 @@ export const SetupWizard: React.FC = () => {
                 value={tagline}
                 onChange={(e) => setTagline(e.target.value)}
                 placeholder="In a few words, explain what this site is about."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-4 py-2.5 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary transition"
               />
-              <p className="text-[11px] text-slate-500 mt-1">In a few words, explain what this site is about.</p>
+              <p className="font-body-sm text-[11px] text-on-surface-variant mt-1">In a few words, explain what this site is about.</p>
             </div>
 
             {/* Divider */}
-            <div className="border-t border-slate-800/80 pt-4">
-              <h3 className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">
+            <div className="border-t border-surface-container-high/40 pt-4">
+              <h3 className="font-label-xs text-label-xs font-bold text-on-surface uppercase tracking-wider mb-4">
                 Administrator Account
               </h3>
             </div>
 
             {/* Username or Email */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Username or Email Address <span className="text-cyan-400">*</span>
+              <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Username or Email Address <span className="text-primary">*</span>
               </label>
               <div className="relative">
-                <UserIcon className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <UserIcon className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant" />
                 <input
                   type="text"
                   required
                   value={usernameOrEmail}
                   onChange={(e) => setUsernameOrEmail(e.target.value)}
                   placeholder="e.g. admin or you@example.com"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl pl-10 pr-4 py-2.5 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary transition"
                 />
               </div>
-              <p className="text-[11px] text-slate-500 mt-1">
+              <p className="font-body-sm text-[11px] text-on-surface-variant mt-1">
                 You will use this username or email address to log in to Planfo CMS.
               </p>
             </div>
 
             {/* Password */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Password <span className="text-cyan-400">*</span>
+              <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Password <span className="text-primary">*</span>
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter a secure password (min 6 characters)"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-10 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl pl-10 pr-10 py-2.5 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary transition"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 transition"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant hover:text-on-surface transition"
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
@@ -233,29 +230,31 @@ export const SetupWizard: React.FC = () => {
 
             {/* Confirm Password */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
-                Confirm Password <span className="text-cyan-400">*</span>
+              <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider mb-1.5">
+                Confirm Password <span className="text-primary">*</span>
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
+                <Lock className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-on-surface-variant" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   placeholder="Confirm your password"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl pl-10 pr-4 py-2.5 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary transition"
                 />
               </div>
             </div>
 
             {/* Default Theme notice */}
-            <div className="p-3 bg-slate-950 border border-slate-800/80 rounded-xl flex items-center justify-between text-xs text-slate-400">
-              <div className="flex items-center space-x-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span>Default Theme: <strong className="text-white">Planfo Default</strong> (Included)</span>
+            <div className="p-3.5 bg-surface-container-low border border-surface-container-high/40 rounded-xl flex items-center justify-between font-body-sm text-body-sm text-on-surface-variant">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary shrink-0" />
+                <span>Default Theme: <strong className="text-on-surface">Planfo Default</strong> (Included)</span>
               </div>
-              <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono">Ready</span>
+              <span className="font-label-xs text-label-xs px-2.5 py-0.5 rounded-full bg-surface-container-highest text-primary font-mono font-semibold">
+                Ready
+              </span>
             </div>
 
             {/* Install Button */}
@@ -263,7 +262,7 @@ export const SetupWizard: React.FC = () => {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full py-3 bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-slate-950 font-bold text-sm rounded-xl flex items-center justify-center space-x-2 shadow-lg shadow-cyan-500/20 transition disabled:opacity-50"
+                className="w-full py-3 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold rounded-xl flex items-center justify-center space-x-2 shadow-sm transition disabled:opacity-50"
               >
                 {submitting ? (
                   <>
@@ -279,8 +278,8 @@ export const SetupWizard: React.FC = () => {
         </div>
 
         {/* Footer info */}
-        <div className="text-center text-xs text-slate-500">
-          <p>Planfo CMS Beta v0.1 &bull; Database-free static website builder</p>
+        <div className="text-center font-body-sm text-body-sm text-on-surface-variant">
+          <p>Planfo CMS v1.0 • Database-free static website builder</p>
         </div>
       </div>
     </div>
