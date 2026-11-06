@@ -33,14 +33,19 @@ export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If in the post editor, page editor, or blueprints studio route, let the studio handle its custom stage
+  // If in the post editor, page editor, product editor, or blueprints studio/entry editor route, let the studio handle its custom stage
   const isPostEditor = location.pathname.startsWith('/posts/') && location.pathname !== '/posts';
   const isPageEditor = location.pathname.startsWith('/pages/') && location.pathname !== '/pages';
+  const isProductEditor = location.pathname.startsWith('/products/') && location.pathname !== '/products';
   const isBlueprintStudio =
     location.pathname === '/blueprints/studio' ||
     location.pathname === '/blueprints' ||
     location.pathname === '/blueprints/new' ||
     location.pathname.startsWith('/blueprints/edit');
+  const isBlueprintEntryEditor =
+    location.pathname.startsWith('/blueprints/') &&
+    !isBlueprintStudio &&
+    (location.pathname.endsWith('/new') || location.pathname.split('/').filter(Boolean).length === 3);
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
@@ -124,8 +129,8 @@ export const AdminLayout: React.FC = () => {
     navigate('/login');
   };
 
-  // If in Post Editor, Page Editor, or Blueprints Studio, render the outlet directly
-  if (isPostEditor || isPageEditor || isBlueprintStudio) {
+  // If in Post Editor, Page Editor, Product Editor, or Blueprints Studio/Entry Editor, render the outlet directly
+  if (isPostEditor || isPageEditor || isProductEditor || isBlueprintStudio || isBlueprintEntryEditor) {
     return (
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
         <Outlet />

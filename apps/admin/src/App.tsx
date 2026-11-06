@@ -47,8 +47,9 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 
   if (loading || checkingSetup) {
     return (
-      <div className="min-h-screen bg-slate-950 flex items-center justify-center text-slate-400 font-mono text-xs">
-        Verifying authenticated session...
+      <div className="min-h-screen bg-surface flex flex-col items-center justify-center gap-3 text-on-surface-variant font-body-sm">
+        <span className="w-6 h-6 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <span>Verifying authenticated session...</span>
       </div>
     );
   }

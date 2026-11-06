@@ -31,7 +31,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
       const data = await api.get<Category[]>(`/api/categories?type=${type}`);
       setCategories(data || []);
     } catch {
-      // If categories can't be fetched, fail silently or fallback to empty
+      //
     } finally {
       setLoading(false);
     }
@@ -71,9 +71,9 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
   };
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-1.5 font-body-md text-on-surface antialiased">
       <div className="flex items-center justify-between">
-        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+        <label className="block font-label-xs text-label-xs font-semibold text-on-surface-variant uppercase tracking-wider">
           {label}
         </label>
         {!isCreating && (
@@ -81,7 +81,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
             type="button"
             onClick={() => setIsCreating(true)}
             disabled={disabled}
-            className="flex items-center space-x-1 text-[11px] font-medium text-brand-400 hover:text-brand-300 transition disabled:opacity-50"
+            className="flex items-center gap-1 text-[11px] font-semibold text-primary hover:underline transition-colors disabled:opacity-50"
           >
             <Plus className="w-3 h-3" />
             <span>New Category</span>
@@ -94,7 +94,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
           value={value || 'general'}
           onChange={(e) => onChange(e.target.value)}
           disabled={disabled || loading}
-          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 disabled:opacity-50"
+          className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-xl px-3.5 py-2 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary disabled:opacity-50"
         >
           <option value="general">General</option>
           {categories.map((c) => (
@@ -105,8 +105,8 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
         </select>
 
         {recentCreated && (
-          <div className="flex items-center space-x-1.5 text-xs text-emerald-400 font-medium bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-1 rounded-md">
-            <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+          <div className="flex items-center gap-1.5 text-xs text-primary font-medium bg-surface-container border border-primary/20 px-3 py-1.5 rounded-xl">
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
             <span>Category "{recentCreated}" created and selected!</span>
           </div>
         )}
@@ -114,11 +114,11 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
         {isCreating && (
           <form
             onSubmit={handleCreateCategory}
-            className="p-3 bg-slate-950 border border-brand-500/30 rounded-lg space-y-2 animate-in fade-in slide-in-from-top-1"
+            className="p-3.5 bg-surface-container-lowest border border-primary/30 rounded-xl space-y-2.5 shadow-sm animate-in fade-in slide-in-from-top-1"
           >
-            <div className="flex items-center justify-between text-xs text-slate-300 font-medium">
-              <span className="flex items-center space-x-1">
-                <FolderPlus className="w-3.5 h-3.5 text-brand-400" />
+            <div className="flex items-center justify-between font-label-xs text-label-xs text-on-surface font-semibold">
+              <span className="flex items-center gap-1.5">
+                <FolderPlus className="w-3.5 h-3.5 text-primary" />
                 <span>Quick Create Category</span>
               </span>
               <button
@@ -127,26 +127,26 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
                   setIsCreating(false);
                   setError(null);
                 }}
-                className="text-slate-400 hover:text-white"
+                className="text-on-surface-variant hover:text-on-surface"
               >
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center gap-2">
               <input
                 type="text"
                 autoFocus
-                placeholder="Category name (e.g. Engineering)"
+                placeholder="Category name (e.g. Design Systems)"
                 value={newCatName}
                 onChange={(e) => setNewCatName(e.target.value)}
                 disabled={submitting}
-                className="flex-1 bg-slate-900 border border-slate-800 rounded-md px-2.5 py-1.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500"
+                className="flex-1 bg-surface-container-low border border-surface-container-high/40 rounded-lg px-2.5 py-1.5 font-body-sm text-xs text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-1 focus:ring-primary"
               />
               <button
                 type="submit"
                 disabled={submitting || !newCatName.trim()}
-                className="px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold rounded-md text-xs flex items-center space-x-1 transition disabled:opacity-50"
+                className="px-3 py-1.5 bg-primary hover:bg-primary-container text-on-primary font-semibold rounded-lg text-xs flex items-center gap-1 transition-all disabled:opacity-50 shadow-xs"
               >
                 {submitting ? (
                   <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -159,9 +159,7 @@ export const CategorySelector: React.FC<CategorySelectorProps> = ({
               </button>
             </div>
 
-            {error && (
-              <p className="text-[11px] text-red-400 font-medium">{error}</p>
-            )}
+            {error && <p className="text-[11px] text-error">{error}</p>}
           </form>
         )}
       </div>
