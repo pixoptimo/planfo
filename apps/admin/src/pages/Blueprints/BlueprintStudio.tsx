@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useSearchParams, useNavigate } from 'react-router-dom';
 import type { Blueprint, BlueprintField, BlueprintFieldType } from '@cms/schemas';
 import { api } from '../../api/client.js';
 import { slugify } from '../../utils/slugify.js';
@@ -66,6 +66,7 @@ function getMaterialIconName(iconName?: string): string {
 
 export const BlueprintStudio: React.FC = () => {
   const { user, can } = useAuth();
+  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
 
   // Blueprints & Core counts
@@ -468,7 +469,7 @@ export const BlueprintStudio: React.FC = () => {
               {can('blueprints.create') && (
                 <button
                   type="button"
-                  onClick={() => openCreateModal()}
+                  onClick={() => navigate('/blueprints/new')}
                   className="inline-flex items-center gap-2 px-space-md py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm transition-all hover:scale-[1.01]"
                 >
                   <span className="material-symbols-outlined text-[18px]">add</span>
@@ -529,7 +530,7 @@ export const BlueprintStudio: React.FC = () => {
                 {can('blueprints.create') && (
                   <button
                     type="button"
-                    onClick={() => openCreateModal()}
+                    onClick={() => navigate('/blueprints/new')}
                     className="inline-flex items-center gap-2 px-space-md py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm transition-all hover:scale-[1.01]"
                   >
                     <span className="material-symbols-outlined text-[18px]">add</span>
@@ -772,7 +773,7 @@ export const BlueprintStudio: React.FC = () => {
                   {can('blueprints.create') && (
                     <button
                       type="button"
-                      onClick={() => openCreateModal()}
+                      onClick={() => navigate('/blueprints/new')}
                       className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-lowest hover:bg-surface-container-low text-primary font-label-md text-label-md transition-colors shadow-sm border border-surface-container-high/40"
                     >
                       <span className="material-symbols-outlined text-[16px]">add_circle</span>
@@ -857,7 +858,7 @@ export const BlueprintStudio: React.FC = () => {
                             {can('blueprints.update') && (
                               <button
                                 type="button"
-                                onClick={() => openEditModal(bp)}
+                                onClick={() => navigate(`/blueprints/edit/${bp.slug}`)}
                                 className="p-1.5 rounded-lg hover:bg-surface-container text-on-surface-variant hover:text-primary transition-colors"
                                 title="Edit Schema"
                               >

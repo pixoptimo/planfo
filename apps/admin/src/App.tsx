@@ -22,6 +22,7 @@ import { TrashPage } from './pages/Trash/TrashPage.js';
 import { ThemesPage } from './pages/Themes/ThemesPage.js';
 import { SetupWizard } from './pages/Setup/SetupWizard.js';
 import { BlueprintStudio } from './pages/Blueprints/BlueprintStudio.js';
+import { BlueprintCreate } from './pages/Blueprints/BlueprintCreate.js';
 import { FeaturePacksPage } from './pages/Blueprints/FeaturePacksPage.js';
 import { DynamicEntryList } from './pages/Blueprints/DynamicEntryList.js';
 import { DynamicEntryEdit } from './pages/Blueprints/DynamicEntryEdit.js';
@@ -113,6 +114,8 @@ export const App: React.FC = () => {
             <Route path="trash" element={<TrashPage />} />
             <Route path="blueprints" element={<Navigate to="/blueprints/studio" replace />} />
             <Route path="blueprints/studio" element={<BlueprintStudio />} />
+            <Route path="blueprints/new" element={<BlueprintCreate />} />
+            <Route path="blueprints/edit/:blueprintSlug" element={<BlueprintCreate />} />
             <Route path="blueprints/feature-packs" element={<FeaturePacksPage />} />
             <Route path="blueprints/:blueprintSlug" element={<DynamicEntryList />} />
             <Route path="blueprints/:blueprintSlug/new" element={<DynamicEntryEdit />} />
