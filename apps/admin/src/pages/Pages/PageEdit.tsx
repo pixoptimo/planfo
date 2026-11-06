@@ -153,28 +153,28 @@ export const PageEdit: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="text-center py-20 text-slate-400">Loading page data...</div>;
+    return <div className="text-center py-20 text-on-surface-variant font-label-md">Loading page data...</div>;
   }
 
   return (
-    <div className="space-y-6 pb-20 w-full">
+    <div className="space-y-6 pb-20 w-full font-body-md text-on-surface antialiased">
       {/* Top action bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-outline-variant/30 pb-4">
         <div className="flex items-center space-x-3">
           <Link
             to="/pages"
-            className="p-2 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
+            className="p-2 text-on-surface-variant hover:text-on-surface bg-surface-container-lowest border border-outline-variant/30 rounded-lg shadow-xs transition"
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
           <div>
             <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-bold text-white tracking-tight">
+              <h1 className="font-headline-sm text-headline-sm text-on-surface tracking-tight">
                 {isNew ? 'Create New Page' : `Edit: ${page.title}`}
               </h1>
               {!isNew && page.status && <StatusBadge status={page.status} />}
             </div>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">
+            <p className="font-body-sm text-body-sm text-on-surface-variant font-mono mt-0.5">
               URL: /{page.slug === 'home' ? '' : page.slug || 'slug-preview'}
             </p>
           </div>
@@ -189,9 +189,9 @@ export const PageEdit: React.FC = () => {
                   setShowRevisions(true);
                   loadRevisions();
                 }}
-                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
+                className="px-3.5 py-2 bg-surface-container-lowest hover:bg-surface-container text-on-surface border border-outline-variant/30 rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-xs transition"
               >
-                <History className="w-3.5 h-3.5" />
+                <History className="w-3.5 h-3.5 text-primary" />
                 <span>Revisions</span>
               </button>
             </>
@@ -201,7 +201,7 @@ export const PageEdit: React.FC = () => {
             type="button"
             onClick={() => handleSave(false)}
             disabled={saving}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
+            className="px-4 py-2 bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             <span>Save Draft</span>
@@ -212,7 +212,7 @@ export const PageEdit: React.FC = () => {
               type="button"
               onClick={() => handleSave(true)}
               disabled={saving}
-              className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+              className="px-4 py-2 bg-primary hover:bg-primary-container text-on-primary font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-sm transition disabled:opacity-50"
             >
               <Send className="w-3.5 h-3.5" />
               <span>{page.status === 'published' ? 'Update Page' : 'Publish Page'}</span>
@@ -223,13 +223,13 @@ export const PageEdit: React.FC = () => {
 
       {/* Messages */}
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+        <div className="p-4 bg-error/10 border border-error/20 rounded-xl text-xs text-error flex items-center space-x-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
       {success && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
+        <div className="p-4 bg-primary/10 border border-primary/20 rounded-xl text-xs text-primary flex items-center space-x-2">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           <span>{success}</span>
         </div>
@@ -237,9 +237,9 @@ export const PageEdit: React.FC = () => {
 
       {/* Core Fields */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div className="md:col-span-2 bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 space-y-4 shadow-xs">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block font-label-sm text-label-sm font-semibold text-on-surface uppercase tracking-wider mb-1">
               Page Title *
             </label>
             <input
@@ -257,13 +257,13 @@ export const PageEdit: React.FC = () => {
                 });
               }}
               placeholder="About Us, Contact, Features..."
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-base font-semibold text-white focus:outline-none focus:border-brand-500"
+              className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3.5 py-2.5 text-base font-semibold text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
 
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <label className="block font-label-sm text-label-sm font-semibold text-on-surface uppercase tracking-wider">
                 URL Slug
               </label>
               {page.title && (
@@ -274,7 +274,7 @@ export const PageEdit: React.FC = () => {
                     setPage((prev) => ({ ...prev, slug: auto }));
                     setSlugManuallyEdited(false);
                   }}
-                  className="text-[11px] text-brand-400 hover:text-brand-300 font-medium transition"
+                  className="text-[11px] text-primary hover:underline font-medium transition"
                 >
                   Regenerate from Title
                 </button>
@@ -289,16 +289,16 @@ export const PageEdit: React.FC = () => {
                 setPage((prev) => ({ ...prev, slug: val }));
               }}
               placeholder="auto-generated-from-title"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
+              className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-xs font-mono text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
             />
           </div>
         </div>
 
         {/* Sidebar Controls */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+        <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-xl p-5 space-y-4 shadow-xs">
           <div>
             <div className="flex items-center justify-between mb-1">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <label className="block font-label-sm text-label-sm font-semibold text-on-surface uppercase tracking-wider">
                 Layout Template
               </label>
             </div>
@@ -323,7 +323,7 @@ export const PageEdit: React.FC = () => {
                   setPage((prev) => ({ ...prev, template: newTemplate }));
                 }
               }}
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 capitalize"
+              className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary capitalize"
             >
               {Array.from(new Set(['default', ...availableTemplates, page.template || 'default'])).map((tpl) => (
                 <option key={tpl} value={tpl}>
@@ -336,9 +336,9 @@ export const PageEdit: React.FC = () => {
               const currentPreset = getTemplatePreset(page.template || 'default');
               if (!currentPreset) return null;
               return (
-                <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between">
-                  <span className="text-[11px] text-slate-400 truncate max-w-[140px]" title={currentPreset.description}>
-                    Preset: <strong className="text-slate-200">{currentPreset.name}</strong>
+                <div className="mt-2 pt-2 border-t border-outline-variant/20 flex items-center justify-between">
+                  <span className="text-[11px] text-on-surface-variant truncate max-w-[140px]" title={currentPreset.description}>
+                    Preset: <strong className="text-on-surface">{currentPreset.name}</strong>
                   </span>
                   <button
                     type="button"
@@ -358,10 +358,10 @@ export const PageEdit: React.FC = () => {
                       }));
                       setSuccess(`Loaded "${currentPreset.name}" sections and grid cards!`);
                     }}
-                    className="text-[11px] text-brand-400 hover:text-brand-300 font-medium flex items-center space-x-1 hover:underline"
+                    className="text-[11px] text-primary hover:underline font-medium flex items-center space-x-1"
                     title="Load starter sections and multi-column grid cards"
                   >
-                    <Sparkles className="w-3 h-3 text-brand-400" />
+                    <Sparkles className="w-3 h-3 text-primary" />
                     <span>Load Sections</span>
                   </button>
                 </div>
@@ -370,7 +370,7 @@ export const PageEdit: React.FC = () => {
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+            <label className="block font-label-sm text-label-sm font-semibold text-on-surface uppercase tracking-wider mb-1">
               Featured Hero Image
             </label>
             <div className="space-y-2">
@@ -380,19 +380,19 @@ export const PageEdit: React.FC = () => {
                   value={page.featuredImage || ''}
                   onChange={(e) => setPage({ ...page, featuredImage: e.target.value })}
                   placeholder="/media/image.jpg"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand-500"
+                  className="w-full bg-surface-container-low border border-outline-variant/30 rounded-lg px-3 py-1.5 text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                 />
                 <button
                   type="button"
                   onClick={() => setShowMediaPicker(true)}
-                  className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs"
+                  className="p-2 bg-surface-container hover:bg-surface-container-high text-on-surface rounded-lg text-xs"
                 >
                   <ImageIcon className="w-4 h-4" />
                 </button>
               </div>
 
               {page.featuredImage && (
-                <div className="aspect-video bg-slate-950 rounded-lg overflow-hidden border border-slate-800 relative">
+                <div className="aspect-video bg-surface-container-low rounded-lg overflow-hidden border border-outline-variant/30 relative">
                   <img
                     src={getMediaUrl(page.featuredImage)}
                     alt="Featured"
@@ -407,23 +407,23 @@ export const PageEdit: React.FC = () => {
           </div>
 
           {/* Search Engine Visibility / Indexing Directive */}
-          <div className="pt-3 border-t border-slate-800 space-y-2">
+          <div className="pt-3 border-t border-outline-variant/20 space-y-2">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+              <label className="block font-label-sm text-label-sm font-semibold text-on-surface uppercase tracking-wider">
                 Search Engine Indexing
               </label>
               <span
                 className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
                   page.noIndex || page.seo?.robots?.includes('noindex')
-                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                    : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                    ? 'bg-secondary/10 text-secondary border border-secondary/30'
+                    : 'bg-primary/10 text-primary border border-primary/30'
                 }`}
               >
                 {page.noIndex || page.seo?.robots?.includes('noindex') ? 'No-Index' : 'Indexed'}
               </span>
             </div>
 
-            <label className="flex items-start space-x-2.5 p-3 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700 transition">
+            <label className="flex items-start space-x-2.5 p-3 bg-surface-container-low border border-outline-variant/30 rounded-lg cursor-pointer hover:border-outline-variant transition">
               <input
                 type="checkbox"
                 checked={Boolean(page.noIndex || page.seo?.robots?.includes('noindex'))}
@@ -439,12 +439,12 @@ export const PageEdit: React.FC = () => {
                     } as any
                   }));
                 }}
-                className="mt-0.5 rounded border-slate-700 text-brand-500 focus:ring-0 focus:ring-offset-0 bg-slate-900"
+                className="mt-0.5 rounded border-outline-variant text-primary focus:ring-0 focus:ring-offset-0 bg-surface-container-lowest"
               />
               <div className="text-xs">
-                <span className="font-semibold text-slate-200 block">No-Index this page</span>
-                <span className="text-[11px] text-slate-400 block leading-relaxed mt-0.5">
-                  Applies <code className="text-amber-300 font-mono text-[10px]">noindex,nofollow</code> to hide this page from search engines and excludes it from sitemap.xml.
+                <span className="font-semibold text-on-surface block">No-Index this page</span>
+                <span className="text-[11px] text-on-surface-variant block leading-relaxed mt-0.5">
+                  Applies <code className="text-secondary font-mono text-[10px]">noindex,nofollow</code> to hide this page from search engines and excludes it from sitemap.xml.
                 </span>
               </div>
             </label>
@@ -454,7 +454,7 @@ export const PageEdit: React.FC = () => {
 
       {/* Structured Content Block Editor */}
       <div className="space-y-2">
-        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+        <label className="block font-label-sm text-label-sm font-semibold text-on-surface-variant uppercase tracking-wider">
           Structured Page Content
         </label>
         <StructuredEditor
@@ -483,17 +483,17 @@ export const PageEdit: React.FC = () => {
 
       {/* Revisions Drawer */}
       {showRevisions && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
-          <div className="bg-slate-900 border-l border-slate-800 w-full max-w-md h-full flex flex-col p-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
+        <div className="fixed inset-0 z-50 flex justify-end bg-black/50 backdrop-blur-sm">
+          <div className="bg-surface-container-lowest border-l border-outline-variant/30 w-full max-w-md h-full flex flex-col p-6 shadow-2xl">
+            <div className="flex items-center justify-between border-b border-outline-variant/30 pb-4 mb-4">
               <div className="flex items-center space-x-2">
-                <History className="w-5 h-5 text-brand-400" />
-                <h3 className="font-bold text-white text-base">Revision History</h3>
+                <History className="w-5 h-5 text-primary" />
+                <h3 className="font-bold text-on-surface text-base">Revision History</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowRevisions(false)}
-                className="text-slate-400 hover:text-white text-sm"
+                className="text-on-surface-variant hover:text-on-surface text-sm"
               >
                 Close ✕
               </button>
@@ -501,30 +501,30 @@ export const PageEdit: React.FC = () => {
 
             <div className="flex-1 overflow-y-auto space-y-3">
               {loadingRevisions ? (
-                <div className="text-center py-10 text-slate-400">Loading revisions...</div>
+                <div className="text-center py-10 text-on-surface-variant">Loading revisions...</div>
               ) : revisions.length === 0 ? (
-                <div className="text-center py-10 text-slate-500">No revisions found for this page yet.</div>
+                <div className="text-center py-10 text-on-surface-variant">No revisions found for this page yet.</div>
               ) : (
                 revisions.map((rev) => (
                   <div
                     key={rev.id}
-                    className="p-4 bg-slate-950 border border-slate-800 rounded-lg space-y-2"
+                    className="p-4 bg-surface-container-low border border-outline-variant/30 rounded-lg space-y-2"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold font-mono text-emerald-400">
+                      <span className="text-xs font-bold font-mono text-primary">
                         Version {rev.version}
                       </span>
-                      <span className="text-[11px] text-slate-500 font-mono">
+                      <span className="text-[11px] text-on-surface-variant font-mono">
                         {new Date(rev.createdAt).toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-300">{rev.summary}</p>
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                      <span className="text-[11px] text-slate-400">By {rev.authorEmail}</span>
+                    <p className="text-xs text-on-surface">{rev.summary}</p>
+                    <div className="flex items-center justify-between pt-2 border-t border-outline-variant/20">
+                      <span className="text-[11px] text-on-surface-variant">By {rev.authorEmail}</span>
                       <button
                         type="button"
                         onClick={() => restoreRevision(rev.id)}
-                        className="px-2.5 py-1 bg-brand-600/20 hover:bg-brand-600/40 text-brand-400 rounded text-xs font-semibold"
+                        className="px-2.5 py-1 bg-primary-container text-on-primary-container rounded text-xs font-semibold hover:bg-primary shadow-xs"
                       >
                         Restore This Version
                       </button>

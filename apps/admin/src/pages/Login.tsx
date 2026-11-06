@@ -39,21 +39,18 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
-      {/* Background decoration */}
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-900/20 via-slate-950 to-slate-950 pointer-events-none"></div>
-
-      <div className="relative w-full max-w-md bg-slate-900 border border-slate-800 rounded-2xl shadow-2xl p-8 backdrop-blur-sm">
+    <div className="min-h-screen bg-surface flex items-center justify-center p-4 font-body-md text-on-surface antialiased">
+      <div className="w-full max-w-md bg-surface-container-lowest border border-outline-variant/30 rounded-2xl shadow-xl p-8 backdrop-blur-sm relative">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 mx-auto flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-cyan-500/20 mb-3">
-            ⚡
+          <div className="w-12 h-12 rounded-xl bg-primary-container text-on-primary-container mx-auto flex items-center justify-center font-bold text-2xl shadow-sm mb-3">
+            <span className="material-symbols-outlined text-[26px]">auto_stories</span>
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Planfo CMS</h1>
-          <p className="text-sm text-slate-400 mt-1">Sign in to your Planfo website manager</p>
+          <h1 className="font-headline-sm text-headline-sm text-on-surface tracking-tight">Editorial Studio</h1>
+          <p className="font-body-sm text-body-sm text-on-surface-variant mt-1">Sign in to your Planfo website manager</p>
         </div>
 
         {error && (
-          <div className="mb-6 p-3 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+          <div className="mb-6 p-3 bg-error/10 border border-error/20 rounded-xl text-xs text-error flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
@@ -61,35 +58,35 @@ export const Login: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block font-label-sm text-label-sm font-semibold text-on-surface uppercase tracking-wider mb-1.5">
               Username or Email Address
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Mail className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
               <input
                 type="text"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="admin or you@example.com"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-cyan-500 transition"
+                placeholder="admin or admin@example.com"
+                className="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl pl-10 pr-4 py-2.5 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1.5">
+            <label className="block font-label-sm text-label-sm font-semibold text-on-surface uppercase tracking-wider mb-1.5">
               Password
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+              <Lock className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" />
               <input
                 type="password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 transition"
+                className="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl pl-10 pr-4 py-2.5 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
               />
             </div>
           </div>
@@ -97,16 +94,25 @@ export const Login: React.FC = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-6 py-2.5 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-sm rounded-xl flex items-center justify-center space-x-2 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+            className="w-full mt-6 py-2.5 bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md font-semibold rounded-xl flex items-center justify-center space-x-2 shadow-sm transition disabled:opacity-50"
           >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : null}
-            <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 animate-spin" />
+                <span>Verifying credentials...</span>
+              </>
+            ) : (
+              <span>Sign In to Studio</span>
+            )}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-slate-800/80 text-center">
-          <p className="text-[11px] text-slate-500">
-            Protected by Argon2id hashing & HTTP-only cookies. Zero SQL database.
+        <div className="mt-6 pt-4 border-t border-outline-variant/20 flex flex-col items-center gap-1.5 text-center">
+          <span className="font-label-xs text-label-xs text-on-surface-variant uppercase tracking-wider">
+            Default Credentials
+          </span>
+          <p className="font-code text-[12px] text-primary bg-surface-container px-2.5 py-1 rounded-md">
+            admin <span className="text-on-surface-variant">•</span> admin123
           </p>
         </div>
       </div>
