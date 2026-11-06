@@ -1,0 +1,58 @@
+{
+  "id": "rev_page_about-us_v001",
+  "contentType": "page",
+  "contentId": "page_about",
+  "slug": "about-us",
+  "version": 1,
+  "createdAt": "2026-11-06T11:13:38.252Z",
+  "authorEmail": "admin@example.com",
+  "data": {
+    "id": "page_about",
+    "title": "About Us",
+    "slug": "about-us",
+    "status": "published",
+    "template": "page",
+    "content": {
+      "blocks": [
+        {
+          "id": "ab_1",
+          "type": "heading",
+          "level": 2,
+          "text": "Our Mission & Philosophy"
+        },
+        {
+          "id": "ab_2",
+          "type": "paragraph",
+          "text": "We believe that static websites offer unbeatable speed, security, and hosting cost benefits. Planfo CMS bridges the gap between structured content management and purely static site generation."
+        },
+        {
+          "id": "ab_3",
+          "type": "list",
+          "style": "unordered",
+          "items": [
+            "Zero Database dependency at runtime",
+            "Atomic staging and publishing deployment",
+            "Argon2id password hashing and robust RBAC",
+            "Full JSON revision history and backup portability"
+          ]
+        }
+      ]
+    },
+    "featuredImage": "",
+    "seo": {
+      "title": "About Us - Planfo Static CMS",
+      "description": "Learn about the philosophy and engineering behind Planfo Static CMS.",
+      "canonical": "http://localhost:3000/about-us",
+      "ogTitle": "About Us",
+      "ogDescription": "Philosophy and engineering behind Planfo Static CMS.",
+      "ogImage": "",
+      "robots": "index,follow",
+      "noIndex": false
+    },
+    "noIndex": false,
+    "createdAt": "2026-10-14T08:12:06.354Z",
+    "updatedAt": "2026-11-06T11:13:38.244Z",
+    "publishedAt": "2026-10-14T08:12:06.354Z"
+  },
+  "summary": "Updated and published"
+}

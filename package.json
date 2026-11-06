@@ -12,7 +12,7 @@
     "dev": "concurrently -n \"SERVER,ADMIN\" -c \"blue,green\" \"npm:dev:server\" \"npm:dev:admin\"",
     "dev:server": "npm run dev --workspace=@cms/server",
     "dev:admin": "npm run dev --workspace=@cms/admin",
-    "serve:website": "npx serve generated/website -p 8080",
+    "serve:website": "npm run start",
     "build": "npm run build --workspaces --if-present",
     "start": "npm run start --workspace=@cms/server",
     "generate": "npx tsx apps/generator/src/cli.ts",

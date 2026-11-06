@@ -25,7 +25,7 @@ function getTargetCmsUrl(): string {
     } catch {}
   }
 
-  const envPort = process.env.CMS_PORT || '4000';
+  const envPort = process.env.CMS_PORT || '3000';
   const envHost = process.env.CMS_HOST || 'localhost';
   return `http://${envHost}:${envPort}`;
 }

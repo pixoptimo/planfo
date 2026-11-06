@@ -87,3 +87,4 @@ export const PlanfoLogo: React.FC<PlanfoLogoProps> = ({
     </svg>
   );
 };
+

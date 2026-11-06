@@ -29,6 +29,51 @@ import { blueprintRouter } from './routes/blueprint.routes.js';
 import { trashRouter } from './routes/trash.routes.js';
 import { demoRouter } from './routes/demo.routes.js';
 
+// Dynamic Website Name Resolver:
+// Allows accessing the website at http://localhost:<port>/<website-name> and http://localhost:<port>/<website-name>/*
+// on the EXACT SAME PORT as http://localhost:<port>/admin.
+export function getWebsiteAliases(): string[] {
+  const aliases = new Set<string>();
+
+  try {
+    const siteSettingsFile = path.join(config.SETTINGS_PATH, 'site.json');
+    if (fs.existsSync(siteSettingsFile)) {
+      const siteData = JSON.parse(fs.readFileSync(siteSettingsFile, 'utf8'));
+      if (siteData.siteName) {
+        const s1 = siteData.siteName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+        if (s1) aliases.add(s1);
+        const s2 = siteData.siteName.toLowerCase().replace(/\s+/g, '');
+        if (s2) aliases.add(s2);
+      }
+    }
+  } catch {}
+
+  try {
+    if (process.env.PLANFO_PROJECT_DIR) {
+      const p1 = path.basename(process.env.PLANFO_PROJECT_DIR).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+      if (p1) aliases.add(p1);
+    }
+    const w1 = path.basename(config.WORKSPACE_ROOT).toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    if (w1 && w1 !== 'workspace') aliases.add(w1);
+  } catch {}
+
+  aliases.add('website');
+  aliases.add('site');
+
+  // Never intercept core system routes
+  aliases.delete('admin');
+  aliases.delete('api');
+  aliases.delete('media');
+  aliases.delete('demos');
+  aliases.delete('assets');
+  aliases.delete('blog');
+  aliases.delete('products');
+  aliases.delete('pages');
+  aliases.delete('templates');
+
+  return Array.from(aliases);
+}
+
 export function createApp(): express.Application {
   const app = express();
 
@@ -233,6 +278,50 @@ export function createApp(): express.Application {
       return res.sendFile(detailsPath);
     }
     return res.redirect(302, `/templates/${encodeURIComponent(slug)}`);
+  });
+
+  // Support accessing the website under http://localhost:<port>/<website-name> and http://localhost:<port>/<website-name>/*
+  app.use((req, res, next) => {
+    if (
+      req.path.startsWith('/admin') ||
+      req.path.startsWith('/api') ||
+      req.path.startsWith('/media') ||
+      req.path.startsWith('/demos')
+    ) {
+      return next();
+    }
+
+    const segments = req.path.split('/').filter(Boolean);
+    if (segments.length === 0) {
+      return next();
+    }
+
+    const firstSegment = segments[0].toLowerCase();
+    const aliases = getWebsiteAliases();
+
+    if (aliases.includes(firstSegment)) {
+      // If accessed without trailing slash (e.g. /my-website), redirect to /my-website/ preserving query params
+      if (req.path === `/${segments[0]}`) {
+        const query = req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '';
+        return res.redirect(301, `/${segments[0]}/${query}`);
+      }
+
+      // Rewrite URL to the subpath within generated static website
+      const subPath = '/' + segments.slice(1).join('/');
+      const originalUrl = req.url;
+      req.url = subPath + (req.url.includes('?') ? req.url.slice(req.url.indexOf('?')) : '');
+
+      return express.static(config.OUTPUT_PATH, { extensions: ['html'] })(req, res, () => {
+        req.url = originalUrl;
+        const subIndexPath = path.join(config.OUTPUT_PATH, subPath.replace(/^\//, ''), 'index.html');
+        if (fs.existsSync(subIndexPath)) {
+          return res.sendFile(subIndexPath);
+        }
+        next();
+      });
+    }
+
+    next();
   });
 
   // Public Static Website - Root Level

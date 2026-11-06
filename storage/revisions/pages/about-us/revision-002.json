@@ -1,0 +1,81 @@
+{
+  "id": "rev_page_about-us_v002",
+  "contentType": "page",
+  "contentId": "page_about",
+  "slug": "about-us",
+  "version": 2,
+  "createdAt": "2026-11-06T11:13:44.986Z",
+  "authorEmail": "admin@example.com",
+  "data": {
+    "id": "page_about",
+    "title": "About Us",
+    "slug": "about-us",
+    "status": "published",
+    "template": "about",
+    "content": {
+      "blocks": [
+        {
+          "id": "def_h1",
+          "type": "heading",
+          "level": 2,
+          "text": "Page Title"
+        },
+        {
+          "id": "def_p1",
+          "type": "paragraph",
+          "text": "Welcome to this page. You can customize this layout effortlessly with headings, paragraphs, and multi-column grid cards."
+        },
+        {
+          "id": "def_grid",
+          "type": "grid",
+          "columns": 3,
+          "items": [
+            {
+              "id": "dg1",
+              "title": "Core Feature",
+              "text": "Explain your first key product or content highlight in this multi-column card.",
+              "icon": "✨",
+              "badge": "Highlight",
+              "buttonText": "Learn More",
+              "buttonUrl": "#"
+            },
+            {
+              "id": "dg2",
+              "title": "Second Feature",
+              "text": "Highlight another key capability, benefit, or value proposition here.",
+              "icon": "🚀",
+              "badge": "Benefit",
+              "buttonText": "Learn More",
+              "buttonUrl": "#"
+            },
+            {
+              "id": "dg3",
+              "title": "Third Feature",
+              "text": "Provide key insights or next steps for your readers and customers.",
+              "icon": "🎯",
+              "badge": "Value",
+              "buttonText": "Learn More",
+              "buttonUrl": "#"
+            }
+          ]
+        }
+      ]
+    },
+    "featuredImage": "",
+    "seo": {
+      "title": "About Us - Planfo Static CMS",
+      "description": "Learn about the philosophy and engineering behind Planfo Static CMS.",
+      "canonical": "http://localhost:3000/about-us",
+      "ogTitle": "About Us",
+      "ogDescription": "Philosophy and engineering behind Planfo Static CMS.",
+      "ogImage": "",
+      "robots": "index,follow",
+      "noIndex": false
+    },
+    "noIndex": false,
+    "createdAt": "2026-10-14T08:12:06.354Z",
+    "updatedAt": "2026-11-06T11:13:44.985Z",
+    "publishedAt": "2026-10-14T08:12:06.354Z"
+  },
+  "summary": "Updated and published"
+}

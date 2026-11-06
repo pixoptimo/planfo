@@ -2,7 +2,7 @@ import express from 'express';
 import type { Server } from 'node:http';
 import fs from 'node:fs';
 import path from 'node:path';
-import { createApp } from './app.js';
+import { createApp, getWebsiteAliases } from './app.js';
 import { config } from './config/env.js';
 import { initializeStorage } from './storage/storageInit.js';
 import { SessionStore } from './storage/sessionStore.js';
@@ -52,12 +52,15 @@ async function startServer(): Promise<void> {
   // 4. Create CMS Unified Server (Website, Admin & API on 1 single host/port)
   const app = createApp();
   const server = app.listen(actualCmsPort, config.CMS_HOST, () => {
+    const aliases = getWebsiteAliases();
+    const primaryAlias = aliases.find((a: string) => a !== 'website' && a !== 'site') || 'website';
     logger.info(`⚡ Planfo CMS Unified Server running at http://${config.CMS_HOST}:${actualCmsPort}`);
-    logger.info(`🌐 Public Website:  http://${config.CMS_HOST}:${actualCmsPort}/`);
-    logger.info(`🛠️  Admin Dashboard: http://${config.CMS_HOST}:${actualCmsPort}/admin`);
-    logger.info(`🔌 REST API:        http://${config.CMS_HOST}:${actualCmsPort}/api`);
-    logger.info(`📂 Storage Root:    ${config.STORAGE_PATH}`);
-    logger.info(`🌐 Static Output:   ${config.OUTPUT_PATH}`);
+    logger.info(`🌐 Public Website:       http://${config.CMS_HOST}:${actualCmsPort}/`);
+    logger.info(`🌐 Website Named Alias:  http://${config.CMS_HOST}:${actualCmsPort}/${primaryAlias}/`);
+    logger.info(`🛠️  Admin Dashboard:      http://${config.CMS_HOST}:${actualCmsPort}/admin`);
+    logger.info(`🔌 REST API:             http://${config.CMS_HOST}:${actualCmsPort}/api`);
+    logger.info(`📂 Storage Root:         ${config.STORAGE_PATH}`);
+    logger.info(`🌐 Static Output:        ${config.OUTPUT_PATH}`);
   });
 
   const actualSitePort = actualCmsPort;

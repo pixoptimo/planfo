@@ -45,20 +45,9 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
       fs.mkdirSync(path.join(projectDir, d), { recursive: true });
     }
 
-    // 1b. Seed default admin credentials (planfo/auth/users.json)
+    // 1b. Initialize auth storage (empty users array so first-run Setup Wizard triggers on first visit to /admin)
     const initialUsers = {
-      users: [
-        {
-          id: 'usr_admin_default',
-          email: 'admin@example.com',
-          name: 'admin',
-          passwordHash: '$argon2id$v=19$m=65536,t=3,p=1$bRr1/KcA8eRedvVwjBVixA$gShPE8k4zPthQ4Q9enRRW6lOLwzEee2NwXmL8NB0ffA',
-          role: 'admin',
-          active: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        }
-      ]
+      users: []
     };
     fs.writeFileSync(path.join(projectDir, 'planfo/auth/users.json'), JSON.stringify(initialUsers, null, 2), 'utf-8');
 

@@ -20,10 +20,10 @@ program.on('--help', () => {
 \x1b[1mExamples:\x1b[0m
   $ planfo init my-site          Initialize a new Planfo website project
   $ cd my-site
-  $ planfo dev                   Start Planfo CMS dashboard on http://localhost:3000
-  $ planfo dev -p 4000           Start Planfo CMS dashboard on a custom port
+  $ planfo dev                   Start Planfo CMS on http://localhost:3000
+  $ planfo dev -p 4000           Start Planfo CMS on a custom port
   $ planfo build                 Compile static HTML/CSS into generated/
-  $ planfo preview               Preview the generated static website on :8080
+  $ planfo preview               Preview website and admin on http://localhost:3000
   $ planfo publish               Build and publish static output to GitHub Pages
 
 \x1b[1m\x1b[33mImportant Note:\x1b[0m
@@ -101,12 +101,15 @@ program
     const projectInfo = resolvePlanfoProject(dir);
     const monorepoRoot = findMonorepoRoot();
 
-    console.log(`\n\x1b[36m⚡ Starting Planfo CMS Development Server on port ${port}...\x1b[0m`);
+    const projectName = projectInfo ? path.basename(projectInfo.projectDir) : 'website';
+    console.log(`\n\x1b[36m⚡ Starting Planfo CMS Unified Server on port ${port}...\x1b[0m`);
     if (projectInfo) {
       console.log(`\x1b[90m  Project: ${projectInfo.projectDir}\x1b[0m`);
       console.log(`\x1b[90m  Storage: ${projectInfo.storageDir}\x1b[0m`);
     }
-    console.log(`\x1b[32m  ➜ CMS Dashboard: http://localhost:${port}\x1b[0m\n`);
+    console.log(`\x1b[32m  ➜ CMS Admin:      http://localhost:${port}/admin\x1b[0m`);
+    console.log(`\x1b[32m  ➜ Website:        http://localhost:${port}/${projectName}/\x1b[0m`);
+    console.log(`\x1b[32m  ➜ Website (Root): http://localhost:${port}/\x1b[0m\n`);
 
     const env: NodeJS.ProcessEnv = {
       ...process.env,
@@ -174,23 +177,41 @@ program
 // planfo preview [dir]
 program
   .command('preview [dir]')
-  .description('Preview the generated static website')
-  .option('-p, --port <port>', 'Port for static preview server', '8080')
+  .description('Preview the generated static website and admin on the unified port')
+  .option('-p, --port <port>', 'Port number to run on', '3000')
   .action((dir, options) => {
-    const port = options.port || '8080';
+    const port = options.port || '3000';
     const projectInfo = resolvePlanfoProject(dir);
-    const projectDir = projectInfo ? projectInfo.projectDir : process.cwd();
-    const generatedDir = path.join(projectDir, 'generated');
+    const monorepoRoot = findMonorepoRoot();
+    const projectName = projectInfo ? path.basename(projectInfo.projectDir) : 'website';
 
-    if (!fs.existsSync(generatedDir)) {
-      console.warn(`\x1b[33m⚠ Warning: 'generated/' folder not found in ${projectDir}. Running 'planfo build' first...\x1b[0m`);
+    console.log(`\n\x1b[36m⚡ Starting Planfo CMS Unified Preview Server on port ${port}...\x1b[0m`);
+    console.log(`\x1b[32m  ➜ CMS Admin:      http://localhost:${port}/admin\x1b[0m`);
+    console.log(`\x1b[32m  ➜ Website:        http://localhost:${port}/${projectName}/\x1b[0m`);
+    console.log(`\x1b[32m  ➜ Website (Root): http://localhost:${port}/\x1b[0m\n`);
+
+    const env: NodeJS.ProcessEnv = {
+      ...process.env,
+      CMS_PORT: port,
+      PORT: port
+    };
+
+    if (projectInfo) {
+      env.PLANFO_PROJECT_DIR = projectInfo.projectDir;
+      env.STORAGE_PATH = projectInfo.storageDir;
+      env.CONTENT_PATH = path.join(projectInfo.storageDir, 'content');
+      env.MEDIA_PATH = path.join(projectInfo.storageDir, 'media');
+      env.SETTINGS_PATH = projectInfo.storageDir;
+      env.OUTPUT_PATH = path.join(projectInfo.projectDir, 'generated');
+      env.THEMES_PATH = path.join(projectInfo.storageDir, 'themes');
     }
 
-    console.log(`\n\x1b[36m⚡ Previewing generated static website on http://localhost:${port}...\x1b[0m\n`);
-    const child = spawn('npx', ['serve', generatedDir, '-p', port], {
-      cwd: projectDir,
-      stdio: 'inherit'
+    const child = spawn('npm', ['run', 'start'], {
+      cwd: monorepoRoot,
+      stdio: 'inherit',
+      env
     });
+
     child.on('error', (err) => {
       console.error(`Failed to start preview server: ${err.message}`);
     });

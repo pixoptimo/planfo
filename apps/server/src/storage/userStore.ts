@@ -26,15 +26,29 @@ export class UserStore {
   static async findByEmail(identifier: string): Promise<User | null> {
     const users = await this.getAllUsers();
     const query = identifier.trim().toLowerCase();
-    return (
-      users.find(
-        (u) =>
-          u.email.toLowerCase() === query ||
-          u.email.toLowerCase().split('@')[0] === query ||
-          (u.name && u.name.toLowerCase() === query) ||
-          (query === 'admin' && u.role === 'admin' && u.active)
-      ) || null
+
+    // 1. Direct match on email, username prefix, or display name
+    const match = users.find(
+      (u) =>
+        u.email.toLowerCase() === query ||
+        u.email.toLowerCase().split('@')[0] === query ||
+        (u.name && u.name.toLowerCase() === query)
     );
+    if (match) return match;
+
+    // 2. If identifier is 'admin', match any active admin
+    if (query === 'admin') {
+      const admin = users.find((u) => u.role === 'admin' && u.active);
+      if (admin) return admin;
+    }
+
+    // 3. Resilient local fallback: if there is only 1 admin account in the system, resolve to it
+    const activeAdmins = users.filter((u) => u.role === 'admin' && u.active);
+    if (activeAdmins.length === 1) {
+      return activeAdmins[0];
+    }
+
+    return null;
   }
 
   static async saveUser(user: User): Promise<void> {

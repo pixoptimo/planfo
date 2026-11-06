@@ -1,13 +1,13 @@
 {
   "siteName": "Planfo Static CMS",
-  "siteUrl": "http://localhost:4000",
+  "siteUrl": "http://localhost:3000",
   "tagline": "Modern, high-performance static website powered by a file-based CMS.",
   "logo": "",
   "favicon": "",
   "defaultSEO": {
     "title": "Planfo Static CMS - Blazing Fast Content Management",
     "description": "Manage rich content with zero database overhead and deploy lightning-fast static HTML.",
-    "canonical": "http://localhost:4000",
+    "canonical": "http://localhost:3000",
     "ogTitle": "Planfo Static CMS",
     "ogDescription": "Manage rich content with zero database overhead.",
     "ogImage": "",
@@ -33,7 +33,7 @@
     "events": true,
     "faqs": true
   },
-  "activeTheme": "planfo-default",
+  "activeTheme": "aero-modern",
   "deployment": {
     "target": "local",
     "gitRepo": "",
@@ -44,5 +44,5 @@
     "customDomain": "",
     "autoPublishOnSave": false
   },
-  "updatedAt": "2026-10-19T15:02:35.018Z"
+  "updatedAt": "2026-11-06T11:44:12.266Z"
 }

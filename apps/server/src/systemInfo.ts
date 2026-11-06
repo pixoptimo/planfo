@@ -9,9 +9,9 @@ export interface SystemInfo {
 
 export const systemInfo: SystemInfo = {
   cmsHost: 'localhost',
-  cmsPort: 4000,
-  cmsUrl: 'http://localhost:4000',
+  cmsPort: 3000,
+  cmsUrl: 'http://localhost:3000',
   sitePort: 3000,
   siteUrl: 'http://localhost:3000',
-  isStaticServerRunning: false
+  isStaticServerRunning: true
 };

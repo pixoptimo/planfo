@@ -8,9 +8,9 @@ dotenv.config();
 const EnvSchema = z.object({
   NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   CMS_HOST: z.string().default('localhost'),
-  CMS_PORT: z.coerce.number().default(4000),
-  SITE_URL: z.string().url().default('http://localhost:4000'),
-  ADMIN_URL: z.string().url().default('http://localhost:4000'),
+  CMS_PORT: z.coerce.number().default(3000),
+  SITE_URL: z.string().url().default('http://localhost:3000'),
+  ADMIN_URL: z.string().url().default('http://localhost:3000/admin'),
   
   // Storage & paths
   STORAGE_PATH: z.string().default('./storage'),
