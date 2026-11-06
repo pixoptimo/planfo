@@ -8,11 +8,8 @@ import {
   AlertCircle,
   Loader2,
   ArrowRight,
-  Sparkles,
-  Layers,
   Check,
-  Power,
-  ExternalLink
+  Power
 } from 'lucide-react';
 import { FEATURE_PACKS, type FeaturePackDefinition } from '../../data/featurePacks.js';
 import { getBlueprintIcon } from '../../utils/blueprintIcons.js';
@@ -64,7 +61,6 @@ export const FeaturePacksPage: React.FC = () => {
   const getConnectedBlueprints = (pack: FeaturePackDefinition): BlueprintWithCount[] => {
     return blueprints.filter((b) => {
       if (b.slug === pack.suggestedSlug) return true;
-      // Check if blueprint has matching field names from this pack
       const fieldNames = new Set(pack.fields.map((f) => f.name));
       const matchCount = b.fields.filter((f) => fieldNames.has(f.name)).length;
       return matchCount >= 2;
@@ -92,7 +88,7 @@ export const FeaturePacksPage: React.FC = () => {
       setSettings(updated);
       setSuccessMsg(
         nextState
-          ? `${pack.name} enabled! Its plugin fields and capabilities are now available to attach to any Blueprint or Page.`
+          ? `${pack.name} enabled! Its plugin fields and capabilities are ready to attach in Blueprints Studio.`
           : `${pack.name} disabled.`
       );
     } catch (err) {
@@ -105,27 +101,28 @@ export const FeaturePacksPage: React.FC = () => {
   const activePacksCount = FEATURE_PACKS.filter((p) => isPackActive(p)).length;
 
   return (
-    <div className="space-y-6 w-full pb-20">
-      {/* Top Banner & Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-        <div>
-          <div className="inline-flex items-center space-x-1.5 text-xs font-mono text-emerald-400 mb-1">
-            <Sparkles className="w-3.5 h-3.5" />
-            <span>Schema Architect & Collections</span>
-          </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-            <span>Blueprints Studio</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1 max-w-2xl leading-relaxed">
-            Visually design custom schemas, configure custom fields (text, media, dropdowns, dates), and automatically instantiate new collections in the sidebar without touching code.
-          </p>
+    <div className="w-full pb-20 font-body-md text-on-surface antialiased">
+      {/* Sub-header Breadcrumb Bar */}
+      <div className="w-full bg-surface-container-lowest px-6 py-3 flex flex-wrap items-center justify-between gap-4 shadow-sm border-b border-surface-container-high/40 rounded-xl mb-6">
+        <div className="flex items-center gap-2 text-body-sm font-body-sm min-w-0">
+          <Link
+            to="/blueprints/studio"
+            className="text-on-surface-variant hover:text-primary cursor-pointer transition-colors font-medium"
+          >
+            Blueprints Studio
+          </Link>
+          <span className="text-outline-variant select-none">/</span>
+          <span className="text-primary font-semibold">Feature Packs Hub</span>
+          <span className="ml-2 inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container font-code text-code text-primary font-medium">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+            {activePacksCount} of {FEATURE_PACKS.length} Active
+          </span>
         </div>
-
-        <div className="flex items-center space-x-2 self-start sm:self-auto">
+        <div className="flex items-center gap-2">
           {can('blueprints.create') && (
             <Link
-              to="/blueprints/studio?action=new"
-              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition"
+              to="/blueprints/new"
+              className="inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm transition-all hover:scale-[1.01]"
             >
               <Plus className="w-4 h-4" />
               <span>Create Custom Blueprint</span>
@@ -134,41 +131,80 @@ export const FeaturePacksPage: React.FC = () => {
         </div>
       </div>
 
-      {/* Navigation Sub-Tabs */}
-      <div className="flex border-b border-slate-800 space-x-2">
+      {/* Hero / Title Overview Section */}
+      <section className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 mb-6">
+        <div className="flex flex-col gap-1 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm w-fit uppercase tracking-wider font-semibold">
+            <Package className="w-3.5 h-3.5" />
+            <span>Plugin Marketplace &amp; Fast-Track Schemas</span>
+          </div>
+          <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight mt-1 font-serif text-3xl sm:text-4xl">
+            Feature Packs Hub
+          </h1>
+          <p className="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+            Attach pre-packaged schema modules and capability templates to any blueprint collection. Fast-track setup
+            for eCommerce catalogs, portfolios, event booking, FAQs, and staff directories.
+          </p>
+        </div>
+
+        {/* Quick Metrics Ribbon */}
+        <div className="grid grid-cols-3 gap-2 p-2 bg-surface-container-lowest rounded-xl shadow-sm min-w-[300px] border border-surface-container-high/40">
+          <div className="flex flex-col p-2.5 rounded-lg bg-surface-container-low text-center">
+            <span className="font-code text-code text-on-surface-variant uppercase font-medium">Packs</span>
+            <span className="font-headline-sm text-headline-sm text-primary font-bold text-xl">
+              {FEATURE_PACKS.length}
+            </span>
+            <span className="font-label-sm text-[10px] text-on-surface-variant">Available</span>
+          </div>
+          <div className="flex flex-col p-2.5 rounded-lg bg-surface-container-low text-center">
+            <span className="font-code text-code text-on-surface-variant uppercase font-medium">Active</span>
+            <span className="font-headline-sm text-headline-sm text-secondary font-bold text-xl">
+              {activePacksCount}
+            </span>
+            <span className="font-label-sm text-[10px] text-on-surface-variant">Enabled</span>
+          </div>
+          <div className="flex flex-col p-2.5 rounded-lg bg-surface-container-low text-center">
+            <span className="font-code text-code text-on-surface-variant uppercase font-medium">Ready</span>
+            <span className="font-headline-sm text-headline-sm text-on-surface font-bold text-xl">100%</span>
+            <span className="font-label-sm text-[10px] text-on-surface-variant">Type-Safe</span>
+          </div>
+        </div>
+      </section>
+
+      {/* Sub-navigation Tabs */}
+      <div className="flex items-center gap-1 pb-1 bg-surface-container-low p-1.5 rounded-xl border border-surface-container-high/40 mb-6">
         <Link
           to="/blueprints/studio"
-          className="px-4 py-2.5 text-xs font-medium text-slate-400 hover:text-slate-200 flex items-center space-x-2 transition"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md"
         >
           <Boxes className="w-4 h-4" />
-          <span>Schema Builder & Blueprints</span>
+          <span>Schema Builder &amp; Blueprints</span>
         </Link>
         <Link
           to="/blueprints/feature-packs"
-          className="px-4 py-2.5 text-xs font-bold border-b-2 border-brand-500 text-brand-400 flex items-center space-x-2"
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-surface-container-lowest text-primary shadow-sm font-label-md text-label-md font-semibold transition-all"
         >
           <Package className="w-4 h-4" />
           <span>Feature Packs Hub</span>
         </Link>
       </div>
 
-
       {/* Alerts */}
       {errorMsg && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
+        <div className="p-4 bg-error-container/40 border border-error/30 rounded-xl text-xs text-on-error-container flex items-center space-x-2 mb-6">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 text-error" />
           <span>{errorMsg}</span>
         </div>
       )}
       {successMsg && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+        <div className="p-4 bg-primary-fixed/40 border border-primary/30 rounded-xl text-xs text-on-primary-fixed flex items-center space-x-2 mb-6">
+          <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-primary" />
           <span>{successMsg}</span>
         </div>
       )}
 
       {/* Feature Packs Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-2">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pt-1">
         {FEATURE_PACKS.map((pack) => {
           const IconComp = getBlueprintIcon(pack.icon);
           const active = isPackActive(pack);
@@ -178,10 +214,10 @@ export const FeaturePacksPage: React.FC = () => {
           return (
             <div
               key={pack.id}
-              className={`rounded-2xl border transition flex flex-col justify-between overflow-hidden relative ${
+              className={`rounded-2xl border transition-all flex flex-col justify-between overflow-hidden relative shadow-sm ${
                 active
-                  ? 'bg-slate-900 border-slate-800 shadow-lg shadow-black/40 ring-1 ring-emerald-500/20'
-                  : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-800 opacity-90'
+                  ? 'bg-surface-container-lowest border-primary/30 shadow-md ring-1 ring-primary/20'
+                  : 'bg-surface-container-lowest/80 border-surface-container-high/50 hover:border-surface-container-high'
               }`}
             >
               <div className="p-6">
@@ -189,10 +225,10 @@ export const FeaturePacksPage: React.FC = () => {
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-center space-x-3.5">
                     <div
-                      className={`w-11 h-11 rounded-xl flex items-center justify-center transition ${
+                      className={`w-11 h-11 rounded-xl flex items-center justify-center transition-all shadow-xs ${
                         active
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                          : 'bg-slate-800 text-slate-400 border border-slate-700'
+                          ? 'bg-primary-fixed text-primary'
+                          : 'bg-surface-container-high text-on-surface-variant'
                       }`}
                     >
                       <IconComp className="w-5 h-5" />
@@ -200,13 +236,13 @@ export const FeaturePacksPage: React.FC = () => {
 
                     <div>
                       <div className="flex items-center space-x-2">
-                        <h3 className="font-bold text-white text-base">{pack.name}</h3>
+                        <h3 className="font-bold text-on-surface text-base font-serif">{pack.name}</h3>
                       </div>
                       <div className="flex items-center space-x-2 mt-0.5">
-                        <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700/60">
+                        <span className="text-[10px] uppercase font-mono px-2 py-0.5 rounded bg-surface-container text-on-surface-variant">
                           {pack.badge}
                         </span>
-                        <span className="text-xs font-mono text-slate-500">Plugin ID: {pack.id}</span>
+                        <span className="text-xs font-mono text-on-surface-variant">Plugin ID: {pack.id}</span>
                       </div>
                     </div>
                   </div>
@@ -214,12 +250,12 @@ export const FeaturePacksPage: React.FC = () => {
                   {/* Active / Inactive Status pill & Toggle switch */}
                   <div className="flex items-center space-x-3">
                     {active ? (
-                      <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 font-semibold flex items-center space-x-1">
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-primary-fixed text-primary font-semibold flex items-center space-x-1">
+                        <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
                         <span>Enabled</span>
                       </span>
                     ) : (
-                      <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-500 border border-slate-700">
+                      <span className="text-[10px] font-mono px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant">
                         Inactive
                       </span>
                     )}
@@ -231,7 +267,7 @@ export const FeaturePacksPage: React.FC = () => {
                         disabled={isToggling}
                         title={active ? 'Click to disable plugin' : 'Click to enable plugin'}
                         className={`w-11 h-6 flex items-center rounded-full p-1 transition duration-200 cursor-pointer ${
-                          active ? 'bg-emerald-500' : 'bg-slate-800'
+                          active ? 'bg-primary' : 'bg-surface-container-high'
                         } ${isToggling ? 'opacity-50 cursor-wait' : ''}`}
                       >
                         <div
@@ -239,7 +275,7 @@ export const FeaturePacksPage: React.FC = () => {
                             active ? 'translate-x-5' : 'translate-x-0'
                           }`}
                         >
-                          {isToggling && <Loader2 className="w-2.5 h-2.5 animate-spin text-slate-900" />}
+                          {isToggling && <Loader2 className="w-2.5 h-2.5 animate-spin text-primary" />}
                         </div>
                       </button>
                     )}
@@ -247,33 +283,33 @@ export const FeaturePacksPage: React.FC = () => {
                 </div>
 
                 {/* Description */}
-                <p className="text-xs text-slate-300 mt-4 leading-relaxed">{pack.description}</p>
+                <p className="text-xs text-on-surface-variant mt-4 leading-relaxed">{pack.description}</p>
 
                 {/* Capabilities list */}
-                <div className="mt-4 pt-4 border-t border-slate-800/80 space-y-1.5">
-                  <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider font-mono mb-2">
+                <div className="mt-4 pt-4 border-t border-surface-container-high/40 space-y-1.5">
+                  <div className="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider font-mono mb-2">
                     Plugin Capabilities:
                   </div>
                   {pack.capabilities.map((cap, idx) => (
-                    <div key={idx} className="flex items-center space-x-2 text-xs text-slate-300">
-                      <Check className="w-3.5 h-3.5 text-brand-400 flex-shrink-0" />
+                    <div key={idx} className="flex items-center space-x-2 text-xs text-on-surface">
+                      <Check className="w-3.5 h-3.5 text-primary flex-shrink-0" />
                       <span>{cap}</span>
                     </div>
                   ))}
                 </div>
 
                 {/* Fields provided */}
-                <div className="mt-4 pt-3 border-t border-slate-800/50">
-                  <div className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider font-mono mb-1.5">
+                <div className="mt-4 pt-3 border-t border-surface-container-high/40">
+                  <div className="text-[11px] font-semibold text-on-surface-variant uppercase tracking-wider font-mono mb-1.5">
                     Included Fields ({pack.fields.length}):
                   </div>
                   <div className="flex flex-wrap gap-1.5">
                     {pack.fields.map((fld) => (
                       <span
                         key={fld.name}
-                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-950 text-slate-400 border border-slate-800"
+                        className="text-[10px] font-mono px-2 py-0.5 rounded bg-surface-container-low text-on-surface-variant border border-surface-container-high/40"
                       >
-                        {fld.label} <span className="text-brand-400">({fld.type})</span>
+                        {fld.label} <span className="text-primary font-semibold">({fld.type})</span>
                       </span>
                     ))}
                   </div>
@@ -281,24 +317,24 @@ export const FeaturePacksPage: React.FC = () => {
               </div>
 
               {/* Footer action bar */}
-              <div className="px-6 py-3.5 bg-slate-950/70 border-t border-slate-800/80 flex items-center justify-between">
-                <div className="text-xs font-mono text-slate-400">
+              <div className="px-6 py-3.5 bg-surface-container-low/60 border-t border-surface-container-high/40 flex items-center justify-between">
+                <div className="text-xs font-mono text-on-surface-variant">
                   {connectedBps.length > 0 ? (
-                    <span className="text-emerald-400 font-semibold">
+                    <span className="text-primary font-semibold">
                       Connected to: {connectedBps.map((b) => `/${b.slug}`).join(', ')}
                     </span>
                   ) : (
-                    <span className="text-slate-500">No blueprint connected yet</span>
+                    <span className="text-on-surface-variant">No blueprint connected yet</span>
                   )}
                 </div>
 
                 <div className="flex items-center space-x-3">
                   {active ? (
                     <Link
-                      to={`/blueprints/studio?pack=${pack.id}`}
-                      className="px-3 py-1.5 bg-brand-500/10 hover:bg-brand-500/20 text-brand-400 border border-brand-500/30 rounded-lg text-xs font-bold flex items-center space-x-1.5 transition"
+                      to={`/blueprints/new`}
+                      className="px-3 py-1.5 bg-primary text-on-primary rounded-lg text-xs font-bold flex items-center space-x-1.5 shadow-xs hover:bg-primary-container transition"
                     >
-                      <span>Connect in Studio</span>
+                      <span>Attach to Blueprint</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   ) : (
@@ -306,7 +342,7 @@ export const FeaturePacksPage: React.FC = () => {
                       type="button"
                       disabled={isToggling}
                       onClick={() => handleTogglePack(pack)}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium flex items-center space-x-1.5 transition"
+                      className="px-3 py-1.5 bg-surface-container-high hover:bg-surface-container-highest text-on-surface rounded-lg text-xs font-medium flex items-center space-x-1.5 transition"
                     >
                       {isToggling ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Power className="w-3.5 h-3.5" />}
                       <span>Enable Plugin</span>
