@@ -33,8 +33,9 @@ export const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // If in the post editor route (/posts/:slug), let the post editor handle its custom three-panel stage
+  // If in the post editor or page editor route, let the editor handle its custom three-panel stage
   const isPostEditor = location.pathname.startsWith('/posts/') && location.pathname !== '/posts';
+  const isPageEditor = location.pathname.startsWith('/pages/') && location.pathname !== '/pages';
 
   const [isPublishing, setIsPublishing] = useState(false);
   const [publishResult, setPublishResult] = useState<PublishResult | null>(null);
@@ -118,8 +119,8 @@ export const AdminLayout: React.FC = () => {
     navigate('/login');
   };
 
-  // If in Post Editor, render the outlet directly so it has full control over the 3-panel editorial stage
-  if (isPostEditor) {
+  // If in Post Editor or Page Editor, render the outlet directly so it has full control over the 3-panel editorial stage
+  if (isPostEditor || isPageEditor) {
     return (
       <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
         <Outlet />
