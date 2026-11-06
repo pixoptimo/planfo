@@ -24,8 +24,8 @@
       "slug": "technology",
       "type": "post",
       "description": "Articles on software, architecture, and static generation",
-      "createdAt": "2026-09-15T17:41:29.424Z",
-      "updatedAt": "2026-09-15T17:41:29.424Z"
+      "createdAt": "2026-10-14T08:12:06.354Z",
+      "updatedAt": "2026-10-14T08:12:06.354Z"
     },
     {
       "id": "cat_hardware",
@@ -33,8 +33,8 @@
       "slug": "hardware",
       "type": "product",
       "description": "High performance hardware accessories",
-      "createdAt": "2026-09-15T17:41:29.424Z",
-      "updatedAt": "2026-09-15T17:41:29.424Z"
+      "createdAt": "2026-10-14T08:12:06.354Z",
+      "updatedAt": "2026-10-14T08:12:06.354Z"
     },
     {
       "id": "cat_apparel",
@@ -42,8 +42,8 @@
       "slug": "merchandise",
       "type": "product",
       "description": "Official CMS merchandise and apparel",
-      "createdAt": "2026-09-15T17:41:29.424Z",
-      "updatedAt": "2026-09-15T17:41:29.424Z"
+      "createdAt": "2026-10-14T08:12:06.354Z",
+      "updatedAt": "2026-10-14T08:12:06.354Z"
     }
   ]
 }

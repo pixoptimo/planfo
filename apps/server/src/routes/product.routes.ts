@@ -1,6 +1,8 @@
+import { triggerStaticBuild } from "../storage/buildTrigger.js";
 import { Router, type Request, type Response } from 'express';
 import { CreateProductSchema, UpdateProductSchema, type Product } from '@cms/schemas';
 import { ProductStore } from '../storage/productStore.js';
+import { TrashStore } from '../storage/trashStore.js';
 import { RevisionStore } from '../storage/revisionStore.js';
 import { requireAuth, requirePermission } from '../auth/middleware.js';
 import { slugify, makeUniqueSlug, logger } from '@cms/utils';
@@ -69,7 +71,8 @@ productRouter.post('/', requirePermission('products.create'), async (req: Reques
       ogTitle: '',
       ogDescription: '',
       ogImage: parseResult.data.images?.[0] || '',
-      robots: 'index,follow'
+      robots: 'index,follow',
+      noIndex: false
     },
     createdAt: now,
     updatedAt: now,
@@ -79,6 +82,7 @@ productRouter.post('/', requirePermission('products.create'), async (req: Reques
   await ProductStore.save(newProduct);
   logger.audit('Product Created', { id: newProduct.id, slug: newProduct.slug, user: req.user?.email });
 
+  triggerStaticBuild().catch(() => {});
   res.status(201).json({ success: true, data: newProduct });
 });
 
@@ -135,6 +139,7 @@ productRouter.put('/:slug', requirePermission('products.update'), async (req: Re
   }
 
   logger.audit('Product Updated', { id: updatedProduct.id, slug: updatedProduct.slug, user: req.user?.email });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: updatedProduct });
 });
 
@@ -150,8 +155,10 @@ productRouter.delete('/:slug', requirePermission('products.delete'), async (req:
     return;
   }
 
+  await TrashStore.moveToTrash('product', current, req.user?.email);
   await ProductStore.delete(current.slug);
   logger.audit('Product Deleted', { id: current.id, slug: current.slug, user: req.user?.email });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: { message: `Product "${current.slug}" deleted successfully` } });
 });
 
@@ -189,5 +196,6 @@ productRouter.post('/:slug/revisions/:revisionId/restore', requirePermission('re
   );
 
   logger.audit('Product Revision Restored', { id: restoredProduct.id, slug: restoredProduct.slug, fromVersion: revision.version });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: restoredProduct, message: `Restored to version ${revision.version}` });
 });

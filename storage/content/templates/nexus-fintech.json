@@ -1,0 +1,50 @@
+{
+  "id": "tpl_nexus_fintech",
+  "blueprintId": "templates",
+  "title": "Nexus — Decentralized Wealth OS & Trading Terminal",
+  "slug": "nexus-fintech",
+  "status": "published",
+  "publishedAt": "2026-10-11T19:53:30.748Z",
+  "category": "general",
+  "tags": [
+    "fintech",
+    "crypto",
+    "web3"
+  ],
+  "excerpt": "High-frequency institutional decentralized terminal with glassmorphism telemetry.",
+  "featuredImage": "assets/images/nexus-fintech.jpg",
+  "data": {
+    "tagline": "High-frequency institutional decentralized terminal with glassmorphism telemetry.",
+    "badge": "Popular",
+    "badgeColor": "emerald",
+    "category": "Fintech & Web3",
+    "categorySlug": "fintech",
+    "price": " PRO",
+    "isFree": false,
+    "demoUrl": "sample-templates/nexus-fintech.html",
+    "downloadFile": "sample-templates/nexus-fintech.html",
+    "version": "v2.1.0",
+    "releaseDate": "Aug 14, 2026",
+    "lastUpdated": "Oct 04, 2026",
+    "license": "Commercial License",
+    "author": "Pixoptimo Labs",
+    "rating": 4.96,
+    "reviewCount": 289,
+    "downloads": "11,400",
+    "fileSize": "18.6 KB (Gzipped)",
+    "techStack": "HTML5, Vanilla CSS3, Vanilla ES6, SVG Charts, Accessible Tables",
+    "features": "Institutional 3-column financial workstation layout\nInteractive JavaScript token swap calculator with live exchange rate emulation\nCustom vector SVG crypto candlestick and smooth equity area charts\nDynamic horizontal ticker marquee with real-time price delta badges\nModal wallet connector interface with simulated Web3 connection state\nOptimized for high-density OLED monitors with true pitch-black contrast",
+    "quickStartCode": "<!-- Pure Vanilla HTML & JS - Drop into any web server -->\n<script src=\"assets/js/dex-calc.js\" defer></script>\n<link rel=\"stylesheet\" href=\"assets/css/terminal.css\">",
+    "cssTokens": ":root {\n  --bg: #090d16;\n  --card-bg: #111726;\n  --border: rgba(16, 185, 129, 0.2);\n  --accent-green: #10b981;\n  --accent-green-glow: rgba(16, 185, 129, 0.35);\n  --text: #f1f5f9;\n  --font-heading: 'Space Grotesk', sans-serif;\n}",
+    "lighthousePerformance": 99,
+    "lighthouseAccessibility": 100,
+    "lighthouseBestPractices": 100,
+    "lighthouseSeo": 100,
+    "changelog": "v3.1.2 (Oct 04, 2026): Polished swap calculation rounding and added keyboard hotkeys.\nv3.0.0 (Aug 14, 2026): Major refactor with Space Grotesk typography and SVG candles."
+  },
+  "content": {
+    "blocks": []
+  },
+  "createdAt": "2026-10-11T19:53:30.748Z",
+  "updatedAt": "2026-10-11T20:16:53.888Z"
+}

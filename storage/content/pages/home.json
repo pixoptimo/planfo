@@ -3,33 +3,42 @@
   "title": "Home",
   "slug": "home",
   "status": "published",
-  "template": "landing",
+  "template": "default",
   "content": {
     "blocks": [
       {
-        "id": "hm_1",
+        "id": "b1",
         "type": "heading",
         "level": 2,
-        "text": "Welcome to My Website"
+        "text": "Welcome to the Future of File-Based Static Content Management"
       },
       {
-        "id": "hm_2",
+        "id": "b2",
         "type": "paragraph",
-        "text": "This website was created with Planfo CMS — the simple, database-free website builder."
+        "text": "Planfo CMS eliminates database overhead, vulnerability surfaces, and complex infrastructure. All content is stored as clean JSON files on disk and compiled into pure static HTML/CSS."
+      },
+      {
+        "id": "b3",
+        "type": "callout",
+        "variant": "success",
+        "title": "Zero Database Runtime",
+        "text": "Visitors load pure pre-rendered static files at maximum edge speed without hitting an API or database."
       }
     ]
   },
   "featuredImage": "",
+  "noIndex": false,
   "seo": {
-    "title": "Home - Planfo Website",
-    "description": "Welcome to our website created with Planfo CMS.",
+    "title": "Home - Planfo Static CMS",
+    "description": "Modern, high-performance static website powered by a file-based CMS.",
     "canonical": "http://localhost:3000/",
-    "ogTitle": "Home - Planfo Website",
-    "ogDescription": "Welcome to our website created with Planfo CMS.",
+    "ogTitle": "Planfo Static CMS",
+    "ogDescription": "Manage content effortlessly on the filesystem.",
     "ogImage": "",
-    "robots": "index,follow"
+    "robots": "index,follow",
+    "noIndex": false
   },
-  "createdAt": "2026-09-15T17:41:29.424Z",
-  "updatedAt": "2026-10-10T10:00:00.000Z",
-  "publishedAt": "2026-09-15T17:41:29.424Z"
+  "createdAt": "2026-10-14T08:12:06.354Z",
+  "updatedAt": "2026-10-14T08:12:06.354Z",
+  "publishedAt": "2026-10-14T08:12:06.354Z"
 }

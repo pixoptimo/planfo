@@ -1,4 +1,4 @@
-# Aero Static CMS — Production-Ready File-Based Content Management System
+# Planfo Static CMS — Production-Ready File-Based Content Management System
 
 A high-performance, production-ready Content Management System (CMS) designed to manage content for static HTML websites with **zero database dependencies**.
 

@@ -135,7 +135,7 @@ describe('Planfo CMS — Beta v0.1 Automated Verification Suite', () => {
     expect(existsSync(indexPath)).toBe(true);
     const indexHtml = await fs.readFile(indexPath, 'utf-8');
     expect(indexHtml).toContain('<!DOCTYPE html>');
-    expect(indexHtml).toContain('Welcome to My Website');
+    expect(indexHtml).toContain('Pure HTML5');
     expect(indexHtml).toContain('rel="stylesheet" href="./assets/style.css"');
 
     // Verify about/index.html

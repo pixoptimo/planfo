@@ -1,0 +1,21 @@
+{
+  "id": "ent_1792060687757_2",
+  "blueprintId": "templates",
+  "title": "Trashed Template Showcase",
+  "slug": "trashed-test-1792060687701",
+  "status": "draft",
+  "publishedAt": "2026-10-15T10:38:07.757Z",
+  "category": "saas",
+  "tags": [],
+  "excerpt": "Trashed template in blueprints",
+  "featuredImage": "",
+  "data": {
+    "demoUrl": "sample-templates/trashed-test-1792060687701.html",
+    "downloadFile": "sample-templates/trashed-test-1792060687701.html"
+  },
+  "content": {
+    "blocks": []
+  },
+  "createdAt": "2026-10-15T10:38:07.757Z",
+  "updatedAt": "2026-10-15T10:38:09.684Z"
+}

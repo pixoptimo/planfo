@@ -21,6 +21,7 @@ export const PageSchema = z.object({
   content: PageContentSchema,
   featuredImage: z.string().optional().default(''),
   seo: SEOSchema.default({}),
+  noIndex: z.boolean().optional().default(false),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
   publishedAt: z.string().datetime().nullable().default(null)
@@ -34,7 +35,8 @@ export const CreatePageSchema = z.object({
   template: z.string().default('default'),
   content: PageContentSchema.optional().default({ blocks: [] }),
   featuredImage: z.string().optional().default(''),
-  seo: SEOSchema.optional()
+  seo: SEOSchema.optional(),
+  noIndex: z.boolean().optional().default(false)
 });
 export type CreatePageInput = z.infer<typeof CreatePageSchema>;
 
@@ -45,6 +47,7 @@ export const UpdatePageSchema = z.object({
   template: z.string().optional(),
   content: PageContentSchema.optional(),
   featuredImage: z.string().optional(),
-  seo: SEOSchema.optional()
+  seo: SEOSchema.optional(),
+  noIndex: z.boolean().optional()
 });
 export type UpdatePageInput = z.infer<typeof UpdatePageSchema>;

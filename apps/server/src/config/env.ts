@@ -20,6 +20,8 @@ const EnvSchema = z.object({
   SESSION_PATH: z.string().default('./storage/sessions'),
   SETTINGS_PATH: z.string().default('./storage/settings'),
   BACKUP_PATH: z.string().default('./storage/backups'),
+  TRASH_PATH: z.string().default('./storage/trash'),
+  DEMOS_PATH: z.string().default('./storage/demos'),
 
   OUTPUT_PATH: z.string().default('./generated/website'),
   TEMPLATES_PATH: z.string().default('./templates'),
@@ -100,6 +102,8 @@ export const config = {
   SESSION_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'sessions') : path.resolve(workspaceRoot, rawConfig.SESSION_PATH),
   SETTINGS_PATH: activePlanfo ? activePlanfo.storageDir : path.resolve(workspaceRoot, rawConfig.SETTINGS_PATH),
   BACKUP_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'backups') : path.resolve(workspaceRoot, rawConfig.BACKUP_PATH),
+  TRASH_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'trash') : path.resolve(workspaceRoot, rawConfig.TRASH_PATH),
+  DEMOS_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'demos') : path.resolve(workspaceRoot, rawConfig.DEMOS_PATH),
   OUTPUT_PATH: activePlanfo ? path.join(activePlanfo.projectDir, 'generated') : path.resolve(workspaceRoot, rawConfig.OUTPUT_PATH),
   TEMPLATES_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'themes') : path.resolve(workspaceRoot, rawConfig.TEMPLATES_PATH),
   THEMES_PATH: activePlanfo ? path.join(activePlanfo.storageDir, 'themes') : path.resolve(workspaceRoot, rawConfig.THEMES_PATH)

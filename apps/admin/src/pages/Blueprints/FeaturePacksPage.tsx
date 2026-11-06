@@ -12,7 +12,6 @@ import {
   Layers,
   Check,
   Power,
-  Puzzle,
   ExternalLink
 } from 'lucide-react';
 import { FEATURE_PACKS, type FeaturePackDefinition } from '../../data/featurePacks.js';
@@ -153,18 +152,6 @@ export const FeaturePacksPage: React.FC = () => {
         </Link>
       </div>
 
-      {/* Philosophy Banner */}
-      <div className="p-4 bg-slate-900 border border-brand-500/20 rounded-xl flex items-start space-x-3.5 text-xs">
-        <div className="p-2 rounded-lg bg-brand-500/10 text-brand-400 flex-shrink-0 mt-0.5">
-          <Puzzle className="w-4 h-4" />
-        </div>
-        <div className="space-y-1">
-          <span className="font-bold text-white block">WordPress-Style Plugin Philosophy</span>
-          <p className="text-slate-300 leading-relaxed">
-            Feature Packs provide the data models, custom fields, and frontend behaviors. You choose where and how they appear on your website: attach them to any collection in <strong>Blueprint Studio</strong> to create custom permalinks, or embed them into custom static pages.
-          </p>
-        </div>
-      </div>
 
       {/* Alerts */}
       {errorMsg && (

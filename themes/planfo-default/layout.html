@@ -1,101 +1,265 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <%- metaTags %>
-  <% const assetPrefix = (typeof page !== 'undefined' && page && page.slug === 'home') ? '.' : '..'; %>
+
+  <%
+    let assetPrefix = '.';
+    if (typeof isRoot !== 'undefined' && isRoot) {
+      assetPrefix = '.';
+    } else if (typeof activeSlug !== 'undefined') {
+      if (activeSlug === 'home' || activeSlug === 'demo' || activeSlug === 'details' || activeSlug === 'privacy' || activeSlug === 'terms') {
+        assetPrefix = '.';
+      } else if (typeof product !== 'undefined' || (typeof blueprint !== 'undefined' && blueprint.slug === 'templates')) {
+        assetPrefix = '../..';
+      } else {
+        assetPrefix = '..';
+      }
+    }
+
+    let resolvedLogo = '';
+    if (site.logo && site.logo.trim()) {
+      if (site.logo.startsWith('http://') || site.logo.startsWith('https://') || site.logo.startsWith('data:')) {
+        resolvedLogo = site.logo;
+      } else {
+        const cleanPath = site.logo.replace(/^\//, '');
+        resolvedLogo = assetPrefix + '/' + cleanPath;
+      }
+    } else {
+      resolvedLogo = assetPrefix + '/assets/images/logo.png';
+    }
+
+    let resolvedFavicon = '';
+    if (site.favicon && site.favicon.trim()) {
+      if (site.favicon.startsWith('http://') || site.favicon.startsWith('https://') || site.favicon.startsWith('data:')) {
+        resolvedFavicon = site.favicon;
+      } else {
+        const cleanFav = site.favicon.replace(/^\//, '');
+        resolvedFavicon = assetPrefix + '/' + cleanFav;
+      }
+    }
+  %>
+
+  <% if (resolvedFavicon) { %>
+    <% const favExt = resolvedFavicon.split('?')[0].split('.').pop().toLowerCase(); %>
+    <% const favType = favExt === 'ico' ? 'image/x-icon' : (favExt === 'png' ? 'image/png' : (favExt === 'svg' ? 'image/svg+xml' : 'image/x-icon')); %>
+    <link rel="icon" type="<%= favType %>" href="<%= resolvedFavicon %>">
+  <% } %>
+
+  <!-- Fonts & Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+
+  <!-- Stylesheets -->
   <link rel="stylesheet" href="<%= assetPrefix %>/assets/style.css">
+  <link rel="stylesheet" href="<%= assetPrefix %>/assets/css/style.css">
+  <% if (typeof activeSlug !== 'undefined' && (activeSlug === 'details' || typeof product !== 'undefined' || typeof template !== 'undefined' || (typeof blueprint !== 'undefined' && (blueprint.slug === 'templates' || blueprint.slug === 'products')))) { %>
+  <link rel="stylesheet" href="<%= assetPrefix %>/assets/css/details.css">
+  <% } %>
+  <% if (typeof activeSlug !== 'undefined' && activeSlug === 'demo') { %>
+  <link rel="stylesheet" href="<%= assetPrefix %>/assets/css/demo.css">
+  <% } %>
 </head>
-<body>
-  <!-- Header -->
-  <header class="site-header">
-    <div class="container header-inner">
-      <a href="<%= assetPrefix %>/index.html" class="site-brand">
-        <span class="site-brand-logo"><%= site.siteName ? site.siteName.charAt(0) : 'P' %></span>
-        <span><%= site.siteName || 'Planfo Website' %></span>
-      </a>
+<body class="<%= (typeof activeSlug !== 'undefined' && activeSlug === 'demo') ? 'demo-body' : '' %>">
+  <!-- Ambient Light & Grid Background FX -->
+  <div class="ambient-background" aria-hidden="true"></div>
+  <div class="ambient-grid" aria-hidden="true"></div>
 
-      <!-- Desktop Nav -->
-      <nav aria-label="Main Navigation">
-        <ul class="nav-links">
-          <li>
-            <a href="<%= assetPrefix %>/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'home') ? 'active' : '' %>">Home</a>
-          </li>
-          <li>
-            <a href="<%= assetPrefix %>/about/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'about') ? 'active' : '' %>">About</a>
-          </li>
-          <li>
-            <a href="<%= assetPrefix %>/contact/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'contact') ? 'active' : '' %>">Contact</a>
-          </li>
-          <% if (typeof pages !== 'undefined' && Array.isArray(pages)) { %>
-            <% pages.filter(p => p.slug !== 'home' && p.slug !== 'about' && p.slug !== 'contact' && p.status === 'published').forEach(p => { %>
-              <li>
-                <a href="<%= assetPrefix %>/<%= p.slug %>/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === p.slug) ? 'active' : '' %>">
-                  <%= p.title %>
-                </a>
-              </li>
-            <% }); %>
-          <% } %>
-        </ul>
-      </nav>
-
-      <!-- Mobile Menu Button -->
-      <button id="mobile-menu-toggle" class="mobile-menu-btn" aria-label="Toggle navigation menu" aria-expanded="false">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"></line>
-          <line x1="3" y1="6" x2="21" y2="6"></line>
-          <line x1="3" y1="18" x2="21" y2="18"></line>
-        </svg>
-      </button>
-    </div>
-  </header>
-
-  <!-- Mobile Nav Drawer -->
-  <nav id="mobile-nav-drawer" class="mobile-nav" aria-label="Mobile Navigation">
-    <ul class="mobile-nav-links">
-      <li>
-        <a href="<%= assetPrefix %>/index.html" class="mobile-nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'home') ? 'active' : '' %>">Home</a>
-      </li>
-      <li>
-        <a href="<%= assetPrefix %>/about/index.html" class="mobile-nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'about') ? 'active' : '' %>">About</a>
-      </li>
-      <li>
-        <a href="<%= assetPrefix %>/contact/index.html" class="mobile-nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'contact') ? 'active' : '' %>">Contact</a>
-      </li>
-      <% if (typeof pages !== 'undefined' && Array.isArray(pages)) { %>
-        <% pages.filter(p => p.slug !== 'home' && p.slug !== 'about' && p.slug !== 'contact' && p.status === 'published').forEach(p => { %>
-          <li>
-            <a href="<%= assetPrefix %>/<%= p.slug %>/index.html" class="mobile-nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === p.slug) ? 'active' : '' %>">
-              <%= p.title %>
-            </a>
-          </li>
-        <% }); %>
-      <% } %>
-    </ul>
-  </nav>
-
-  <!-- Main Body Content -->
-  <main class="site-main">
+  <% if (typeof activeSlug !== 'undefined' && activeSlug === 'demo') { %>
+    <!-- Studio Simulator renders full cockpit without navbar clutter -->
     <%- body %>
-  </main>
+  <% } else { %>
+    <!-- Global Header / Navbar -->
+    <header class="site-header" id="siteHeader">
+      <div class="container">
+        <div class="nav-wrapper">
+          <a href="<%= assetPrefix %>/index.html" class="brand-logo" id="brandLogo" aria-label="<%= site.siteName || 'UICells' %> Homepage">
+            <img src="<%= resolvedLogo %>" alt="<%= site.siteName || 'UICells' %>" class="brand-logo-img">
+            <span class="brand-tag"><%= (typeof activeSlug !== 'undefined' && (activeSlug === 'details' || typeof product !== 'undefined' || (typeof blueprint !== 'undefined' && blueprint.slug === 'templates'))) ? 'DOCUMENTATION' : ((typeof activeSlug !== 'undefined' && (activeSlug === 'privacy' || activeSlug === 'terms')) ? 'LEGAL' : 'UI TEMPLATES') %></span>
+          </a>
 
-  <!-- Footer -->
-  <footer class="site-footer">
-    <div class="container footer-inner">
-      <div>
-        <p class="footer-brand"><%= site.siteName || 'Planfo Website' %></p>
-        <p class="footer-tagline"><%= site.tagline || 'Published with Planfo CMS — Database-free static architecture' %></p>
+          <nav class="nav-links" aria-label="Main Navigation">
+            <% const activeMenu = (typeof headerMenu !== 'undefined' && headerMenu) ? headerMenu : (typeof menu !== 'undefined' ? menu : null); %>
+            <% if (activeMenu && Array.isArray(activeMenu.items) && activeMenu.items.length > 0) { %>
+              <% activeMenu.items.forEach(function(mItem) { %>
+                <% const hasSub = Array.isArray(mItem.children) && mItem.children.length > 0; %>
+                <% const isNoLink = Boolean(mItem.noLink || !mItem.url || mItem.url === '#'); %>
+                <% if (hasSub) { %>
+                  <div class="nav-item has-dropdown">
+                    <% if (isNoLink) { %>
+                      <button type="button" class="nav-link nav-link-btn" aria-haspopup="true">
+                        <span><%= mItem.label %></span>
+                        <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                      </button>
+                    <% } else { %>
+                      <a href="<%= mItem.url === '/' ? (assetPrefix + '/index.html') : (mItem.url.startsWith('/') ? (assetPrefix + mItem.url) : mItem.url) %>" class="nav-link <%= (typeof activeSlug !== 'undefined' && (activeSlug === mItem.url.replace(/^\//, '') || (mItem.url === '/' && activeSlug === 'home'))) ? 'active' : '' %>" target="<%= mItem.target || '_self' %>">
+                        <span><%= mItem.label %></span>
+                        <svg class="dropdown-chevron" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m6 9 6 6 6-6"/></svg>
+                      </a>
+                    <% } %>
+                    <div class="dropdown-menu">
+                      <% mItem.children.forEach(function(child) { %>
+                        <a href="<%= child.url === '/' ? (assetPrefix + '/index.html') : (child.url.startsWith('/') ? (assetPrefix + child.url) : child.url) %>" class="dropdown-link" target="<%= child.target || '_self' %>"><%= child.label %></a>
+                      <% }); %>
+                    </div>
+                  </div>
+                <% } else { %>
+                  <% if (isNoLink) { %>
+                    <span class="nav-link nav-link-text"><%= mItem.label %></span>
+                  <% } else { %>
+                    <a href="<%= mItem.url === '/' ? (assetPrefix + '/index.html') : (mItem.url.startsWith('/') ? (assetPrefix + mItem.url) : mItem.url) %>" class="nav-link <%= (typeof activeSlug !== 'undefined' && (activeSlug === mItem.url.replace(/^\//, '') || (mItem.url === '/' && activeSlug === 'home'))) ? 'active' : '' %>" target="<%= mItem.target || '_self' %>"><%= mItem.label %></a>
+                  <% } %>
+                <% } %>
+              <% }); %>
+            <% } else { %>
+              <a href="<%= assetPrefix %>/index.html" class="nav-link <%= (typeof activeSlug !== 'undefined' && activeSlug === 'home') ? 'active' : '' %>">Explore Catalog</a>
+            <% } %>
+          </nav>
+        </div>
       </div>
-      <ul class="footer-links">
-        <li><a href="<%= assetPrefix %>/index.html" class="footer-link">Home</a></li>
-        <li><a href="<%= assetPrefix %>/about/index.html" class="footer-link">About</a></li>
-        <li><a href="<%= assetPrefix %>/contact/index.html" class="footer-link">Contact</a></li>
-      </ul>
-      <p class="footer-tagline">&copy; <%= currentYear %> <%= site.siteName %>. All rights reserved.</p>
-    </div>
-  </footer>
+    </header>
 
-  <script src="<%= assetPrefix %>/assets/script.js"></script>
+    <!-- Main Content Body Slot -->
+    <% if (typeof activeSlug !== 'undefined' && (activeSlug === 'details' || typeof product !== 'undefined' || (typeof blueprint !== 'undefined' && blueprint.slug === 'templates'))) { %>
+      <main class="container" id="mainDetailsContent">
+        <%- body %>
+      </main>
+    <% } else { %>
+      <main id="mainContent">
+        <%- body %>
+      </main>
+    <% } %>
+
+    <!-- Global Footer -->
+    <footer class="site-footer" id="siteFooter">
+      <div class="container">
+        <div class="footer-simple-content">
+          <a href="<%= assetPrefix %>/index.html" class="footer-simple-logo" aria-label="<%= site.siteName || 'UICells' %> Logo">
+            <img src="<%= resolvedLogo %>" alt="<%= site.siteName || 'UICells' %>" class="footer-logo-img">
+          </a>
+          <p class="footer-simple-desc">
+            <%= site.description || site.tagline || 'Architecting the future of HTML & CSS with accessible, ultra-performant, and visually stunning web templates.' %>
+          </p>
+
+          <!-- Centered Single Navigation Menu -->
+          <% const footNav = (typeof footerMenu !== 'undefined' && footerMenu && Array.isArray(footNavItems = footerMenu.items) && footNavItems.length > 0) ? footerMenu : ((typeof headerMenu !== 'undefined' && headerMenu) ? headerMenu : (typeof menu !== 'undefined' ? menu : null)); %>
+          <% if (footNav && Array.isArray(footNav.items) && footNav.items.length > 0) { %>
+            <nav class="footer-simple-nav" aria-label="Footer Navigation">
+              <% footNav.items.forEach(function(fItem) { %>
+                <% if (fItem.noLink || !fItem.url || fItem.url === '#') { %>
+                  <span class="footer-nav-item footer-nav-text"><%= fItem.label %></span>
+                <% } else { %>
+                  <a href="<%= fItem.url === '/' ? (assetPrefix + '/index.html') : (fItem.url.startsWith('/') ? (assetPrefix + fItem.url) : fItem.url) %>" class="footer-nav-item" target="<%= fItem.target || '_self' %>"><%= fItem.label %></a>
+                <% } %>
+              <% }); %>
+            </nav>
+          <% } %>
+        </div>
+
+        <div class="footer-bottom">
+          <div>
+            <% if (site.footerText && site.footerText.trim()) { %>
+              <%= site.footerText %>
+            <% } else { %>
+              &copy; <%= currentYear %> <%= site.siteName || 'UICells' %>. All rights reserved.
+            <% } %>
+          </div>
+          <div style="display: flex; gap: 1.5rem; align-items: center;">
+            <a href="<%= assetPrefix %>/privacy/" <%= (typeof activeSlug !== 'undefined' && activeSlug === 'privacy') ? 'style="color: var(--primary-light); font-weight: 600;"' : '' %>>Privacy Policy</a>
+            <a href="<%= assetPrefix %>/terms/" <%= (typeof activeSlug !== 'undefined' && activeSlug === 'terms') ? 'style="color: var(--primary-light); font-weight: 600;"' : '' %>>Terms of Service</a>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <!-- Floating Quick Contact Widget (Email) -->
+    <aside class="floating-contact-widget" aria-label="Quick Contact &amp; Support">
+      <a href="mailto:pixoptimo@gmail.com?subject=UI%20Templates%20Inquiry" class="floating-btn floating-btn-email" aria-label="Send us an Email" title="Email Support">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+          <polyline points="22,6 12,13 2,6"></polyline>
+        </svg>
+        <span class="floating-tooltip">Email Support</span>
+      </a>
+    </aside>
+  <% } %>
+
+  <%
+    const jsonSerialize = typeof safeJson === 'function' ? safeJson : (o => JSON.stringify(o).replace(/</g, '\\u003c').replace(/>/g, '\\u003e'));
+    let allCatalogItems = (typeof templates !== 'undefined' && Array.isArray(templates) && templates.length > 0) ? templates : ((typeof products !== 'undefined' && Array.isArray(products) && products.length > 0) ? products : []);
+    // Always include the entry currently being viewed so details.js resolves the correct record
+    const __currentCatalogItem = (typeof template !== 'undefined' && template && template.slug) ? template : ((typeof product !== 'undefined' && product && product.slug) ? product : null);
+    if (__currentCatalogItem && !allCatalogItems.some(i => i.slug === __currentCatalogItem.slug)) {
+      allCatalogItems = [__currentCatalogItem].concat(allCatalogItems);
+    }
+  %>
+  <% if (allCatalogItems && allCatalogItems.length > 0) { %>
+  <script id="planfo-catalog-data" type="application/json"><%- jsonSerialize(allCatalogItems.map(item => {
+      const d = item.data || {};
+      return {
+        id: item.slug,
+        title: item.title || item.name || '',
+        category: d.category || 'SaaS & Dashboard',
+        categorySlug: d.categorySlug || 'saas',
+        badge: d.badge || (d.isFree ? 'Free' : 'PRO'),
+        badgeColor: d.badgeColor || 'purple',
+        tagline: d.tagline || item.excerpt || '',
+        description: d.description || (item.content?.blocks ? item.content.blocks.map(b => b.text || (b.items ? b.items.join(' ') : '')).filter(Boolean).join('\n\n') : '') || item.excerpt || '',
+        contentHtml: (typeof renderContent === 'function' && item.content) ? renderContent(item.content) : '',
+        thumbnail: item.featuredImage || d.thumbnail || ('assets/images/' + item.slug + '.jpg'),
+        featuredImage: item.featuredImage || d.featuredImage || ('assets/images/' + item.slug + '.jpg'),
+        demoUrl: d.demoUrl || ('sample-templates/' + item.slug + '.html'),
+        downloadFile: d.downloadFile || ('sample-templates/' + item.slug + '.html'),
+        version: d.version || 'v1.0.0',
+        releaseDate: d.releaseDate || 'Sept 2026',
+        lastUpdated: d.lastUpdated || 'Oct 2026',
+        license: d.license || 'MIT Commercial & Personal',
+        price: d.price || 'Free',
+        isFree: d.isFree ?? (d.price === 'Free'),
+        rating: Number(d.rating) || 4.98,
+        reviewCount: Number(d.reviewCount) || 120,
+        downloads: String(d.downloads || '10,000+'),
+        author: d.author || 'Pixoptimo Labs',
+        techStack: Array.isArray(d.techStack) ? d.techStack : (typeof d.techStack === 'string' ? d.techStack.split(',').map(s=>s.trim()).filter(Boolean) : ['HTML5 Semantic', 'Vanilla CSS3', 'Zero Runtime']),
+        fileSize: d.fileSize || '14.2 KB (Gzipped)',
+        lighthouseScore: d.lighthouseScore || {
+          performance: Number(d.lighthousePerformance) || 100,
+          accessibility: Number(d.lighthouseAccessibility) || 100,
+          bestPractices: Number(d.lighthouseBestPractices) || 100,
+          seo: Number(d.lighthouseSeo) || 100
+        },
+        features: Array.isArray(d.features) ? d.features : (typeof d.features === 'string' ? d.features.split('\n').map(s=>s.trim()).filter(Boolean) : ['Pure semantic markup', 'Zero layout shift']),
+        fileTree: Array.isArray(d.fileTree) ? d.fileTree : [
+          { name: item.slug + '.html', type: 'file', desc: 'Main template markup' },
+          { name: 'assets/', type: 'dir', children: [
+            { name: 'css/style.css', type: 'file', desc: 'Custom styles and layout tokens' }
+          ]},
+          { name: 'README.md', type: 'file', desc: 'Documentation & setup guidelines' }
+        ],
+        quickStartCode: d.quickStartCode || ('<!-- Drop into any web server -->\n<link rel="stylesheet" href="assets/css/' + item.slug + '.css">\n<script src="assets/js/' + item.slug + '.js" defer><' + '/script>'),
+        cssTokens: d.cssTokens || (':root {\n  --bg: #07090e;\n  --accent: #6366f1;\n}'),
+        changelog: Array.isArray(d.changelog) ? d.changelog : (typeof d.changelog === 'string' ? d.changelog.split('\n').map(l => ({ version: d.version || 'v1.0.0', date: d.lastUpdated || 'Oct 2026', note: l.trim() })).filter(c=>c.note) : [
+          { version: d.version || 'v1.0.0', date: d.lastUpdated || 'Oct 2026', note: 'Production release.' }
+        ])
+      };
+    })) %></script>
+  <script>
+    try {
+      var __rawCatalog = document.getElementById('planfo-catalog-data');
+      if (__rawCatalog && (!window.TEMPLATES_DATA || !window.TEMPLATES_DATA.length)) {
+        window.TEMPLATES_DATA = JSON.parse(__rawCatalog.textContent || '[]');
+      }
+    } catch (e) {}
+  </script>
+  <% } %>
+  <script src="<%= assetPrefix %>/assets/js/templates-data.js"></script>
+  <script src="<%= assetPrefix %>/assets/js/app.js"></script>
+  <% if (typeof activeSlug !== 'undefined' && (activeSlug === 'details' || typeof product !== 'undefined' || (typeof blueprint !== 'undefined' && blueprint.slug === 'templates'))) { %>
+  <script src="<%= assetPrefix %>/assets/js/details.js"></script>
+  <% } %>
 </body>
 </html>
+

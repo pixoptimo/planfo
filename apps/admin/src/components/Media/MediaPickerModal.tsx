@@ -96,7 +96,7 @@ export const MediaPickerModal: React.FC<MediaPickerModalProps> = ({ isOpen, onCl
             <span>{uploading ? 'Uploading...' : 'Upload Image'}</span>
             <input
               type="file"
-              accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,image/x-icon,image/vnd.microsoft.icon,.ico"
               onChange={handleFileUpload}
               disabled={uploading}
               className="hidden"

@@ -3,7 +3,7 @@
   "title": "About Us",
   "slug": "about-us",
   "status": "published",
-  "template": "about",
+  "template": "default",
   "content": {
     "blocks": [
       {
@@ -15,7 +15,7 @@
       {
         "id": "ab_2",
         "type": "paragraph",
-        "text": "We believe that static websites offer unbeatable speed, security, and hosting cost benefits. Aero CMS bridges the gap between structured content management and purely static site generation."
+        "text": "We believe that static websites offer unbeatable speed, security, and hosting cost benefits. Planfo CMS bridges the gap between structured content management and purely static site generation."
       },
       {
         "id": "ab_3",
@@ -31,16 +31,18 @@
     ]
   },
   "featuredImage": "",
+  "noIndex": false,
   "seo": {
-    "title": "About Us - Aero Static CMS",
-    "description": "Learn about the philosophy and engineering behind Aero Static CMS.",
-    "canonical": "http://localhost:4000/about-us",
+    "title": "About Us - Planfo Static CMS",
+    "description": "Learn about the philosophy and engineering behind Planfo Static CMS.",
+    "canonical": "http://localhost:3000/about-us",
     "ogTitle": "About Us",
-    "ogDescription": "Philosophy and engineering behind Aero Static CMS.",
+    "ogDescription": "Philosophy and engineering behind Planfo Static CMS.",
     "ogImage": "",
-    "robots": "index,follow"
+    "robots": "index,follow",
+    "noIndex": false
   },
-  "createdAt": "2026-09-15T17:41:29.424Z",
-  "updatedAt": "2026-09-15T17:41:29.424Z",
-  "publishedAt": "2026-09-15T17:41:29.424Z"
+  "createdAt": "2026-10-14T08:12:06.354Z",
+  "updatedAt": "2026-10-14T08:12:06.354Z",
+  "publishedAt": "2026-10-14T08:12:06.354Z"
 }

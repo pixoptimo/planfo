@@ -1,13 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { Save, Globe, Image as ImageIcon, CheckCircle2, AlertCircle, Loader2, Package, Search, ArrowRight, RefreshCw, GitBranch, Server } from 'lucide-react';
+import { Link, useSearchParams } from 'react-router-dom';
+import { Save, Globe, Image as ImageIcon, CheckCircle2, AlertCircle, Loader2, Package, Search, ArrowRight, RefreshCw, GitBranch, Server, Sliders, Cloud, ArrowRightLeft } from 'lucide-react';
 import type { SiteSettings } from '@cms/schemas';
 import { api } from '../../api/client.js';
-import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { useAuth } from '../../context/AuthContext.js';
 
 export const SiteSettingsPage: React.FC = () => {
   const { can } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const rawTab = searchParams.get('tab');
+  const activeTab: 'general' | 'deployment' | 'features' | 'tools' =
+    rawTab === 'deployment' || rawTab === 'features' || rawTab === 'tools' ? rawTab : 'general';
+
+  const setActiveTab = (tab: 'general' | 'deployment' | 'features' | 'tools') => {
+    if (tab === 'general') {
+      searchParams.delete('tab');
+      setSearchParams(searchParams);
+    } else {
+      setSearchParams({ tab });
+    }
+  };
+
   const [settings, setSettings] = useState<SiteSettings | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -43,7 +57,7 @@ export const SiteSettingsPage: React.FC = () => {
       const updated = await api.put<SiteSettings>('/api/settings', settings);
       setSettings(updated);
       window.dispatchEvent(new CustomEvent('settings-updated', { detail: updated }));
-      setSuccess('Site settings and default SEO updated successfully!');
+      setSuccess('Site settings updated successfully!');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Save failed');
     } finally {
@@ -52,28 +66,96 @@ export const SiteSettingsPage: React.FC = () => {
   };
 
   if (loading || !settings) {
-    return <div className="text-center py-20 text-slate-500">Loading site configuration...</div>;
+    return <div className="text-center py-20 text-slate-500 font-mono text-xs">Loading site configuration...</div>;
   }
 
   return (
     <div className="space-y-6 w-full pb-20">
       <form onSubmit={handleSave} className="space-y-6">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-          <div>
-            <h1 className="text-2xl font-bold text-white tracking-tight">Site Settings & SEO</h1>
-            <p className="text-xs text-slate-400 mt-1">Global website branding, URLs, metadata defaults, and social links</p>
+        <div className="border-b border-slate-800 pb-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div>
+              <h1 className="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
+                <Sliders className="w-6 h-6 text-brand-400" />
+                <span>Settings</span>
+              </h1>
+              <p className="text-xs text-slate-400 mt-1">Manage website branding, SEO directives, feature packs, and hosting configuration</p>
+            </div>
+
+            {can('settings.update') && activeTab !== 'tools' && (
+              <button
+                type="submit"
+                disabled={saving}
+                className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50 self-start"
+              >
+                {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+                <span>{saving ? 'Saving...' : 'Save Settings'}</span>
+              </button>
+            )}
           </div>
 
-          {can('settings.update') && (
+          {/* Navigation Tabs */}
+          <div className="flex items-center space-x-1.5 overflow-x-auto pb-1">
             <button
-              type="submit"
-              disabled={saving}
-              className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50 self-start"
+              type="button"
+              onClick={() => setActiveTab('general')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
+                activeTab === 'general'
+                  ? 'bg-brand-600 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
             >
-              {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-              <span>{saving ? 'Saving...' : 'Save Settings'}</span>
+              <Sliders className="w-3.5 h-3.5" />
+              <span>General Settings</span>
             </button>
-          )}
+
+            <Link
+              to="/settings/seo"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-white hover:bg-slate-800/60 flex items-center space-x-1.5 transition"
+            >
+              <Globe className="w-3.5 h-3.5" />
+              <span>SEO & Indexing</span>
+            </Link>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('deployment')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
+                activeTab === 'deployment'
+                  ? 'bg-brand-600 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Cloud className="w-3.5 h-3.5" />
+              <span>Hosting & Deployment</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('features')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
+                activeTab === 'features'
+                  ? 'bg-brand-600 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <Package className="w-3.5 h-3.5" />
+              <span>Feature Packs</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setActiveTab('tools')}
+              className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
+                activeTab === 'tools'
+                  ? 'bg-brand-600 text-slate-950 shadow-sm'
+                  : 'text-slate-400 hover:text-white hover:bg-slate-800/60'
+              }`}
+            >
+              <ArrowRightLeft className="w-3.5 h-3.5" />
+              <span>URL Tools</span>
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -90,76 +172,79 @@ export const SiteSettingsPage: React.FC = () => {
         )}
 
         {/* Feature Packs Section */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-          <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
-            <Package className="w-4 h-4 text-brand-400" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
-              Aero Feature Packs
-            </h2>
-          </div>
-          <p className="text-xs text-slate-400">
-            Activate or deactivate modular capabilities for your site. Deactivated packs remain hidden to keep your CMS interface and static output lightweight.
-          </p>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-            {/* Pages & Articles (Core - Always Active) */}
-            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 flex items-start justify-between">
-              <div>
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs font-bold text-white">Pages & Articles Blueprint</span>
-                  <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono border border-emerald-500/20 font-semibold">
-                    Core Active
-                  </span>
-                </div>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Manage static pages, blog articles, hierarchical categories, and menus.
-                </p>
-              </div>
+        {activeTab === 'features' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
+            <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
+              <Package className="w-4 h-4 text-brand-400" />
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+                Planfo Feature Packs
+              </h2>
             </div>
+            <p className="text-xs text-slate-400">
+              Activate or deactivate modular capabilities for your site. Deactivated packs remain hidden to keep your CMS interface and static output lightweight.
+            </p>
 
-            {/* Storefront Catalog Pack (Toggleable) */}
-            <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 flex items-start justify-between">
-              <div className="pr-4">
-                <div className="flex items-center space-x-2">
-                  <span className="text-xs font-bold text-white">Storefront Catalog Pack</span>
-                  {settings.featurePacks?.catalog ? (
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 font-mono border border-brand-500/20 font-semibold">
-                      Enabled
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+              {/* Pages & Articles (Core - Always Active) */}
+              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 flex items-start justify-between">
+                <div>
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-bold text-white">Pages & Articles Blueprint</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono border border-emerald-500/20 font-semibold">
+                      Core Active
                     </span>
-                  ) : (
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono border border-slate-700 font-semibold">
-                      Disabled
-                    </span>
-                  )}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Manage static pages, blog articles, hierarchical categories, and menus.
+                  </p>
                 </div>
-                <p className="text-[11px] text-slate-400 mt-1">
-                  Enables product catalog, pricing, SKU tracking, and product category pages.
-                </p>
               </div>
 
-              <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-1">
-                <input
-                  type="checkbox"
-                  checked={settings.featurePacks?.catalog ?? false}
-                  onChange={(e) =>
-                    setSettings({
-                      ...settings,
-                      featurePacks: {
-                        ...settings.featurePacks,
-                        catalog: e.target.checked
-                      }
-                    })
-                  }
-                  className="sr-only peer"
-                />
-                <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
-              </label>
+              {/* Storefront Catalog Pack (Toggleable) */}
+              <div className="p-4 rounded-xl bg-slate-950 border border-slate-800/80 flex items-start justify-between">
+                <div className="pr-4">
+                  <div className="flex items-center space-x-2">
+                    <span className="text-xs font-bold text-white">Storefront Catalog Pack</span>
+                    {settings.featurePacks?.catalog ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 font-mono border border-brand-500/20 font-semibold">
+                        Enabled
+                      </span>
+                    ) : (
+                      <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-400 font-mono border border-slate-700 font-semibold">
+                        Disabled
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Enables product catalog, pricing, SKU tracking, and product category pages.
+                  </p>
+                </div>
+
+                <label className="relative inline-flex items-center cursor-pointer flex-shrink-0 mt-1">
+                  <input
+                    type="checkbox"
+                    checked={settings.featurePacks?.catalog ?? false}
+                    onChange={(e) =>
+                      setSettings({
+                        ...settings,
+                        featurePacks: {
+                          ...settings.featurePacks,
+                          catalog: e.target.checked
+                        }
+                      })
+                    }
+                    className="sr-only peer"
+                  />
+                  <div className="w-11 h-6 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-brand-500"></div>
+                </label>
+              </div>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Deployment & Hosting Section */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
+        {activeTab === 'deployment' && (
+          <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
           <div className="flex items-center space-x-2 border-b border-slate-800 pb-3">
             <GitBranch className="w-4 h-4 text-brand-400" />
             <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
@@ -167,7 +252,7 @@ export const SiteSettingsPage: React.FC = () => {
             </h2>
           </div>
           <p className="text-xs text-slate-400">
-            Configure how and where your static website is published. Aero runs with zero database, compiling clean static assets.
+            Configure how and where your static website is published. Planfo runs with zero database, compiling clean static assets.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
@@ -195,10 +280,10 @@ export const SiteSettingsPage: React.FC = () => {
                   }
                   className="accent-brand-500"
                 />
-                <span className="text-xs font-bold text-white">GitHub Pages (Free Tier)</span>
+                <span className="text-xs font-bold text-white">Git & Cloud Hosting (GitHub Pages, Cloudflare, Netlify, Vercel)</span>
               </div>
               <p className="text-[11px] text-slate-400">
-                1-click push to GitHub Pages, Cloudflare Pages, or Netlify. Zero hosting or database costs.
+                1-click push to Git repositories, Cloudflare Pages, Netlify, Vercel, or GitHub Pages. Zero database costs.
               </p>
             </label>
 
@@ -283,10 +368,13 @@ export const SiteSettingsPage: React.FC = () => {
             </div>
           )}
         </div>
+      )}
 
         {/* General Info */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">General Website Information</h2>
+        {activeTab === 'general' && (
+          <div className="space-y-6">
+            <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
+              <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">General Website Information</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -377,14 +465,6 @@ export const SiteSettingsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* Global Default SEO */}
-        <SEOFields
-          seo={settings.defaultSEO}
-          onChange={(newSeo) => setSettings({ ...settings, defaultSEO: newSeo })}
-          defaultTitle={settings.siteName}
-          defaultDescription={settings.tagline}
-        />
-
         {/* Social Links & Analytics */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-6 space-y-4">
           <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">Social Links & Integrations</h2>
@@ -454,10 +534,39 @@ export const SiteSettingsPage: React.FC = () => {
             </div>
           </div>
         </div>
-      </form>
+
+        {/* Dedicated SEO Settings Shortcut Card */}
+        <div className="p-5 rounded-xl bg-gradient-to-r from-brand-950/40 via-slate-900 to-slate-900 border border-brand-500/20 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-start space-x-3.5">
+            <div className="p-2.5 rounded-lg bg-brand-500/10 text-brand-400 border border-brand-500/20 flex-shrink-0 mt-0.5">
+              <Globe className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+                <span>SEO & Search Engine Indexing Settings</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 font-mono border border-brand-500/20 font-semibold">
+                  Dedicated Tab
+                </span>
+              </h3>
+              <p className="text-xs text-slate-400 mt-1 max-w-xl leading-relaxed">
+                Configure search engine visibility directives, fallback meta descriptions, social graph Open Graph banners, and preview live Google SERP snippets.
+              </p>
+            </div>
+          </div>
+          <Link
+            to="/settings/seo"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition flex-shrink-0 self-start sm:self-auto border border-slate-700 hover:border-slate-600 shadow-sm"
+          >
+            <span>Open SEO Settings</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+      </div>
+    )}
+  </form>
 
       {/* Global URL Migration & Search-Replace */}
-      <UrlRewriterCard />
+      {activeTab === 'tools' && <UrlRewriterCard />}
 
       <MediaPickerModal
         isOpen={Boolean(activeMediaTarget)}

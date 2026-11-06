@@ -10,7 +10,8 @@ export const ContentBlockTypeSchema = z.enum([
   'table',
   'callout',
   'divider',
-  'code'
+  'code',
+  'grid'
 ]);
 export type ContentBlockType = z.infer<typeof ContentBlockTypeSchema>;
 
@@ -87,6 +88,25 @@ export const CodeBlockSchema = z.object({
   code: z.string().default('')
 });
 
+export const GridItemSchema = z.object({
+  id: z.string(),
+  title: z.string().default(''),
+  text: z.string().default(''),
+  icon: z.string().optional().default(''),
+  badge: z.string().optional().default(''),
+  buttonText: z.string().optional().default(''),
+  buttonUrl: z.string().optional().default('')
+});
+export type GridItem = z.infer<typeof GridItemSchema>;
+
+export const GridBlockSchema = z.object({
+  id: z.string(),
+  type: z.literal('grid'),
+  columns: z.union([z.literal(2), z.literal(3), z.literal(4)]).default(3),
+  items: z.array(GridItemSchema).default([])
+});
+export type GridBlock = z.infer<typeof GridBlockSchema>;
+
 export const ContentBlockSchema = z.discriminatedUnion('type', [
   HeadingBlockSchema,
   ParagraphBlockSchema,
@@ -97,7 +117,8 @@ export const ContentBlockSchema = z.discriminatedUnion('type', [
   TableBlockSchema,
   CalloutBlockSchema,
   DividerBlockSchema,
-  CodeBlockSchema
+  CodeBlockSchema,
+  GridBlockSchema
 ]);
 export type ContentBlock = z.infer<typeof ContentBlockSchema>;
 

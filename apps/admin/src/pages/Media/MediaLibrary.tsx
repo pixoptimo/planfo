@@ -64,6 +64,7 @@ export const MediaLibrary: React.FC = () => {
       await api.delete(`/api/media/${item.id}`);
       setItems(items.filter((i) => i.id !== item.id));
       if (previewItem?.id === item.id) setPreviewItem(null);
+      window.dispatchEvent(new CustomEvent('trash-updated'));
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Delete failed');
     }
@@ -95,7 +96,7 @@ export const MediaLibrary: React.FC = () => {
             <input
               type="file"
               multiple
-              accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml"
+              accept="image/jpeg,image/png,image/webp,image/gif,image/svg+xml,image/x-icon,image/vnd.microsoft.icon,.ico"
               onChange={handleFileUpload}
               disabled={uploading}
               className="hidden"

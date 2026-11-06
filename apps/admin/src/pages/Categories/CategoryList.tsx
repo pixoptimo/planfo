@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Plus, FolderTree, Trash2, Edit, Tag as TagIcon, Check, X } from 'lucide-react';
 import type { Category } from '@cms/schemas';
 import { api } from '../../api/client.js';
+import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 
 export const CategoryList: React.FC = () => {
@@ -16,6 +17,7 @@ export const CategoryList: React.FC = () => {
   const [editingCat, setEditingCat] = useState<Category | null>(null);
   const [name, setName] = useState('');
   const [slug, setSlug] = useState('');
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(false);
   const [type, setType] = useState<'post' | 'product'>('post');
   const [description, setDescription] = useState('');
 
@@ -47,12 +49,14 @@ export const CategoryList: React.FC = () => {
       setEditingCat(cat);
       setName(cat.name);
       setSlug(cat.slug);
+      setSlugManuallyEdited(true);
       setType(cat.type);
       setDescription(cat.description || '');
     } else {
       setEditingCat(null);
       setName('');
       setSlug('');
+      setSlugManuallyEdited(false);
       setType('post');
       setDescription('');
     }
@@ -277,20 +281,44 @@ export const CategoryList: React.FC = () => {
                   type="text"
                   required
                   value={name}
-                  onChange={(e) => setName(e.target.value)}
+                  onChange={(e) => {
+                    const newName = e.target.value;
+                    setName(newName);
+                    if (!slugManuallyEdited || !slug) {
+                      setSlug(slugify(newName));
+                    }
+                  }}
                   placeholder="e.g. Tutorials, Keyboards..."
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500"
                 />
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-                  Slug (optional)
-                </label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                    Slug (optional)
+                  </label>
+                  {name && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSlug(slugify(name));
+                        setSlugManuallyEdited(false);
+                      }}
+                      className="text-[11px] text-brand-400 hover:text-brand-300 font-medium transition"
+                    >
+                      Regenerate from Name
+                    </button>
+                  )}
+                </div>
                 <input
                   type="text"
                   value={slug}
-                  onChange={(e) => setSlug(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setSlugManuallyEdited(val.trim().length > 0);
+                    setSlug(val);
+                  }}
                   placeholder="auto-generated"
                   className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
                 />

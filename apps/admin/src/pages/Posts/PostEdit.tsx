@@ -1,26 +1,128 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import {
-  ArrowLeft,
-  Save,
-  Send,
-  Eye,
-  History,
-  Image as ImageIcon,
-  Loader2,
-  CheckCircle2,
-  AlertCircle,
-  Plus,
-  X
-} from 'lucide-react';
-import type { Post, Category, RevisionMeta } from '@cms/schemas';
+import type { Post, Category, RevisionMeta, ContentBlock, SEO } from '@cms/schemas';
 import { api } from '../../api/client.js';
-import { StructuredEditor } from '../../components/Editor/StructuredEditor.js';
-import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
-import { StatusBadge } from '../../components/UI/StatusBadge.js';
-import { CategorySelector } from '../../components/Taxonomy/CategorySelector.js';
+import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
+
+// Default block templates for all supported ContentBlock types
+const createDefaultBlock = (type: string): ContentBlock => {
+  const id = `block_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
+  switch (type) {
+    case 'heading':
+      return { id, type: 'heading', level: 1, text: 'New Section Heading' };
+    case 'paragraph':
+      return {
+        id,
+        type: 'paragraph',
+        text: 'Enter your editorial narrative here. Standardize typographic cadence and fluid line-height for optimal reading comfort.'
+      };
+    case 'blockquote':
+      return {
+        id,
+        type: 'blockquote',
+        text: '“Great systems don’t constrain creativity; they liberate designers and engineers from repeatedly solving solved problems.”',
+        citation: '— Systems Manifesto, Vol. IV • Design Principles'
+      };
+    case 'image':
+      return {
+        id,
+        type: 'image',
+        url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+        alt: 'Geometric modern architectural study in soft ambient light',
+        caption: 'Fig 1.1: Geometric modulation and structural whitespace in modern architecture.'
+      };
+    case 'list':
+      return {
+        id,
+        type: 'list',
+        style: 'unordered',
+        items: [
+          'Cadence over Clutter: lock vertical margins strictly to modular line-height multiples.',
+          'Intentional Tokens: colors express semantic role hierarchy, never decorative mood boards.',
+          'Adaptive Shells: decouple reading columns from dynamic auxiliary toolchains.'
+        ]
+      };
+    case 'table':
+      return {
+        id,
+        type: 'table',
+        headers: ['Metric Parameter', 'Baseline Legacy', 'Editorial Studio Standard'],
+        rows: [
+          ['Typographic Measure', '960px Fluid Stretch', '720px Clamped Optimal'],
+          ['Typeface Pairing', 'Single System Sans', 'Newsreader Serif + Inter Sans'],
+          ['Rendering Latency', '45ms Hydration', '< 12ms Pure Static Edge']
+        ]
+      };
+    case 'button':
+      return {
+        id,
+        type: 'button',
+        text: 'Subscribe to Dispatch',
+        url: '#',
+        variant: 'primary',
+        target: '_self'
+      };
+    case 'code':
+      return {
+        id,
+        type: 'code',
+        language: 'typescript',
+        code: `// Systems Manifesto Token Definition\nexport const designSystem = {\n  rhythm: '4px-grid',\n  measure: '720px',\n  contrast: 'WCAG AAA'\n};`
+      };
+    case 'callout':
+      return {
+        id,
+        type: 'callout',
+        variant: 'info',
+        title: 'Editorial Guidance',
+        text: 'Ensure all vertical margins lock strictly to modular line-height multiples for harmonious cadence.'
+      };
+    case 'divider':
+      return {
+        id,
+        type: 'divider'
+      };
+    case 'grid':
+      return {
+        id,
+        type: 'grid',
+        columns: 3,
+        items: [
+          {
+            id: `item_1_${Date.now()}`,
+            icon: '01',
+            badge: '#primary',
+            title: 'Cadence over Clutter',
+            text: 'Lock all vertical margins strictly to modular line-height multiples.',
+            buttonText: '',
+            buttonUrl: ''
+          },
+          {
+            id: `item_2_${Date.now()}`,
+            icon: '02',
+            badge: '#secondary',
+            title: 'Intentional Tokens',
+            text: 'Colors express semantic role hierarchy, never decorative mood boards.',
+            buttonText: '',
+            buttonUrl: ''
+          },
+          {
+            id: `item_3_${Date.now()}`,
+            icon: '03',
+            badge: '#tertiary',
+            title: 'Adaptive Shells',
+            text: 'Decouple reading columns from dynamic auxiliary toolchains.',
+            buttonText: '',
+            buttonUrl: ''
+          }
+        ]
+      };
+    default:
+      return { id, type: 'paragraph', text: 'New content block' };
+  }
+};
 
 export const PostEdit: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
@@ -28,17 +130,20 @@ export const PostEdit: React.FC = () => {
   const navigate = useNavigate();
   const { user, can } = useAuth();
 
+  // Core Post Data
   const [post, setPost] = useState<Partial<Post>>({
-    title: '',
-    slug: '',
-    excerpt: '',
-    author: user?.name || user?.email || 'Admin',
-    category: 'general',
-    tags: [],
+    title: isNew ? 'The Evolution of Design Systems in Autonomous Workflows' : '',
+    slug: isNew ? 'evolution-of-design-systems' : '',
+    excerpt: isNew
+      ? 'A practical framework for scaling typographic cadence, token consistency, and fluid layouts across distributed engineering and generative product teams.'
+      : '',
+    author: user?.name || user?.email || 'Elena Rostova',
+    category: 'technology',
+    tags: ['DesignSystems', 'Typography', 'Architecture'],
     status: 'draft',
     template: 'default',
     content: { blocks: [] },
-    featuredImage: '',
+    featuredImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
     seo: {
       title: '',
       description: '',
@@ -46,104 +151,388 @@ export const PostEdit: React.FC = () => {
       ogTitle: '',
       ogDescription: '',
       ogImage: '',
-      robots: 'index,follow'
+      robots: 'index,follow',
+      noIndex: false
     }
   });
 
+  // Editor Workspace State
   const [categories, setCategories] = useState<Category[]>([]);
   const [tagInput, setTagInput] = useState('');
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+  const [saveStatus, setSaveStatus] = useState<string>('Auto-synced 1m ago');
+  const [activeInspectorTab, setActiveInspectorTab] = useState<'design' | 'settings'>('design');
+  const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
+  const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
+  const [mediaPickerTarget, setMediaPickerTarget] = useState<'featured' | 'new' | string>('featured');
+  const [showPublishMenu, setShowPublishMenu] = useState(false);
+  const [showStatsModal, setShowStatsModal] = useState(false);
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState('');
+  const [showBlockPalette, setShowBlockPalette] = useState(true);
 
-  // Revisions
-  const [revisions, setRevisions] = useState<RevisionMeta[]>([]);
+  // Design Inspector Controls State
+  const [columnWidth, setColumnWidth] = useState<number>(720);
+  const [headlineFont, setHeadlineFont] = useState<'Newsreader' | 'Inter' | 'Plus Jakarta Sans'>('Newsreader');
+  const [bodyFont, setBodyFont] = useState<'Inter' | 'Newsreader' | 'Plus Jakarta Sans'>('Inter');
+  const [fontSizeHeading, setFontSizeHeading] = useState<'32px' | '36px' | '40px' | '48px'>('36px');
+  const [fontSizeBody, setFontSizeBody] = useState<'15px' | '16px' | '18px'>('18px');
+  const [textAlignment, setTextAlignment] = useState<'left' | 'center' | 'justify'>('left');
+  const [canvasBgColor, setCanvasBgColor] = useState<string>('#FFFFFF');
+  const [tokenSearch, setTokenSearch] = useState<string>('');
+
+  // History Stack for Undo/Redo
+  const [history, setHistory] = useState<Array<ContentBlock[]>>([]);
+  const [historyIndex, setHistoryIndex] = useState<number>(-1);
+
+  // Revisions Modal
   const [showRevisions, setShowRevisions] = useState(false);
+  const [revisions, setRevisions] = useState<RevisionMeta[]>([]);
   const [loadingRevisions, setLoadingRevisions] = useState(false);
 
-  useEffect(() => {
-    loadCategories();
-    if (!isNew && slug) {
-      loadPost(slug);
-    }
-  }, [slug, isNew]);
+  const manuscriptRef = useRef<HTMLDivElement>(null);
+  const autosaveTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Trigger feedback toast
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const updateSEO = (updates: Partial<SEO>) => {
+    setPost((prev) => ({
+      ...prev,
+      seo: {
+        title: prev.seo?.title || '',
+        description: prev.seo?.description || '',
+        canonical: prev.seo?.canonical || '',
+        ogTitle: prev.seo?.ogTitle || '',
+        ogDescription: prev.seo?.ogDescription || '',
+        ogImage: prev.seo?.ogImage || '',
+        robots: prev.seo?.robots || 'index,follow',
+        noIndex: prev.seo?.noIndex || false,
+        ...updates
+      }
+    }));
+  };
+
+  // Push to history for undo/redo
+  const commitBlocks = useCallback((newBlocks: ContentBlock[]) => {
+    setPost((prev) => ({ ...prev, content: { blocks: newBlocks } }));
+    setSaveStatus('Unsaved changes');
+
+    setHistory((prev) => {
+      const sliced = prev.slice(0, historyIndex + 1);
+      const nextHistory = [...sliced, newBlocks];
+      if (nextHistory.length > 30) nextHistory.shift();
+      return nextHistory;
+    });
+    setHistoryIndex((prev) => Math.min(prev + 1, 29));
+  }, [historyIndex]);
+
+  // Load Categories
   const loadCategories = async () => {
     try {
       const data = await api.get<Category[]>('/api/categories?type=post');
-      setCategories(data);
+      if (Array.isArray(data)) setCategories(data);
     } catch {
-      //
+      // Graceful fallback
     }
   };
 
+  // Load Post by slug
   const loadPost = async (postSlug: string) => {
     setLoading(true);
     try {
       const data = await api.get<Post>(`/api/posts/${postSlug}`);
       setPost(data);
+      const blks = data.content?.blocks || [];
+      setHistory([blks]);
+      setHistoryIndex(0);
+      setSaveStatus('Auto-synced just now');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load post');
+      triggerToast(err instanceof Error ? err.message : 'Failed to load post');
     } finally {
       setLoading(false);
     }
   };
 
+  // Initialize or fetch post
+  useEffect(() => {
+    loadCategories();
+    if (!isNew && slug) {
+      loadPost(slug);
+    } else {
+      // Seed default editorial blocks matching Reference 2
+      const defaultBlocks: ContentBlock[] = [
+        {
+          id: 'p1',
+          type: 'paragraph',
+          text: 'In an era where modern interfaces evolve in fractions of seconds through programmatic synthesis and model-driven assembly, the foundational tenets of typography and typographic cadence are not relics—they are our most dependable structural anchors. Rather than relying on arbitrary pixel choices, systematic design mandates that whitespace behaves as a functional variable, orchestrating cognitive calm amidst information density.'
+        },
+        {
+          id: 'img1',
+          type: 'image',
+          url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+          alt: 'A clean architectural photograph of modern brutalist concrete structures paired with smooth glass panels and natural light casting rhythmic geometric shadows on a white studio gallery floor.',
+          caption: 'Fig 1.1: Geometric modulation and structural whitespace in modern architecture.   ISO 400 • 50mm'
+        },
+        {
+          id: 'p2',
+          type: 'paragraph',
+          text: 'When teams unify around atomic layout primitives, component ergonomics shift from rigid styling specifications into resilient relational contracts. Layouts adapt fluidly without fracturing reading rhythms, ensuring that an editorial piece reads with the deliberate dignity of hand-set letterpress, whether consumed on an ultrawide canvas or an ambient mobile viewport.'
+        },
+        {
+          id: 'quote1',
+          type: 'blockquote',
+          text: '“Great systems don’t constrain creativity; they liberate designers and engineers from repeatedly solving solved problems.”',
+          citation: '— Systems Manifesto, Vol. IV • Design Principles Chapter'
+        },
+        {
+          id: 'grid1',
+          type: 'grid',
+          columns: 3,
+          items: [
+            {
+              id: 'tk1',
+              icon: '01',
+              badge: '#primary',
+              title: 'Cadence over Clutter',
+              text: 'Lock all vertical margins strictly to modular line-height multiples.',
+              buttonText: '',
+              buttonUrl: ''
+            },
+            {
+              id: 'tk2',
+              icon: '02',
+              badge: '#secondary',
+              title: 'Intentional Tokens',
+              text: 'Colors express semantic role hierarchy, never decorative mood boards.',
+              buttonText: '',
+              buttonUrl: ''
+            },
+            {
+              id: 'tk3',
+              icon: '03',
+              badge: '#tertiary',
+              title: 'Adaptive Shells',
+              text: 'Decouple reading columns from dynamic auxiliary toolchains.',
+              buttonText: '',
+              buttonUrl: ''
+            }
+          ]
+        },
+        {
+          id: 'p3',
+          type: 'paragraph',
+          text: 'As autonomous tooling continues to generate code and visual patterns in real time, our mandate as architects is to establish uncompromising benchmarks for editorial legibility and tonal composure. The future belongs not to louder interfaces, but to sharper ones.'
+        },
+        {
+          id: 'cta1',
+          type: 'button',
+          text: 'Subscribe to Dispatch',
+          url: '#',
+          variant: 'primary',
+          target: '_self'
+        }
+      ];
+
+      setPost((prev) => ({
+        ...prev,
+        content: { blocks: defaultBlocks }
+      }));
+      setHistory([defaultBlocks]);
+      setHistoryIndex(0);
+    }
+  }, [slug, isNew]);
+
+  // Handle Undo
+  const handleUndo = useCallback(() => {
+    if (historyIndex > 0) {
+      const newIndex = historyIndex - 1;
+      setHistoryIndex(newIndex);
+      const targetBlocks = history[newIndex];
+      setPost((prev) => ({ ...prev, content: { blocks: targetBlocks } }));
+      triggerToast('Undo applied');
+    }
+  }, [historyIndex, history]);
+
+  // Handle Redo
+  const handleRedo = useCallback(() => {
+    if (historyIndex < history.length - 1) {
+      const newIndex = historyIndex + 1;
+      setHistoryIndex(newIndex);
+      const targetBlocks = history[newIndex];
+      setPost((prev) => ({ ...prev, content: { blocks: targetBlocks } }));
+      triggerToast('Redo applied');
+    }
+  }, [historyIndex, history]);
+
+  // Block Operations
+  const insertBlock = (type: string, atIndex?: number) => {
+    const newBlock = createDefaultBlock(type);
+    const blocks = [...(post.content?.blocks || [])];
+
+    if (typeof atIndex === 'number' && atIndex >= 0) {
+      blocks.splice(atIndex + 1, 0, newBlock);
+    } else {
+      blocks.push(newBlock);
+    }
+
+    commitBlocks(blocks);
+    setSelectedBlockId(newBlock.id);
+    triggerToast(`Inserted ${type} block`);
+  };
+
+  const updateBlock = (blockId: string, updates: Partial<ContentBlock>) => {
+    const blocks = (post.content?.blocks || []).map((b) => {
+      if (b.id === blockId) {
+        return { ...b, ...updates } as ContentBlock;
+      }
+      return b;
+    });
+    commitBlocks(blocks);
+  };
+
+  const moveBlock = (index: number, direction: 'up' | 'down') => {
+    const blocks = [...(post.content?.blocks || [])];
+    const targetIndex = direction === 'up' ? index - 1 : index + 1;
+    if (targetIndex < 0 || targetIndex >= blocks.length) return;
+
+    const [moved] = blocks.splice(index, 1);
+    blocks.splice(targetIndex, 0, moved);
+    commitBlocks(blocks);
+  };
+
+  const duplicateBlock = (index: number) => {
+    const blocks = [...(post.content?.blocks || [])];
+    const original = blocks[index];
+    const clone = {
+      ...original,
+      id: `block_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
+    } as ContentBlock;
+    blocks.splice(index + 1, 0, clone);
+    commitBlocks(blocks);
+    triggerToast('Block duplicated');
+  };
+
+  const deleteBlock = (blockId: string) => {
+    const blocks = (post.content?.blocks || []).filter((b) => b.id !== blockId);
+    commitBlocks(blocks);
+    if (selectedBlockId === blockId) setSelectedBlockId(null);
+    triggerToast('Block removed');
+  };
+
+  // Save / Publish
   const handleSave = async (publish = false) => {
     if (!post.title?.trim()) {
-      setError('Post title is required');
+      triggerToast('Post title is required');
       return;
     }
 
     setSaving(true);
-    setError(null);
-    setSuccess(null);
+    setSaveStatus('Saving to filesystem...');
 
     const targetStatus = publish ? 'published' : post.status || 'draft';
-    const payload = {
+    const postSlug = post.slug?.trim() || slugify(post.title);
+
+    const payload: Partial<Post> = {
       ...post,
+      slug: postSlug,
       status: targetStatus
     };
 
     try {
       if (isNew) {
         const created = await api.post<Post>('/api/posts', payload);
+        triggerToast('Post created successfully!');
+        setSaveStatus('Auto-synced just now');
         navigate(`/posts/${created.slug}`, { replace: true });
-        setSuccess('Post created successfully!');
       } else {
         const updated = await api.put<Post>(`/api/posts/${slug}`, payload);
         setPost(updated);
-        setSuccess(publish ? 'Post published successfully!' : 'Changes saved successfully!');
+        setSaveStatus('Auto-synced just now');
+        triggerToast(publish ? 'Post published successfully!' : 'Draft saved to filesystem');
+        if (updated.slug !== slug) {
+          navigate(`/posts/${updated.slug}`, { replace: true });
+        }
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Save failed');
+      triggerToast(err instanceof Error ? err.message : 'Save failed');
+      setSaveStatus('Save error');
     } finally {
       setSaving(false);
+      setShowPublishMenu(false);
     }
   };
 
-  const addTag = () => {
-    const clean = tagInput.trim().toLowerCase().replace(/[^a-z0-9-]/g, '');
-    if (clean && !post.tags?.includes(clean)) {
-      setPost({ ...post, tags: [...(post.tags || []), clean] });
-      setTagInput('');
-    }
-  };
+  // Debounced Autosave for existing posts
+  useEffect(() => {
+    if (isNew || !slug || !post.title?.trim()) return;
+    if (saveStatus !== 'Unsaved changes') return;
 
-  const removeTag = (tagToRemove: string) => {
-    setPost({ ...post, tags: post.tags?.filter((t) => t !== tagToRemove) });
-  };
+    if (autosaveTimeoutRef.current) clearTimeout(autosaveTimeoutRef.current);
 
+    autosaveTimeoutRef.current = setTimeout(async () => {
+      try {
+        setSaveStatus('Auto-saving...');
+        const payload: Partial<Post> = {
+          ...post,
+          slug: post.slug?.trim() || slugify(post.title || ''),
+          status: post.status || 'draft'
+        };
+        const updated = await api.put<Post>(`/api/posts/${slug}`, payload);
+        setPost(updated);
+        setSaveStatus('Auto-synced just now');
+      } catch {
+        setSaveStatus('Unsaved changes');
+      }
+    }, 3000);
+
+    return () => {
+      if (autosaveTimeoutRef.current) clearTimeout(autosaveTimeoutRef.current);
+    };
+  }, [post, slug, isNew, saveStatus]);
+
+  // Global Keyboard Shortcuts (Cmd+S, Cmd+Z, Cmd+Y, Cmd+K)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's') {
+        e.preventDefault();
+        handleSave(false);
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setShowBlockPalette((prev) => !prev);
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'z') {
+        if (e.shiftKey) {
+          e.preventDefault();
+          handleRedo();
+        } else {
+          e.preventDefault();
+          handleUndo();
+        }
+      } else if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'y') {
+        e.preventDefault();
+        handleRedo();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleUndo, handleRedo, post]);
+
+  // Revisions
   const loadRevisions = async () => {
     if (isNew || !slug) return;
     setLoadingRevisions(true);
     try {
       const data = await api.get<RevisionMeta[]>(`/api/posts/${slug}/revisions`);
-      setRevisions(data);
+      if (Array.isArray(data)) setRevisions(data);
     } catch {
-      //
+      // Graceful fallback
     } finally {
       setLoadingRevisions(false);
     }
@@ -151,317 +540,1714 @@ export const PostEdit: React.FC = () => {
 
   const restoreRevision = async (revId: string) => {
     if (!slug) return;
-    if (!confirm('Restore this revision?')) return;
+    if (!confirm('Restore this revision to the manuscript?')) return;
 
     try {
       const restored = await api.post<Post>(`/api/posts/${slug}/revisions/${revId}/restore`);
       setPost(restored);
       setShowRevisions(false);
-      setSuccess('Restored revision successfully!');
+      triggerToast('Revision restored successfully!');
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Restore failed');
     }
   };
 
+  // Compute stats (word count, read time)
+  const computeStats = () => {
+    const textBlocks = (post.content?.blocks || [])
+      .map((b: any) => b.text || b.citation || (Array.isArray(b.items) ? b.items.join(' ') : ''))
+      .join(' ');
+    const fullText = `${post.title || ''} ${post.excerpt || ''} ${textBlocks}`;
+    const words = fullText.trim().split(/\s+/).filter(Boolean).length;
+    const chars = fullText.length;
+    const readTimeMinutes = Math.max(1, Math.ceil(words / 200));
+    return { words, chars, readTimeMinutes };
+  };
+
+  const stats = computeStats();
+
   if (loading) {
-    return <div className="text-center py-20 text-slate-400">Loading post data...</div>;
+    return (
+      <div className="min-h-screen bg-surface flex flex-col items-center justify-center text-on-surface-variant font-label-md gap-3">
+        <span className="w-8 h-8 rounded-full border-2 border-primary border-t-transparent animate-spin" />
+        <span>Loading Editorial Studio Manuscript...</span>
+      </div>
+    );
   }
 
+  const blocks = post.content?.blocks || [];
+  const activeBlock = blocks.find((b) => b.id === selectedBlockId);
+  const activeBlockIndex = activeBlock ? blocks.findIndex((b) => b.id === selectedBlockId) : -1;
+
   return (
-    <div className="space-y-6 pb-20 w-full">
-      {/* Top action bar */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
-        <div className="flex items-center space-x-3">
-          <Link
-            to="/posts"
-            className="p-2 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
-          >
-            <ArrowLeft className="w-4 h-4" />
-          </Link>
-          <div>
-            <div className="flex items-center space-x-2">
-              <h1 className="text-xl font-bold text-white tracking-tight">
-                {isNew ? 'Create New Post' : `Edit: ${post.title}`}
-              </h1>
-              {!isNew && post.status && <StatusBadge status={post.status} />}
-            </div>
-            <p className="text-xs text-slate-400 font-mono mt-0.5">
-              URL: /blog/{post.slug || 'slug-preview'}
-            </p>
-          </div>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2">
-          {!isNew && (
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  setShowRevisions(true);
-                  loadRevisions();
-                }}
-                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-300 border border-slate-800 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
-              >
-                <History className="w-3.5 h-3.5" />
-                <span>Revisions</span>
-              </button>
-
-              <a
-                href={`/api/preview/post/${post.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-brand-400 border border-slate-800 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>Live Preview</span>
-              </a>
-            </>
-          )}
-
-          <button
-            type="button"
-            onClick={() => handleSave(false)}
-            disabled={saving}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
-          >
-            {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-            <span>Save Draft</span>
-          </button>
-
-          {can('posts.publish') && (
-            <button
-              type="button"
-              onClick={() => handleSave(true)}
-              disabled={saving}
-              className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
-            >
-              <Send className="w-3.5 h-3.5" />
-              <span>Publish Post</span>
-            </button>
-          )}
-        </div>
+    <div className="min-h-screen bg-surface text-on-surface font-body-md antialiased flex flex-col">
+      {/* Toast Notification */}
+      <div
+        className={`fixed bottom-8 right-8 z-50 transform transition-all duration-300 pointer-events-none flex items-center gap-3 px-5 py-3.5 rounded-xl bg-inverse-surface text-inverse-on-surface shadow-xl ${
+          showToast ? 'translate-y-0 opacity-100' : 'translate-y-24 opacity-0'
+        }`}
+      >
+        <span className="material-symbols-outlined text-primary text-[20px]">check_circle</span>
+        <span className="font-label-md text-label-md font-semibold tracking-wide">{toastMessage}</span>
       </div>
 
-      {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          <span>{error}</span>
-        </div>
-      )}
-      {success && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
-          <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-          <span>{success}</span>
-        </div>
-      )}
+      {/* Slim Global Icon Navigation Rail (Left 64px) */}
+      <aside className="fixed left-0 top-0 h-full w-16 bg-surface-container-lowest z-50 flex flex-col items-center justify-between py-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-outline-variant/30">
+        <div className="flex flex-col items-center gap-6 w-full">
+          <Link
+            to="/"
+            className="flex items-center justify-center w-10 h-10 rounded-lg hover:bg-surface-container transition-colors"
+            title="Editorial Studio"
+          >
+            <span className="material-symbols-outlined text-primary text-[24px]">auto_stories</span>
+          </Link>
 
-      {/* Main Form Fields */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="md:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Article Title *
-            </label>
-            <input
-              type="text"
-              required
-              value={post.title || ''}
-              onChange={(e) => setPost({ ...post, title: e.target.value })}
-              placeholder="E.g. Building Scalable Web Applications"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-base font-semibold text-white focus:outline-none focus:border-brand-500"
-            />
-          </div>
+          <nav className="flex flex-col items-center gap-2 w-full px-2">
+            <Link
+              to="/"
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+              title="Overview"
+            >
+              <span className="material-symbols-outlined text-[20px]">grid_view</span>
+            </Link>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              URL Slug
-            </label>
-            <input
-              type="text"
-              value={post.slug || ''}
-              onChange={(e) => setPost({ ...post, slug: e.target.value })}
-              placeholder="auto-generated-from-title"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
-            />
-          </div>
+            <Link
+              to="/posts"
+              className="flex items-center justify-center w-10 h-10 transition-colors bg-primary-container text-on-primary-container rounded-lg shadow-xs"
+              title="Articles Library"
+            >
+              <span className="material-symbols-outlined text-[20px]">article</span>
+            </Link>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Excerpt (Summary for cards & search)
-            </label>
-            <textarea
-              rows={2}
-              value={post.excerpt || ''}
-              onChange={(e) => setPost({ ...post, excerpt: e.target.value })}
-              placeholder="Brief summary of the article..."
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
-            />
-          </div>
+            <Link
+              to="/pages"
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+              title="Pages"
+            >
+              <span className="material-symbols-outlined text-[20px]">menu_book</span>
+            </Link>
+
+            <Link
+              to="/blueprints/templates"
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+              title="Templates & Catalog"
+            >
+              <span className="material-symbols-outlined text-[20px]">dashboard_customize</span>
+            </Link>
+
+            <Link
+              to="/media"
+              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+              title="Media Library"
+            >
+              <span className="material-symbols-outlined text-[20px]">image</span>
+            </Link>
+          </nav>
         </div>
 
-        {/* Sidebar Controls */}
-        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
-          <CategorySelector
-            value={post.category || 'general'}
-            onChange={(slug) => setPost({ ...post, category: slug })}
-            type="post"
-            label="Category"
-          />
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Author
-            </label>
-            <input
-              type="text"
-              value={post.author || ''}
-              onChange={(e) => setPost({ ...post, author: e.target.value })}
-              placeholder="Author name"
-              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand-500"
-            />
+        <div className="flex flex-col items-center gap-2 w-full px-2">
+          <Link
+            to="/settings"
+            className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
+            title="Studio Settings"
+          >
+            <span className="material-symbols-outlined text-[20px]">tune</span>
+          </Link>
+          <div
+            className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm text-on-primary font-bold text-label-xs"
+            title={user?.email || 'User'}
+          >
+            {user?.name?.[0]?.toUpperCase() || 'A'}
           </div>
+        </div>
+      </aside>
 
-          {/* Tags */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Tags
-            </label>
-            <div className="flex gap-2 mb-2">
-              <input
-                type="text"
-                value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addTag())}
-                placeholder="Add tag..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand-500"
-              />
-              <button
-                type="button"
-                onClick={addTag}
-                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs"
+      {/* Main Studio Viewport (Padded by left 64px) */}
+      <div className="pl-16 flex-1 flex flex-col">
+        {/* Top Header Bar */}
+        <header className="fixed top-0 left-16 right-0 z-40 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+          <div className="h-16 w-full px-6 flex items-center justify-between gap-4">
+            {/* Breadcrumb Hierarchy */}
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="font-label-md text-label-md text-on-surface font-semibold tracking-normal shrink-0">
+                Editorial Studio
+              </span>
+              <span className="text-outline-variant font-body-sm text-body-sm select-none">/</span>
+              <Link
+                to="/posts"
+                className="font-body-sm text-body-sm text-on-surface-variant hover:text-on-surface cursor-pointer truncate"
               >
-                <Plus className="w-3.5 h-3.5" />
-              </button>
-            </div>
-            <div className="flex flex-wrap gap-1.5">
-              {(post.tags || []).map((t) => (
-                <span
-                  key={t}
-                  className="bg-slate-950 border border-slate-800 text-slate-300 text-[11px] font-mono px-2 py-0.5 rounded-full flex items-center space-x-1"
-                >
-                  <span>#{t}</span>
-                  <button type="button" onClick={() => removeTag(t)} className="hover:text-red-400">
-                    <X className="w-3 h-3" />
-                  </button>
-                </span>
-              ))}
-            </div>
-          </div>
+                Chronicles
+              </Link>
+              <span className="text-outline-variant select-none font-body-sm text-body-sm">/</span>
+              <span className="font-label-md text-label-md text-on-surface truncate max-w-xs font-medium">
+                {post.title || 'Untitled Manuscript'}
+              </span>
 
-          {/* Featured Image */}
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Featured Image
-            </label>
-            <div className="space-y-2">
-              <div className="flex gap-2">
-                <input
-                  type="text"
-                  value={post.featuredImage || ''}
-                  onChange={(e) => setPost({ ...post, featuredImage: e.target.value })}
-                  placeholder="/media/image.jpg"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 focus:outline-none focus:border-brand-500"
-                />
+              <span className="px-2.5 py-0.5 rounded bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium shrink-0">
+                {post.status === 'published' ? 'Published' : 'Draft Saved'}
+              </span>
+            </div>
+
+            {/* Header Right Actions */}
+            <div className="flex items-center gap-3 shrink-0">
+              {/* Responsive Viewport Toggle Buttons */}
+              <div className="flex items-center p-1 bg-surface-container-low rounded-lg">
                 <button
                   type="button"
-                  onClick={() => setShowMediaPicker(true)}
-                  className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs"
+                  onClick={() => setViewportMode('desktop')}
+                  className={`flex items-center justify-center p-1.5 rounded transition-all ${
+                    viewportMode === 'desktop'
+                      ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                  }`}
+                  title="Desktop Canvas (720px)"
                 >
-                  <ImageIcon className="w-4 h-4" />
+                  <span className="material-symbols-outlined text-[18px]">desktop_windows</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setViewportMode('mobile')}
+                  className={`flex items-center justify-center p-1.5 rounded transition-all ${
+                    viewportMode === 'mobile'
+                      ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
+                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                  }`}
+                  title="Mobile Viewport (390px)"
+                >
+                  <span className="material-symbols-outlined text-[18px]">smartphone</span>
                 </button>
               </div>
 
-              {post.featuredImage && (
-                <div className="aspect-video bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
-                  <img src={post.featuredImage} alt="Featured" className="w-full h-full object-cover" />
-                </div>
+              {/* Live Preview Button */}
+              {!isNew && (
+                <a
+                  href={`/api/preview/post/${post.slug}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md"
+                >
+                  <span className="material-symbols-outlined text-[18px]">visibility</span>
+                  <span>Preview</span>
+                </a>
               )}
+
+              {/* Split Publish & Save Button */}
+              <div className="relative inline-flex rounded-lg bg-primary text-on-primary shadow-sm">
+                <button
+                  type="button"
+                  disabled={saving}
+                  onClick={() => handleSave(post.status === 'published')}
+                  className="px-4 py-1.5 font-label-md text-label-md text-on-primary font-medium hover:bg-primary-container transition-colors rounded-l-lg flex items-center gap-1.5"
+                >
+                  {saving ? (
+                    <span className="w-4 h-4 rounded-full border-2 border-white border-t-transparent animate-spin" />
+                  ) : (
+                    <span className="material-symbols-outlined text-[18px]">save</span>
+                  )}
+                  <span>{post.status === 'published' ? 'Update Post' : 'Save Draft'}</span>
+                </button>
+
+                <div className="w-px bg-primary-container self-stretch" />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPublishMenu(!showPublishMenu)}
+                  className="px-2 py-1.5 hover:bg-primary-container transition-colors rounded-r-lg flex items-center justify-center"
+                  title="Publish options"
+                >
+                  <span className="material-symbols-outlined text-[18px]">expand_more</span>
+                </button>
+
+                {showPublishMenu && (
+                  <div className="absolute right-0 top-full mt-2 w-56 rounded-xl bg-surface-container-lowest border border-outline-variant/30 shadow-xl p-2 z-50 space-y-1 text-on-surface">
+                    <button
+                      type="button"
+                      onClick={() => handleSave(false)}
+                      className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-container-low font-label-md text-label-md text-left transition-colors"
+                    >
+                      <span className="material-symbols-outlined text-[18px] text-on-surface-variant">draft</span>
+                      <span>Save as Draft</span>
+                    </button>
+                    {can('posts.publish') && (
+                      <button
+                        type="button"
+                        onClick={() => handleSave(true)}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg bg-primary-container text-on-primary-container font-label-md text-label-md text-left transition-colors font-semibold"
+                      >
+                        <span className="material-symbols-outlined text-[18px]">send</span>
+                        <span>Publish Live Now</span>
+                      </button>
+                    )}
+                    {!isNew && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setShowPublishMenu(false);
+                          setShowRevisions(true);
+                          loadRevisions();
+                        }}
+                        className="w-full flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-surface-container-low font-label-md text-label-md text-left transition-colors border-t border-outline-variant/20 pt-2"
+                      >
+                        <span className="material-symbols-outlined text-[18px] text-primary">history</span>
+                        <span>Revision History</span>
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* User Avatar */}
+              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-label-xs text-on-primary">
+                {user?.name?.[0]?.toUpperCase() || 'A'}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Sub-bar: Document Meta, Presets & Quick Actions */}
+        <div className="mt-16 bg-surface-container-lowest border-b border-outline-variant/20 shadow-[0_1px_3px_rgba(19,27,46,0.03)] px-8 py-2.5 flex items-center justify-between gap-4 z-30">
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider font-semibold">
+              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              Interactive Canvas
+            </div>
+
+            <div className="flex items-center gap-1.5 text-on-surface font-body-sm text-body-sm">
+              <span className="text-on-surface-variant">Preset:</span>
+              <span className="font-label-md text-label-md font-semibold">Longform Editorial</span>
+            </div>
+
+            <div className="h-4 w-px bg-surface-container-high hidden sm:block" />
+
+            <div className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+              <span className="material-symbols-outlined text-[16px] text-primary">cloud_done</span>
+              <span>{saveStatus}</span>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-4">
+            {/* Viewport switch buttons */}
+            <div className="flex items-center bg-surface-container-low p-1 rounded-lg">
+              <button
+                type="button"
+                onClick={() => setViewportMode('desktop')}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded font-label-sm text-label-sm transition-all ${
+                  viewportMode === 'desktop'
+                    ? 'bg-surface-container-lowest text-on-surface shadow-[0_1px_3px_rgba(19,27,46,0.06)] font-semibold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">desktop_windows</span>
+                <span>Desktop (720px)</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setViewportMode('mobile')}
+                className={`flex items-center gap-1.5 px-3 py-1 rounded font-label-sm text-label-sm transition-all ${
+                  viewportMode === 'mobile'
+                    ? 'bg-surface-container-lowest text-on-surface shadow-[0_1px_3px_rgba(19,27,46,0.06)] font-semibold'
+                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                }`}
+              >
+                <span className="material-symbols-outlined text-[16px]">smartphone</span>
+                <span>Mobile (390px)</span>
+              </button>
+            </div>
+
+            <div className="h-4 w-px bg-surface-container-high hidden sm:block" />
+
+            {/* Undo / Redo / Stats */}
+            <div className="flex items-center gap-1.5">
+              <button
+                type="button"
+                onClick={handleUndo}
+                disabled={historyIndex <= 0}
+                className="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors disabled:opacity-40"
+                title="Undo (Cmd+Z)"
+              >
+                <span className="material-symbols-outlined text-[18px]">undo</span>
+              </button>
+              <button
+                type="button"
+                onClick={handleRedo}
+                disabled={historyIndex >= history.length - 1}
+                className="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors disabled:opacity-40"
+                title="Redo (Cmd+Y)"
+              >
+                <span className="material-symbols-outlined text-[18px]">redo</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setShowStatsModal(true)}
+                className="p-1.5 rounded text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
+                title="Document Statistics"
+              >
+                <span className="material-symbols-outlined text-[18px]">insights</span>
+              </button>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Structured Content Block Editor */}
-      <div className="space-y-2">
-        <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
-          Article Body Content
-        </label>
-        <StructuredEditor
-          content={post.content || { blocks: [] }}
-          onChange={(newContent) => setPost({ ...post, content: newContent })}
-        />
-      </div>
+        {/* Three-Panel Post Editor Stage */}
+        <div className="flex-1 flex items-start justify-between min-h-[calc(100vh-120px)] relative overflow-hidden bg-surface">
+          {/* PANEL 1: Left Floating Palette: Content Block Composer */}
+          {showBlockPalette && (
+            <aside className="hidden xl:block fixed left-20 top-32 z-30 w-72 bg-surface-container-lowest rounded-xl p-4 shadow-[0_10px_30px_-8px_rgba(19,27,46,0.08)] border border-outline-variant/20 animate-fade-in">
+              <div className="flex items-center justify-between pb-3 mb-3 bg-surface-container-low px-3 py-2 rounded-lg">
+                <div className="flex items-center gap-2">
+                  <span className="material-symbols-outlined text-primary text-[18px]">add_circle</span>
+                  <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
+                    Insert Blocks
+                  </span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="px-1.5 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-code text-[11px]">
+                    ⌘K
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => setShowBlockPalette(false)}
+                    className="text-on-surface-variant hover:text-on-surface p-0.5"
+                    title="Minimize"
+                  >
+                    <span className="material-symbols-outlined text-[14px]">close</span>
+                  </button>
+                </div>
+              </div>
 
-      {/* SEO Accordion */}
-      <SEOFields
-        seo={post.seo || ({} as any)}
-        onChange={(newSeo) => setPost({ ...post, seo: newSeo })}
-        defaultTitle={post.title}
-        defaultDescription={post.excerpt}
-      />
+              <p className="font-body-sm text-body-sm text-on-surface-variant mb-3 px-1">
+                Click elements to insert directly onto the manuscript surface.
+              </p>
+
+              {/* Block Composer Grid */}
+              <div className="grid grid-cols-2 gap-2 mb-4">
+                <button
+                  type="button"
+                  onClick={() => insertBlock('heading', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      title
+                    </span>
+                    <span className="font-code text-code opacity-60">H1</span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    Heading 1
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => insertBlock('paragraph', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      text_fields
+                    </span>
+                    <span className="font-code text-code opacity-60">P</span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    Paragraph
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMediaPickerTarget('new');
+                    setShowMediaPicker(true);
+                  }}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group relative"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      image
+                    </span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-secondary-container" />
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    Media Frame
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => insertBlock('blockquote', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-primary-fixed text-on-primary-fixed shadow-xs text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary">format_quote</span>
+                    <span className="font-label-sm text-label-sm bg-primary text-on-primary px-1 rounded">Active</span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold">Pull Quote</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => insertBlock('button', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      call_to_action
+                    </span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    CTA Button
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => insertBlock('code', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      code_blocks
+                    </span>
+                    <span className="font-code text-code opacity-60">JS</span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    Code Snippet
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => insertBlock('callout', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      lightbulb
+                    </span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    Callout Note
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => insertBlock('divider', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      horizontal_rule
+                    </span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    Hairline Divider
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => insertBlock('grid', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      fact_check
+                    </span>
+                    <span className="font-code text-code opacity-60">3x</span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    Directive Grid
+                  </span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => insertBlock('list', activeBlockIndex)}
+                  className="flex flex-col items-start gap-1 p-2.5 rounded-lg bg-surface-container-low hover:bg-primary hover:text-on-primary transition-all text-left group"
+                >
+                  <div className="flex items-center justify-between w-full">
+                    <span className="material-symbols-outlined text-[20px] text-primary group-hover:text-on-primary">
+                      format_list_bulleted
+                    </span>
+                  </div>
+                  <span className="font-label-sm text-label-sm font-semibold text-on-surface group-hover:text-on-primary">
+                    Bullet List
+                  </span>
+                </button>
+              </div>
+
+              {/* Live Cursor Pill Indicator */}
+              <div className="relative bg-surface-container p-2.5 rounded-lg flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-secondary-container animate-pulse" />
+                  <span className="font-label-sm text-label-sm text-on-surface font-medium">
+                    {activeBlock ? `Cursor: ${activeBlock.type}` : 'Cursor: Manuscript Root'}
+                  </span>
+                </div>
+                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest text-primary font-code text-code shadow-xs">
+                  {activeBlockIndex >= 0 ? `Ln ${activeBlockIndex + 1}` : 'Ln 1'}
+                </span>
+              </div>
+            </aside>
+          )}
+
+          {/* Toggle pill when floating palette is collapsed */}
+          {!showBlockPalette && (
+            <button
+              type="button"
+              onClick={() => setShowBlockPalette(true)}
+              className="hidden xl:flex fixed left-20 top-32 z-30 items-center gap-2 px-3 py-2 rounded-xl bg-surface-container-lowest shadow-md border border-outline-variant/30 text-primary font-label-sm font-semibold hover:bg-surface-container transition-all"
+            >
+              <span className="material-symbols-outlined text-[18px]">add_circle</span>
+              <span>Insert Blocks (⌘K)</span>
+            </button>
+          )}
+
+          {/* PANEL 2: Center Stage: Editorial Manuscript Canvas */}
+          <main className="flex-1 flex flex-col items-center justify-start py-10 px-4 lg:px-8 overflow-y-auto">
+            <div
+              ref={manuscriptRef}
+              id="manuscriptPaper"
+              style={{
+                maxWidth: viewportMode === 'mobile' ? '390px' : `${columnWidth}px`,
+                backgroundColor: canvasBgColor
+              }}
+              className="w-full rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-outline-variant/20"
+            >
+              {/* Hover contextual sheet badge */}
+              <div className="absolute -top-3 right-8 flex items-center gap-1 bg-inverse-surface text-inverse-on-surface px-2.5 py-1 rounded-full shadow-lg text-[12px] opacity-0 group-hover/canvas:opacity-100 transition-opacity pointer-events-none">
+                <span className="material-symbols-outlined text-[14px]">edit_note</span>
+                <span className="font-label-sm text-label-sm">Live Manuscript Canvas</span>
+              </div>
+
+              {/* Eyebrow / Masthead Metadata Strip */}
+              <header className="mb-6">
+                <div className="flex items-center justify-between gap-2 mb-4">
+                  <span className="font-label-sm text-label-sm tracking-widest uppercase text-primary font-bold">
+                    PRODUCT DISPATCH • {post.category ? post.category.toUpperCase() : 'EDITORIAL'}
+                  </span>
+                  <span className="font-code text-code text-on-surface-variant bg-surface-container px-2 py-0.5 rounded">
+                    AUTONOMOUS ARCHITECTURE
+                  </span>
+                </div>
+
+                {/* Inline Editable Article Title */}
+                <input
+                  type="text"
+                  value={post.title || ''}
+                  onChange={(e) => {
+                    const newTitle = e.target.value;
+                    setPost((prev) => ({
+                      ...prev,
+                      title: newTitle,
+                      slug: isNew ? slugify(newTitle) : prev.slug
+                    }));
+                    setSaveStatus('Unsaved changes');
+                  }}
+                  placeholder="Enter Article Headline..."
+                  className="w-full text-on-surface mb-3 tracking-tight bg-transparent focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 -mx-1"
+                  style={{
+                    fontFamily: headlineFont,
+                    fontSize: fontSizeHeading,
+                    lineHeight: '1.2',
+                    fontWeight: 500
+                  }}
+                />
+
+                {/* Inline Editable Subtitle / Excerpt */}
+                <textarea
+                  rows={2}
+                  value={post.excerpt || ''}
+                  onChange={(e) => {
+                    setPost((prev) => ({ ...prev, excerpt: e.target.value }));
+                    setSaveStatus('Unsaved changes');
+                  }}
+                  placeholder="Draft a provocative summary to invite reader immersion..."
+                  className="w-full text-on-surface-variant italic mb-6 leading-relaxed bg-transparent focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 -mx-1 resize-none"
+                  style={{
+                    fontFamily: bodyFont,
+                    fontSize: fontSizeBody
+                  }}
+                />
+
+                {/* Byline Strip with Author Avatar & Date */}
+                <div className="flex items-center justify-between py-3 bg-surface-container-low px-4 rounded-lg">
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm shadow-sm">
+                      {post.author?.[0] || 'E'}
+                    </div>
+                    <div className="flex flex-col">
+                      <span className="font-label-md text-label-md text-on-surface font-semibold">
+                        {post.author || 'Elena Rostova'}
+                      </span>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">
+                        Principal Director of Design Architecture
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm">
+                    <span className="material-symbols-outlined text-[16px]">schedule</span>
+                    <span>{new Date().toLocaleDateString()} • {stats.readTimeMinutes} min read</span>
+                  </div>
+                </div>
+              </header>
+
+              {/* Hairline Divider */}
+              <div className="w-full h-px bg-surface-container-high mb-6" />
+
+              {/* Rendered Block Flow */}
+              <article className="space-y-6 text-on-surface" style={{ textAlign: textAlignment }}>
+                {blocks.map((block, idx) => {
+                  const isSelected = selectedBlockId === block.id;
+
+                  return (
+                    <div
+                      key={block.id}
+                      onClick={() => setSelectedBlockId(block.id)}
+                      className={`relative group/block rounded-lg transition-all p-1 -m-1 ${
+                        isSelected ? 'ring-2 ring-primary bg-primary/5' : 'hover:bg-surface-container-low/50'
+                      }`}
+                    >
+                      {/* Floating Block Action Toolbar (on hover or focus) */}
+                      <div className="absolute -top-3 right-2 hidden group-hover/block:flex items-center gap-1 bg-surface-container-lowest border border-outline-variant/30 rounded-lg shadow-sm px-1.5 py-0.5 z-20">
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveBlock(idx, 'up');
+                          }}
+                          disabled={idx === 0}
+                          className="p-1 text-on-surface-variant hover:text-on-surface disabled:opacity-30"
+                          title="Move Up"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">arrow_upward</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            moveBlock(idx, 'down');
+                          }}
+                          disabled={idx === blocks.length - 1}
+                          className="p-1 text-on-surface-variant hover:text-on-surface disabled:opacity-30"
+                          title="Move Down"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">arrow_downward</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            duplicateBlock(idx);
+                          }}
+                          className="p-1 text-on-surface-variant hover:text-on-surface"
+                          title="Duplicate"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">content_copy</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            deleteBlock(block.id);
+                          }}
+                          className="p-1 text-on-surface-variant hover:text-error"
+                          title="Delete"
+                        >
+                          <span className="material-symbols-outlined text-[14px]">delete</span>
+                        </button>
+                      </div>
+
+                      {/* Render based on Block Type */}
+                      {block.type === 'heading' && (
+                        <div className="space-y-1">
+                          <input
+                            type="text"
+                            value={block.text || ''}
+                            onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                            placeholder="Heading text..."
+                            className="w-full text-on-surface tracking-tight bg-transparent focus:outline-none"
+                            style={{
+                              fontFamily: headlineFont,
+                              fontSize: block.level === 1 ? fontSizeHeading : block.level === 2 ? '28px' : '22px',
+                              lineHeight: '1.25',
+                              fontWeight: 600
+                            }}
+                          />
+                        </div>
+                      )}
+
+                      {block.type === 'paragraph' && (
+                        <textarea
+                          rows={Math.max(2, Math.ceil((block.text || '').length / 65))}
+                          value={block.text || ''}
+                          onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                          placeholder="Write paragraph..."
+                          className="w-full leading-relaxed text-on-surface bg-transparent focus:outline-none resize-none"
+                          style={{
+                            fontFamily: bodyFont,
+                            fontSize: fontSizeBody
+                          }}
+                        />
+                      )}
+
+                      {block.type === 'image' && (
+                        <div className="w-full rounded-xl overflow-hidden bg-surface-container relative shadow-sm my-4">
+                          <img
+                            src={block.url || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80'}
+                            alt={block.alt || 'Editorial Image'}
+                            className="w-full h-72 object-cover"
+                          />
+                          <div className="p-3 bg-surface-container-low flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                            <input
+                              type="text"
+                              value={block.caption || ''}
+                              onChange={(e) => updateBlock(block.id, { caption: e.target.value })}
+                              placeholder="Add image caption..."
+                              className="font-body-sm text-body-sm text-on-surface-variant bg-transparent focus:outline-none flex-1"
+                            />
+                            <div className="flex items-center gap-2">
+                              <span className="font-code text-code text-on-surface-variant">ISO 400 • 50mm</span>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setMediaPickerTarget(block.id);
+                                  setShowMediaPicker(true);
+                                }}
+                                className="px-2 py-0.5 rounded bg-surface-container-lowest font-label-xs text-label-xs text-primary shadow-xs"
+                              >
+                                Replace
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {block.type === 'blockquote' && (
+                        <blockquote className="my-6 pl-6 py-2 bg-gradient-to-r from-primary-fixed/30 to-transparent rounded-r-xl relative">
+                          <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-full" />
+                          <textarea
+                            rows={2}
+                            value={block.text || ''}
+                            onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                            placeholder="Enter pull quote..."
+                            className="w-full font-headline-md text-headline-md italic text-on-surface leading-snug bg-transparent focus:outline-none resize-none"
+                            style={{ fontFamily: headlineFont }}
+                          />
+                          <footer className="mt-2 font-label-md text-label-md text-on-surface-variant not-italic flex items-center gap-2">
+                            <input
+                              type="text"
+                              value={block.citation || ''}
+                              onChange={(e) => updateBlock(block.id, { citation: e.target.value })}
+                              placeholder="Citation source..."
+                              className="font-semibold text-primary bg-transparent focus:outline-none"
+                            />
+                          </footer>
+                        </blockquote>
+                      )}
+
+                      {block.type === 'list' && (
+                        <div className="my-4 pl-4 space-y-2">
+                          {(block.items || []).map((item: string, itemIdx: number) => (
+                            <div key={itemIdx} className="flex items-start gap-2">
+                              <span className="text-primary mt-1">•</span>
+                              <input
+                                type="text"
+                                value={item}
+                                onChange={(e) => {
+                                  const newItems = [...(block.items || [])];
+                                  newItems[itemIdx] = e.target.value;
+                                  updateBlock(block.id, { items: newItems });
+                                }}
+                                className="flex-1 bg-transparent text-on-surface focus:outline-none font-body-md"
+                              />
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  const newItems = (block.items || []).filter((_, i) => i !== itemIdx);
+                                  updateBlock(block.id, { items: newItems });
+                                }}
+                                className="text-on-surface-variant hover:text-error text-xs px-1"
+                              >
+                                ×
+                              </button>
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const newItems = [...(block.items || []), 'New list item'];
+                              updateBlock(block.id, { items: newItems });
+                            }}
+                            className="text-xs font-semibold text-primary hover:underline flex items-center gap-1 pt-1"
+                          >
+                            <span className="material-symbols-outlined text-[14px]">add</span> Add Item
+                          </button>
+                        </div>
+                      )}
+
+                      {block.type === 'table' && (
+                        <div className="my-4 overflow-x-auto rounded-xl border border-outline-variant/30 bg-surface-container-low p-2">
+                          <table className="w-full text-left font-body-sm text-body-sm">
+                            <thead>
+                              <tr className="border-b border-outline-variant/30">
+                                {(block.headers || []).map((h: string, hIdx: number) => (
+                                  <th key={hIdx} className="p-2 font-semibold text-on-surface">
+                                    <input
+                                      type="text"
+                                      value={h}
+                                      onChange={(e) => {
+                                        const newHeaders = [...(block.headers || [])];
+                                        newHeaders[hIdx] = e.target.value;
+                                        updateBlock(block.id, { headers: newHeaders });
+                                      }}
+                                      className="bg-transparent w-full font-bold focus:outline-none"
+                                    />
+                                  </th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {(block.rows || []).map((row: string[], rIdx: number) => (
+                                <tr key={rIdx} className="border-b border-outline-variant/20 last:border-0">
+                                  {row.map((cell: string, cIdx: number) => (
+                                    <td key={cIdx} className="p-2">
+                                      <input
+                                        type="text"
+                                        value={cell}
+                                        onChange={(e) => {
+                                          const newRows = (block.rows || []).map((r, ri) =>
+                                            ri === rIdx ? r.map((c, ci) => (ci === cIdx ? e.target.value : c)) : r
+                                          );
+                                          updateBlock(block.id, { rows: newRows });
+                                        }}
+                                        className="bg-transparent w-full focus:outline-none"
+                                      />
+                                    </td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                          <div className="pt-2 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const newRows = [...(block.rows || []), Array((block.headers || []).length).fill('Cell')];
+                                updateBlock(block.id, { rows: newRows });
+                              }}
+                              className="text-xs font-semibold text-primary hover:underline flex items-center gap-1"
+                            >
+                              <span className="material-symbols-outlined text-[14px]">add</span> Add Row
+                            </button>
+                          </div>
+                        </div>
+                      )}
+
+                      {block.type === 'grid' && (
+                        <div className="p-6 rounded-xl bg-surface-container-low shadow-[0_1px_4px_rgba(19,27,46,0.02)] space-y-4 my-4">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <span className="material-symbols-outlined text-primary text-[20px]">fact_check</span>
+                              <span className="font-label-md text-label-md uppercase tracking-wider text-on-surface font-bold">
+                                Key Architectural Takeaways
+                              </span>
+                            </div>
+                            <span className="px-2 py-0.5 rounded bg-surface-container text-on-surface-variant font-code text-code">
+                              3 Directives
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
+                            {(block.items || []).map((item: any, i: number) => (
+                              <div
+                                key={item.id || i}
+                                className="bg-surface-container-lowest p-3.5 rounded-lg flex flex-col justify-between shadow-xs"
+                              >
+                                <div>
+                                  <div className="flex items-center justify-between mb-2">
+                                    <span className="font-code text-code text-primary font-bold">
+                                      0{i + 1}
+                                    </span>
+                                    <span
+                                      className={`w-2 h-2 rounded-full ${
+                                        i === 0
+                                          ? 'bg-secondary'
+                                          : i === 1
+                                          ? 'bg-secondary-container'
+                                          : 'bg-primary'
+                                      }`}
+                                    />
+                                  </div>
+                                  <input
+                                    type="text"
+                                    value={item.title || ''}
+                                    onChange={(e) => {
+                                      const newItems = [...(block.items || [])];
+                                      newItems[i] = { ...item, title: e.target.value };
+                                      updateBlock(block.id, { items: newItems });
+                                    }}
+                                    placeholder="Takeaway title..."
+                                    className="font-label-md text-label-md text-on-surface font-semibold mb-1 w-full bg-transparent focus:outline-none"
+                                  />
+                                  <textarea
+                                    rows={2}
+                                    value={item.text || ''}
+                                    onChange={(e) => {
+                                      const newItems = [...(block.items || [])];
+                                      newItems[i] = { ...item, text: e.target.value };
+                                      updateBlock(block.id, { items: newItems });
+                                    }}
+                                    placeholder="Detail takeaway..."
+                                    className="font-body-sm text-body-sm text-on-surface-variant w-full bg-transparent focus:outline-none resize-none"
+                                  />
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {block.type === 'code' && (
+                        <div className="rounded-xl bg-surface-container-highest p-4 font-code text-code my-4 overflow-x-auto">
+                          <textarea
+                            rows={4}
+                            value={block.code || ''}
+                            onChange={(e) => updateBlock(block.id, { code: e.target.value })}
+                            className="w-full bg-transparent font-code text-code text-on-surface focus:outline-none resize-none"
+                          />
+                        </div>
+                      )}
+
+                      {block.type === 'callout' && (
+                        <div className="p-4 rounded-xl bg-primary-fixed/40 border-l-4 border-primary text-on-primary-fixed my-4 space-y-1">
+                          <input
+                            type="text"
+                            value={block.title || ''}
+                            onChange={(e) => updateBlock(block.id, { title: e.target.value })}
+                            placeholder="Callout Title..."
+                            className="font-title-md text-title-md font-bold w-full bg-transparent focus:outline-none"
+                          />
+                          <textarea
+                            rows={2}
+                            value={block.text || ''}
+                            onChange={(e) => updateBlock(block.id, { text: e.target.value })}
+                            placeholder="Callout text..."
+                            className="font-body-md text-body-md w-full bg-transparent focus:outline-none resize-none"
+                          />
+                        </div>
+                      )}
+
+                      {block.type === 'divider' && (
+                        <div className="py-4">
+                          <hr className="border-t border-outline-variant/30" />
+                        </div>
+                      )}
+
+                      {block.type === 'button' && (
+                        <div className="mt-8 p-6 rounded-xl bg-gradient-to-br from-primary-fixed to-surface-container text-on-primary-fixed flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                          <div>
+                            <h4 className="font-headline-sm text-headline-sm text-on-primary-fixed">
+                              Join the Editorial Syndicate
+                            </h4>
+                            <p className="font-body-sm text-body-sm text-on-primary-fixed-variant">
+                              Receive weekly longform teardowns on token systems & typography.
+                            </p>
+                          </div>
+                          <button
+                            type="button"
+                            className="px-5 py-2.5 rounded-lg bg-primary text-on-primary font-label-md text-label-md shadow-sm hover:bg-primary-container transition-all whitespace-nowrap"
+                          >
+                            {block.text || 'Subscribe to Dispatch'}
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
+              </article>
+
+              {/* Manuscript Footer: Tags & Share */}
+              <footer className="mt-10 pt-6 border-t border-outline-variant/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-on-surface-variant font-body-sm text-body-sm">
+                <div className="flex flex-wrap items-center gap-2">
+                  {(post.tags || []).map((tag) => (
+                    <span
+                      key={tag}
+                      className="px-2.5 py-1 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface"
+                    >
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+                <div className="flex items-center gap-3">
+                  <button
+                    type="button"
+                    className="flex items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">favorite</span>
+                    <span className="font-code text-code">248</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (navigator.clipboard) {
+                        navigator.clipboard.writeText(window.location.href);
+                        triggerToast('Proof link copied to clipboard');
+                      }
+                    }}
+                    className="flex items-center gap-1 text-on-surface-variant hover:text-on-surface transition-colors"
+                  >
+                    <span className="material-symbols-outlined text-[18px]">share</span>
+                    <span className="font-code text-code">Share</span>
+                  </button>
+                </div>
+              </footer>
+            </div>
+          </main>
+
+          {/* PANEL 3: Right Inspector Rail (Design & Settings) */}
+          <aside className="w-80 h-[calc(100vh-108px)] sticky top-0 bg-surface-container-lowest border-l border-outline-variant/30 shadow-[-1px_0_4px_rgba(19,27,46,0.03)] flex flex-col z-20 shrink-0">
+            {/* Inspector Tab Switcher */}
+            <div className="p-4 pb-2 bg-surface-container-lowest">
+              <div className="flex items-center p-1 bg-surface-container-low rounded-lg w-full">
+                <button
+                  type="button"
+                  onClick={() => setActiveInspectorTab('design')}
+                  className={`flex-1 py-1.5 text-center font-label-md text-label-md rounded-md transition-all ${
+                    activeInspectorTab === 'design'
+                      ? 'bg-surface-container-lowest text-on-surface shadow-xs font-semibold'
+                      : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  Design
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveInspectorTab('settings')}
+                  className={`flex-1 py-1.5 text-center font-label-md text-label-md rounded-md transition-all ${
+                    activeInspectorTab === 'settings'
+                      ? 'bg-surface-container-lowest text-on-surface shadow-xs font-semibold'
+                      : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  Settings
+                </button>
+              </div>
+            </div>
+
+            {/* Inspector Scrollable Controls */}
+            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-6">
+              {activeInspectorTab === 'design' ? (
+                <>
+                  {/* Search properties */}
+                  <div className="relative">
+                    <span className="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-on-surface-variant">
+                      search
+                    </span>
+                    <input
+                      type="text"
+                      value={tokenSearch}
+                      onChange={(e) => setTokenSearch(e.target.value)}
+                      placeholder="Search tokens & properties..."
+                      className="w-full pl-9 pr-3 py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* Section: Palette & Tokens */}
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
+                        Palette & Tokens
+                      </span>
+                      <span className="material-symbols-outlined text-[16px] text-on-surface-variant">palette</span>
+                    </div>
+
+                    <div className="space-y-2 pt-1">
+                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
+                        <span className="font-body-sm text-body-sm text-on-surface">Background</span>
+                        <div className="flex items-center gap-2">
+                          <button
+                            type="button"
+                            className="w-5 h-5 rounded shadow-xs ring-1 ring-outline-variant/30 cursor-pointer"
+                            style={{ backgroundColor: canvasBgColor }}
+                            onClick={() => {
+                              const next = canvasBgColor === '#FFFFFF' ? '#FAF8FF' : canvasBgColor === '#FAF8FF' ? '#F4EAFF' : '#FFFFFF';
+                              setCanvasBgColor(next);
+                            }}
+                            title="Cycle canvas background"
+                          />
+                          <span className="font-code text-code text-on-surface font-medium">{canvasBgColor}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
+                        <span className="font-body-sm text-body-sm text-on-surface">Text Primary</span>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded bg-on-surface shadow-xs" />
+                          <span className="font-code text-code text-on-surface font-medium">#201636</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
+                        <div className="flex items-center gap-1">
+                          <span className="font-body-sm text-body-sm text-on-surface">Primary Accent</span>
+                          <span className="material-symbols-outlined text-[14px] text-on-surface-variant" title="Brand token">
+                            info
+                          </span>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded bg-primary shadow-xs" />
+                          <span className="font-code text-code text-on-surface font-medium">#5427E6</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
+                        <span className="font-body-sm text-body-sm text-on-surface">Secondary Coral</span>
+                        <div className="flex items-center gap-2">
+                          <span className="w-5 h-5 rounded bg-secondary-container shadow-xs" />
+                          <span className="font-code text-code text-on-surface font-medium">#FF6B6B</span>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section: Typography Hierarchy */}
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
+                        Typography Hierarchy
+                      </span>
+                      <span className="material-symbols-outlined text-[16px] text-on-surface-variant">format_size</span>
+                    </div>
+
+                    <div className="space-y-3 pt-1">
+                      <div>
+                        <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
+                          Headline Font Family
+                        </label>
+                        <select
+                          value={headlineFont}
+                          onChange={(e) => setHeadlineFont(e.target.value as any)}
+                          className="w-full p-2 bg-surface-container-low rounded-lg text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                        >
+                          <option value="Newsreader">Newsreader (Editorial Serif)</option>
+                          <option value="Inter">Inter (Clean Modern Sans)</option>
+                          <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
+                          Body Text Family
+                        </label>
+                        <select
+                          value={bodyFont}
+                          onChange={(e) => setBodyFont(e.target.value as any)}
+                          className="w-full p-2 bg-surface-container-low rounded-lg text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary"
+                        >
+                          <option value="Inter">Inter (Modern Sans)</option>
+                          <option value="Newsreader">Newsreader (Serif Reading)</option>
+                          <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
+                        </select>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-2">
+                        <div>
+                          <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
+                            Heading Size
+                          </label>
+                          <select
+                            value={fontSizeHeading}
+                            onChange={(e) => setFontSizeHeading(e.target.value as any)}
+                            className="w-full p-2 bg-surface-container-low rounded-lg text-on-surface font-code text-code focus:outline-none focus:ring-1 focus:ring-primary"
+                          >
+                            <option value="32px">32px</option>
+                            <option value="36px">36px</option>
+                            <option value="40px">40px</option>
+                            <option value="48px">48px</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
+                            Body Size
+                          </label>
+                          <select
+                            value={fontSizeBody}
+                            onChange={(e) => setFontSizeBody(e.target.value as any)}
+                            className="w-full p-2 bg-surface-container-low rounded-lg text-on-surface font-code text-code focus:outline-none focus:ring-1 focus:ring-primary"
+                          >
+                            <option value="15px">15px</option>
+                            <option value="16px">16px</option>
+                            <option value="18px">18px</option>
+                          </select>
+                        </div>
+                      </div>
+
+                      {/* Formatting Toolstrip */}
+                      <div className="flex items-center justify-between bg-surface-container-low p-1 rounded-lg">
+                        <button
+                          type="button"
+                          className="p-1.5 rounded bg-surface-container-lowest text-on-surface shadow-xs font-bold text-[14px]"
+                          title="Bold"
+                        >
+                          B
+                        </button>
+                        <button
+                          type="button"
+                          className="p-1.5 rounded text-on-surface-variant hover:text-on-surface italic text-[14px]"
+                          title="Italic"
+                        >
+                          I
+                        </button>
+                        <button
+                          type="button"
+                          className="p-1.5 rounded text-on-surface-variant hover:text-on-surface underline text-[14px]"
+                          title="Underline"
+                        >
+                          U
+                        </button>
+                        <div className="h-4 w-px bg-surface-container-high" />
+                        <button
+                          type="button"
+                          onClick={() => setTextAlignment('left')}
+                          className={`p-1.5 rounded ${
+                            textAlignment === 'left' ? 'bg-surface-container-lowest text-primary shadow-xs' : 'text-on-surface-variant'
+                          }`}
+                          title="Align Left"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">format_align_left</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTextAlignment('center')}
+                          className={`p-1.5 rounded ${
+                            textAlignment === 'center' ? 'bg-surface-container-lowest text-primary shadow-xs' : 'text-on-surface-variant'
+                          }`}
+                          title="Align Center"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">format_align_center</span>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setTextAlignment('justify')}
+                          className={`p-1.5 rounded ${
+                            textAlignment === 'justify' ? 'bg-surface-container-lowest text-primary shadow-xs' : 'text-on-surface-variant'
+                          }`}
+                          title="Align Justify"
+                        >
+                          <span className="material-symbols-outlined text-[16px]">format_align_justify</span>
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section: Canvas & Spacing */}
+                  <div className="space-y-2 pt-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
+                        Canvas & Spacing
+                      </span>
+                      <span className="material-symbols-outlined text-[16px] text-on-surface-variant">aspect_ratio</span>
+                    </div>
+
+                    <div className="space-y-3 pt-1">
+                      <div>
+                        <div className="flex items-center justify-between text-on-surface mb-1">
+                          <span className="font-body-sm text-body-sm text-on-surface-variant">Max Column Width</span>
+                          <span className="font-code text-code font-semibold text-primary">{columnWidth} px</span>
+                        </div>
+                        <input
+                          type="range"
+                          min="540"
+                          max="860"
+                          value={columnWidth}
+                          onChange={(e) => setColumnWidth(Number(e.target.value))}
+                          className="w-full accent-primary h-1.5 bg-surface-container-high rounded-lg cursor-pointer"
+                        />
+                        <div className="flex justify-between font-code text-code text-on-surface-variant text-[10px] mt-1">
+                          <span>540px</span>
+                          <span className="text-primary font-semibold">Target: 720px</span>
+                          <span>860px</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
+                        <span className="font-body-sm text-body-sm text-on-surface">Vertical Padding</span>
+                        <span className="font-code text-code text-on-surface">48px (3rem)</span>
+                      </div>
+
+                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
+                        <span className="font-body-sm text-body-sm text-on-surface">Drop Elevation</span>
+                        <span className="px-2 py-0.5 rounded bg-surface-container-lowest font-label-sm text-label-sm text-primary font-medium">
+                          Ambient 12px
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Section: Delivery Readiness */}
+                  <div className="p-3.5 bg-surface-container-low rounded-xl space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface">
+                        Delivery Readiness
+                      </span>
+                      <span className="font-code text-code text-primary font-bold">96%</span>
+                    </div>
+                    <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
+                      <div className="bg-primary h-full rounded-full w-[96%]" />
+                    </div>
+                    <div className="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pt-1">
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+                        Spelling & Syntax
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <span className="material-symbols-outlined text-[14px] text-primary">check_circle</span>
+                        Contrast Valid
+                      </span>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                /* SETTINGS TAB */
+                <div className="space-y-4">
+                  <div>
+                    <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
+                      Publication Slug
+                    </label>
+                    <input
+                      type="text"
+                      value={post.slug || ''}
+                      onChange={(e) => setPost((prev) => ({ ...prev, slug: e.target.value }))}
+                      placeholder="post-slug"
+                      className="w-full h-10 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                    <p className="font-body-sm text-body-sm text-on-surface-variant mt-1 font-mono text-[11px]">
+                      URL: /blog/{post.slug || 'slug'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
+                      Category
+                    </label>
+                    <select
+                      value={post.category || 'general'}
+                      onChange={(e) => setPost((prev) => ({ ...prev, category: e.target.value }))}
+                      className="w-full h-10 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="general">General</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.slug}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
+                      Tags
+                    </label>
+                    <div className="flex flex-wrap gap-1.5 mb-2">
+                      {(post.tags || []).map((t) => (
+                        <span
+                          key={t}
+                          className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container font-label-sm text-label-sm text-on-surface"
+                        >
+                          #{t}
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setPost((prev) => ({
+                                ...prev,
+                                tags: (prev.tags || []).filter((tag) => tag !== t)
+                              }))
+                            }
+                            className="hover:text-error"
+                          >
+                            ×
+                          </button>
+                        </span>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <input
+                        type="text"
+                        value={tagInput}
+                        onChange={(e) => setTagInput(e.target.value)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            const val = tagInput.trim().replace(/^#/, '');
+                            if (val && !post.tags?.includes(val)) {
+                              setPost((prev) => ({ ...prev, tags: [...(prev.tags || []), val] }));
+                              setTagInput('');
+                            }
+                          }
+                        }}
+                        placeholder="Add tag (Press Enter)..."
+                        className="flex-1 h-9 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
+                      Featured Cover Image
+                    </label>
+                    {post.featuredImage ? (
+                      <div className="relative rounded-lg overflow-hidden group">
+                        <img
+                          src={post.featuredImage}
+                          alt="Cover"
+                          className="w-full h-32 object-cover"
+                        />
+                        <div className="absolute inset-0 bg-black/40 text-white font-label-sm flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setMediaPickerTarget('featured');
+                              setShowMediaPicker(true);
+                            }}
+                            className="px-2.5 py-1 bg-white/20 hover:bg-white/40 rounded text-xs"
+                          >
+                            Change
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setPost((prev) => ({ ...prev, featuredImage: '' }))}
+                            className="px-2.5 py-1 bg-error/70 hover:bg-error rounded text-xs"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setMediaPickerTarget('featured');
+                          setShowMediaPicker(true);
+                        }}
+                        className="w-full h-24 border-2 border-dashed border-outline-variant rounded-lg flex flex-col items-center justify-center text-on-surface-variant hover:text-primary hover:border-primary transition-colors gap-1"
+                      >
+                        <span className="material-symbols-outlined text-[20px]">add_photo_alternate</span>
+                        <span className="font-label-sm text-label-sm">Select Cover Image</span>
+                      </button>
+                    )}
+                  </div>
+
+                  {/* Template Select */}
+                  <div>
+                    <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
+                      Article Template
+                    </label>
+                    <select
+                      value={post.template || 'default'}
+                      onChange={(e) => setPost((prev) => ({ ...prev, template: e.target.value }))}
+                      className="w-full h-10 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="default">Default Longform</option>
+                      <option value="minimal">Minimalist Canvas</option>
+                      <option value="full-width">Full Bleed Visual</option>
+                    </select>
+                  </div>
+
+                  {/* SEO Fields */}
+                  <div className="pt-2 border-t border-outline-variant/20 space-y-3">
+                    <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold block">
+                      Search Engine Optimization
+                    </span>
+                    <div>
+                      <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
+                        Meta Title
+                      </label>
+                      <input
+                        type="text"
+                        value={post.seo?.title || ''}
+                        onChange={(e) => updateSEO({ title: e.target.value })}
+                        placeholder={post.title}
+                        className="w-full h-9 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
+                        Meta Description
+                      </label>
+                      <textarea
+                        rows={2}
+                        value={post.seo?.description || ''}
+                        onChange={(e) => updateSEO({ description: e.target.value })}
+                        placeholder={post.excerpt}
+                        className="w-full p-2.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Inspector Footer Bar */}
+            <div className="p-4 bg-surface-container-lowest border-t border-outline-variant/20 shadow-[0_-1px_4px_rgba(19,27,46,0.02)] flex items-center justify-between">
+              <button
+                type="button"
+                onClick={() => {
+                  setColumnWidth(720);
+                  setHeadlineFont('Newsreader');
+                  setBodyFont('Inter');
+                  setFontSizeHeading('36px');
+                  setFontSizeBody('18px');
+                  setTextAlignment('left');
+                  setCanvasBgColor('#FFFFFF');
+                  triggerToast('Defaults restored');
+                }}
+                className="flex items-center gap-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-semibold"
+              >
+                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
+                Reset Defaults
+              </button>
+              <button
+                type="button"
+                onClick={() => triggerToast('Styles applied to manuscript')}
+                className="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-semibold shadow-xs hover:bg-primary-container transition-all"
+              >
+                Apply Styles
+              </button>
+            </div>
+          </aside>
+        </div>
+      </div>
 
       {/* Media Picker Modal */}
       <MediaPickerModal
         isOpen={showMediaPicker}
         onClose={() => setShowMediaPicker(false)}
-        onSelect={(url) => setPost({ ...post, featuredImage: url })}
+        onSelect={(url, alt) => {
+          if (mediaPickerTarget === 'featured') {
+            setPost((prev) => ({ ...prev, featuredImage: url }));
+          } else if (mediaPickerTarget === 'new') {
+            const imgBlock = createDefaultBlock('image') as any;
+            imgBlock.url = url;
+            if (alt) imgBlock.alt = alt;
+            const newBlocks = [...(post.content?.blocks || []), imgBlock];
+            commitBlocks(newBlocks);
+          } else {
+            // Update specific block
+            updateBlock(mediaPickerTarget, { url, alt });
+          }
+          setShowMediaPicker(false);
+          triggerToast('Media applied');
+        }}
       />
 
-      {/* Revisions Drawer */}
+      {/* Document Statistics Modal */}
+      {showStatsModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl w-full max-w-sm p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[20px]">insights</span>
+                <h3 className="font-title-md text-title-md text-on-surface font-bold">Manuscript Statistics</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setShowStatsModal(false)}
+                className="text-on-surface-variant hover:text-on-surface"
+              >
+                <span className="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-3 pt-2 font-code text-code">
+              <div className="p-3 rounded-xl bg-surface-container-low">
+                <span className="font-label-xs text-label-xs text-on-surface-variant block uppercase">Words</span>
+                <span className="font-headline-sm text-headline-sm text-primary font-bold">{stats.words}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-surface-container-low">
+                <span className="font-label-xs text-label-xs text-on-surface-variant block uppercase">Characters</span>
+                <span className="font-headline-sm text-headline-sm text-on-surface font-bold">{stats.chars}</span>
+              </div>
+              <div className="p-3 rounded-xl bg-surface-container-low">
+                <span className="font-label-xs text-label-xs text-on-surface-variant block uppercase">Reading Time</span>
+                <span className="font-headline-sm text-headline-sm text-primary font-bold">
+                  {stats.readTimeMinutes} min
+                </span>
+              </div>
+              <div className="p-3 rounded-xl bg-surface-container-low">
+                <span className="font-label-xs text-label-xs text-on-surface-variant block uppercase">Total Blocks</span>
+                <span className="font-headline-sm text-headline-sm text-on-surface font-bold">
+                  {blocks.length}
+                </span>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setShowStatsModal(false)}
+              className="w-full py-2 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-md text-label-md font-semibold"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Revision History Modal */}
       {showRevisions && (
-        <div className="fixed inset-0 z-50 flex justify-end bg-black/60 backdrop-blur-sm">
-          <div className="bg-slate-900 border-l border-slate-800 w-full max-w-md h-full flex flex-col p-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-4">
-              <div className="flex items-center space-x-2">
-                <History className="w-5 h-5 text-brand-400" />
-                <h3 className="font-bold text-white text-base">Revision History</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4">
+          <div className="bg-surface-container-lowest border border-outline-variant/30 rounded-2xl w-full max-w-lg p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <span className="material-symbols-outlined text-primary text-[20px]">history</span>
+                <h3 className="font-title-md text-title-md text-on-surface font-bold">Revision History</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setShowRevisions(false)}
-                className="text-slate-400 hover:text-white text-sm"
+                className="text-on-surface-variant hover:text-on-surface"
               >
-                Close ✕
+                <span className="material-symbols-outlined text-[18px]">close</span>
               </button>
             </div>
 
-            <div className="flex-1 overflow-y-auto space-y-3">
-              {loadingRevisions ? (
-                <div className="text-center py-10 text-slate-400">Loading revisions...</div>
-              ) : revisions.length === 0 ? (
-                <div className="text-center py-10 text-slate-500">No revisions found.</div>
-              ) : (
-                revisions.map((rev) => (
-                  <div key={rev.id} className="p-4 bg-slate-950 border border-slate-800 rounded-lg space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold font-mono text-emerald-400">Version {rev.version}</span>
-                      <span className="text-[11px] text-slate-500 font-mono">{new Date(rev.createdAt).toLocaleString()}</span>
+            {loadingRevisions ? (
+              <div className="py-8 text-center text-on-surface-variant font-body-sm">
+                Loading snapshot timeline...
+              </div>
+            ) : revisions.length === 0 ? (
+              <div className="py-8 text-center text-on-surface-variant font-body-sm">
+                No previous snapshots found for this manuscript.
+              </div>
+            ) : (
+              <div className="max-h-72 overflow-y-auto space-y-2 pr-1">
+                {revisions.map((rev) => (
+                  <div
+                    key={rev.id}
+                    className="p-3 rounded-xl bg-surface-container-low hover:bg-surface-container flex items-center justify-between gap-3 transition-colors"
+                  >
+                    <div>
+                      <span className="font-label-md text-label-md text-on-surface font-semibold block">
+                        {new Date(rev.createdAt).toLocaleString()}
+                      </span>
+                      <span className="font-body-sm text-body-sm text-on-surface-variant">
+                        By {rev.authorEmail} • {rev.summary || `Snapshot v${rev.version}`}
+                      </span>
                     </div>
-                    <p className="text-xs text-slate-300">{rev.summary}</p>
-                    <div className="flex items-center justify-between pt-2 border-t border-slate-800/80">
-                      <span className="text-[11px] text-slate-400">By {rev.authorEmail}</span>
-                      <button
-                        type="button"
-                        onClick={() => restoreRevision(rev.id)}
-                        className="px-2.5 py-1 bg-brand-600/20 hover:bg-brand-600/40 text-brand-400 rounded text-xs font-semibold"
-                      >
-                        Restore
-                      </button>
-                    </div>
+                    <button
+                      type="button"
+                      onClick={() => restoreRevision(rev.id)}
+                      className="px-3 py-1.5 rounded-lg bg-primary-container text-on-primary-container font-label-sm text-label-sm font-semibold hover:bg-primary shadow-xs"
+                    >
+                      Restore
+                    </button>
                   </div>
-                ))
-              )}
-            </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       )}

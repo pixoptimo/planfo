@@ -13,6 +13,7 @@ export interface GitPublisherOptions {
   cname?: string;
   push?: boolean;
   commitMessage?: string;
+  target?: string;
 }
 
 export class GitPublisher implements Publisher {
@@ -21,11 +22,12 @@ export class GitPublisher implements Publisher {
 
   constructor(options: GitPublisherOptions = {}) {
     this.options = {
-      branch: options.branch || 'gh-pages',
+      branch: options.branch || 'main',
       repo: options.repo || '',
       cname: options.cname || '',
       push: options.push ?? false,
-      commitMessage: options.commitMessage
+      commitMessage: options.commitMessage,
+      target: options.target || (options.branch === 'gh-pages' ? 'github-pages' : 'static-site')
     };
   }
 
@@ -73,8 +75,8 @@ export class GitPublisher implements Publisher {
         });
 
         // Set local committer identity if not set globally
-        await this.runGit(['config', 'user.name', 'Aero CMS Publisher'], targetDir).catch(() => {});
-        await this.runGit(['config', 'user.email', 'publisher@aero-cms.local'], targetDir).catch(() => {});
+        await this.runGit(['config', 'user.name', 'Planfo Publisher'], targetDir).catch(() => {});
+        await this.runGit(['config', 'user.email', 'publisher@planfo.local'], targetDir).catch(() => {});
       }
 
       // If remote repository is configured, configure remote
@@ -120,13 +122,19 @@ export class GitPublisher implements Publisher {
     // 4. Record deployment manifest
     const manifest = {
       publishedAt: new Date().toISOString(),
-      target: 'github-pages',
+      target: this.options.target || (branch === 'gh-pages' ? 'github-pages' : 'static-site'),
       branch,
       cname: this.options.cname || null,
       commitSha: commitSha || null
     };
 
     try {
+      await fs.writeFile(
+        path.join(targetDir, '.planfo-publish-manifest.json'),
+        JSON.stringify(manifest, null, 2),
+        'utf-8'
+      );
+      // Backward-compatible alias
       await fs.writeFile(
         path.join(targetDir, '.aero-publish-manifest.json'),
         JSON.stringify(manifest, null, 2),

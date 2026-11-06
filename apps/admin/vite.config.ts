@@ -4,18 +4,26 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 function getTargetCmsUrl(): string {
-  try {
-    const portsFile = path.resolve(__dirname, '../../.active-ports.json');
-    if (fs.existsSync(portsFile)) {
-      const data = JSON.parse(fs.readFileSync(portsFile, 'utf8'));
-      if (data.cmsUrl) {
-        return data.cmsUrl;
+  const candidateFiles = [
+    process.env.PLANFO_PROJECT_DIR ? path.resolve(process.env.PLANFO_PROJECT_DIR, '.active-ports.json') : null,
+    path.resolve(__dirname, '../../.active-ports.json'),
+    path.resolve(process.cwd(), '../../.active-ports.json'),
+    path.resolve(process.cwd(), '.active-ports.json')
+  ].filter(Boolean) as string[];
+
+  for (const portsFile of candidateFiles) {
+    try {
+      if (fs.existsSync(portsFile)) {
+        const data = JSON.parse(fs.readFileSync(portsFile, 'utf8'));
+        if (data.cmsUrl) {
+          return data.cmsUrl;
+        }
+        if (data.cmsPort) {
+          return `http://localhost:${data.cmsPort}`;
+        }
       }
-      if (data.cmsPort) {
-        return `http://localhost:${data.cmsPort}`;
-      }
-    }
-  } catch {}
+    } catch {}
+  }
 
   const envPort = process.env.CMS_PORT || '4000';
   const envHost = process.env.CMS_HOST || 'localhost';
@@ -36,6 +44,15 @@ export default defineConfig({
       '/media': {
         target: getTargetCmsUrl(),
         changeOrigin: true
+      },
+      '/demos': {
+        target: getTargetCmsUrl(),
+        changeOrigin: true
+      },
+      '/admin/demos': {
+        target: getTargetCmsUrl(),
+        changeOrigin: true,
+        rewrite: (p) => p.replace(/^\/admin\/demos/, '/demos')
       }
     }
   }

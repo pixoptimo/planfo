@@ -85,7 +85,7 @@ export async function seedDemoData(): Promise<void> {
           {
             id: 'b2',
             type: 'paragraph',
-            text: 'Aero CMS eliminates database overhead, vulnerability surfaces, and complex infrastructure. All content is stored as clean JSON files on disk and compiled into pure static HTML/CSS.'
+            text: 'Planfo CMS eliminates database overhead, vulnerability surfaces, and complex infrastructure. All content is stored as clean JSON files on disk and compiled into pure static HTML/CSS.'
           },
           {
             id: 'b3',
@@ -97,14 +97,16 @@ export async function seedDemoData(): Promise<void> {
         ]
       },
       featuredImage: '',
+      noIndex: false,
       seo: {
-        title: 'Home - Aero Static CMS',
+        title: 'Home - Planfo Static CMS',
         description: 'Modern, high-performance static website powered by a file-based CMS.',
         canonical: 'http://localhost:3000/',
-        ogTitle: 'Aero Static CMS',
+        ogTitle: 'Planfo Static CMS',
         ogDescription: 'Manage content effortlessly on the filesystem.',
         ogImage: '',
-        robots: 'index,follow'
+        robots: 'index,follow',
+        noIndex: false
       },
       createdAt: now,
       updatedAt: now,
@@ -127,7 +129,7 @@ export async function seedDemoData(): Promise<void> {
           {
             id: 'ab_2',
             type: 'paragraph',
-            text: 'We believe that static websites offer unbeatable speed, security, and hosting cost benefits. Aero CMS bridges the gap between structured content management and purely static site generation.'
+            text: 'We believe that static websites offer unbeatable speed, security, and hosting cost benefits. Planfo CMS bridges the gap between structured content management and purely static site generation.'
           },
           {
             id: 'ab_3',
@@ -143,14 +145,16 @@ export async function seedDemoData(): Promise<void> {
         ]
       },
       featuredImage: '',
+      noIndex: false,
       seo: {
-        title: 'About Us - Aero Static CMS',
-        description: 'Learn about the philosophy and engineering behind Aero Static CMS.',
+        title: 'About Us - Planfo Static CMS',
+        description: 'Learn about the philosophy and engineering behind Planfo Static CMS.',
         canonical: 'http://localhost:3000/about-us',
         ogTitle: 'About Us',
-        ogDescription: 'Philosophy and engineering behind Aero Static CMS.',
+        ogDescription: 'Philosophy and engineering behind Planfo Static CMS.',
         ogImage: '',
-        robots: 'index,follow'
+        robots: 'index,follow',
+        noIndex: false
       },
       createdAt: now,
       updatedAt: now,
@@ -186,14 +190,16 @@ export async function seedDemoData(): Promise<void> {
         ]
       },
       featuredImage: '',
+      noIndex: false,
       seo: {
-        title: 'Contact - Aero Static CMS',
+        title: 'Contact - Planfo Static CMS',
         description: 'Get in touch with our team.',
         canonical: 'http://localhost:3000/contact',
         ogTitle: 'Contact',
         ogDescription: 'Get in touch with our team.',
         ogImage: '',
-        robots: 'index,follow'
+        robots: 'index,follow',
+        noIndex: false
       },
       createdAt: now,
       updatedAt: now,
@@ -245,7 +251,7 @@ export async function seedDemoData(): Promise<void> {
         ]
       },
       featuredImage: '',
-      author: 'Aero Team',
+      author: 'Planfo Team',
       category: 'technology',
       tags: ['static-site', 'typescript', 'architecture', 'performance'],
       status: 'published',
@@ -257,7 +263,8 @@ export async function seedDemoData(): Promise<void> {
         ogTitle: 'Why Static CMS Architecture is Superior for 2026',
         ogDescription: 'Explore why file-based static publishing outperforms traditional CMS.',
         ogImage: '',
-        robots: 'index,follow'
+        robots: 'index,follow',
+        noIndex: false
       },
       createdAt: now,
       updatedAt: now,
@@ -283,6 +290,7 @@ export async function seedDemoData(): Promise<void> {
           }
         ]
       },
+      featuredImage: '',
       author: 'Security Engineer',
       category: 'technology',
       tags: ['nodejs', 'security', 'filesystem'],
@@ -295,7 +303,8 @@ export async function seedDemoData(): Promise<void> {
         ogTitle: 'Building Resilience with Atomic File Operations',
         ogDescription: 'How temporary files and atomic renames protect data.',
         ogImage: '',
-        robots: 'index,follow'
+        robots: 'index,follow',
+        noIndex: false
       },
       createdAt: now,
       updatedAt: now,
@@ -356,7 +365,8 @@ export async function seedDemoData(): Promise<void> {
         ogTitle: 'Ultra-Fast Developer Keyboard',
         ogDescription: 'Custom mechanical keyboard tuned for ergonomics.',
         ogImage: '',
-        robots: 'index,follow'
+        robots: 'index,follow',
+        noIndex: false
       },
       createdAt: now,
       updatedAt: now,
@@ -364,8 +374,8 @@ export async function seedDemoData(): Promise<void> {
     },
     {
       id: 'prod_2',
-      name: 'Aero CMS Limited Edition Hoodie',
-      slug: 'aero-cms-limited-edition-hoodie',
+      name: 'Planfo CMS Limited Edition Hoodie',
+      slug: 'planfo-cms-limited-edition-hoodie',
       sku: 'HOODIE-CMS-01',
       price: 59.0,
       currency: 'USD',
@@ -392,13 +402,14 @@ export async function seedDemoData(): Promise<void> {
       featured: false,
       template: 'default',
       seo: {
-        title: 'Aero CMS Limited Edition Hoodie',
+        title: 'Planfo CMS Limited Edition Hoodie',
         description: 'Heavyweight organic cotton hoodie.',
-        canonical: 'http://localhost:3000/products/aero-cms-limited-edition-hoodie',
-        ogTitle: 'Aero CMS Limited Edition Hoodie',
+        canonical: 'http://localhost:3000/products/planfo-cms-limited-edition-hoodie',
+        ogTitle: 'Planfo CMS Limited Edition Hoodie',
         ogDescription: 'Heavyweight organic cotton hoodie.',
         ogImage: '',
-        robots: 'index,follow'
+        robots: 'index,follow',
+        noIndex: false
       },
       createdAt: now,
       updatedAt: now,

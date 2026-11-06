@@ -112,6 +112,12 @@ export class BlueprintStore {
       try {
         const oldPath = safeResolvePath(dir, `${oldSlug}.json`);
         await deleteFileSafe(oldPath);
+
+        const oldContentDir = path.join(config.CONTENT_PATH, oldSlug);
+        const newContentDir = path.join(config.CONTENT_PATH, blueprint.slug);
+        if (existsSync(oldContentDir) && !existsSync(newContentDir)) {
+          await fs.rename(oldContentDir, newContentDir);
+        }
       } catch {
         //
       }
@@ -212,7 +218,12 @@ export class BlueprintEntryStore {
     const dir = this.getEntriesDir(blueprintSlug);
     await ensureDir(dir);
 
-    if (oldSlug && oldSlug !== entry.slug) {
+    const safeEntry = {
+      ...entry,
+      blueprintId: entry.blueprintId || blueprintSlug
+    };
+
+    if (oldSlug && oldSlug !== safeEntry.slug) {
       try {
         const oldPath = this.getFilePath(blueprintSlug, oldSlug);
         await deleteFileSafe(oldPath);
@@ -221,8 +232,8 @@ export class BlueprintEntryStore {
       }
     }
 
-    const filePath = this.getFilePath(blueprintSlug, entry.slug);
-    await writeJsonAtomic(filePath, entry, BlueprintEntrySchema);
+    const filePath = this.getFilePath(blueprintSlug, safeEntry.slug);
+    await writeJsonAtomic(filePath, safeEntry, BlueprintEntrySchema);
   }
 
   static async delete(blueprintSlug: string, entrySlug: string): Promise<boolean> {

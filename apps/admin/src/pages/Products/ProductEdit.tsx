@@ -21,6 +21,7 @@ import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { StatusBadge } from '../../components/UI/StatusBadge.js';
 import { CategorySelector } from '../../components/Taxonomy/CategorySelector.js';
+import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 
 export const ProductEdit: React.FC = () => {
@@ -28,6 +29,7 @@ export const ProductEdit: React.FC = () => {
   const isNew = !slug || slug === 'new';
   const navigate = useNavigate();
   const { can } = useAuth();
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(!isNew);
 
   const [product, setProduct] = useState<Partial<Product>>({
     name: '',
@@ -50,7 +52,8 @@ export const ProductEdit: React.FC = () => {
       ogTitle: '',
       ogDescription: '',
       ogImage: '',
-      robots: 'index,follow'
+      robots: 'index,follow',
+      noIndex: false
     }
   });
 
@@ -238,7 +241,7 @@ export const ProductEdit: React.FC = () => {
               className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>Publish Product</span>
+              <span>{product.status === 'published' ? 'Update Product' : 'Publish Product'}</span>
             </button>
           )}
         </div>
@@ -268,10 +271,56 @@ export const ProductEdit: React.FC = () => {
               type="text"
               required
               value={product.name || ''}
-              onChange={(e) => setProduct({ ...product, name: e.target.value })}
+              onChange={(e) => {
+                const newName = e.target.value;
+                setProduct((prev) => {
+                  const next = { ...prev, name: newName };
+                  if (!slugManuallyEdited || !prev.slug) {
+                    next.slug = slugify(newName);
+                  }
+                  return next;
+                });
+              }}
               placeholder="e.g. Wireless Noise-Cancelling Headphones"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-base font-semibold text-white focus:outline-none focus:border-brand-500"
             />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                URL Slug
+              </label>
+              {product.name && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const auto = slugify(product.name || '');
+                    setProduct((prev) => ({ ...prev, slug: auto }));
+                    setSlugManuallyEdited(false);
+                  }}
+                  className="text-[11px] text-brand-400 hover:text-brand-300 font-medium transition"
+                >
+                  Regenerate from Name
+                </button>
+              )}
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-mono text-slate-500 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800">
+                /products/
+              </span>
+              <input
+                type="text"
+                value={product.slug || ''}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSlugManuallyEdited(val.trim().length > 0);
+                  setProduct((prev) => ({ ...prev, slug: val }));
+                }}
+                placeholder="auto-generated-from-name"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
+              />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

@@ -12,4 +12,4 @@ export * from './revision.js';
 export * from './backup.js';
 export * from './theme.js';
 export * from './blueprint.js';
-
+export * from './trash.js';

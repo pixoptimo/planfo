@@ -7,7 +7,8 @@ export const SEOSchema = z.object({
   ogTitle: z.string().default(''),
   ogDescription: z.string().default(''),
   ogImage: z.string().default(''),
-  robots: z.string().default('index,follow')
+  robots: z.string().default('index,follow'),
+  noIndex: z.boolean().optional()
 });
 
 export type SEO = z.infer<typeof SEOSchema>;

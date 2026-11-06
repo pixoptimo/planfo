@@ -1,6 +1,6 @@
 import path from 'node:path';
 import fs from 'node:fs/promises';
-import { readJson, writeJsonAtomic, deleteFileSafe, safeResolvePath, sanitizeFilename } from '@cms/utils';
+import { readJson, writeJsonAtomic, deleteFileSafe, safeResolvePath, sanitizeFilename, pathExists } from '@cms/utils';
 import { MediaManifestSchema, MediaItemSchema, type MediaItem, type MediaManifest } from '@cms/schemas';
 import { config } from '../config/env.js';
 import { optimizeImage } from './imageOptimizer.js';
@@ -27,12 +27,12 @@ export class MediaStore {
 
   static async getById(id: string): Promise<MediaItem | null> {
     const items = await this.getAll();
-    return items.find((i) => i.id === id) || null;
+    return items.find((i) => i.id === id || i.filename === id) || null;
   }
 
   static async saveItem(item: MediaItem): Promise<void> {
     const manifest = await this.getManifest();
-    const index = manifest.items.findIndex((i) => i.id === item.id);
+    const index = manifest.items.findIndex((i) => i.id === item.id || i.filename === item.filename);
 
     if (index >= 0) {
       manifest.items[index] = item;
@@ -43,21 +43,45 @@ export class MediaStore {
     await writeJsonAtomic(this.getManifestPath(), manifest, MediaManifestSchema);
   }
 
-  static async deleteItem(id: string): Promise<boolean> {
+  static async deleteItem(id: string, deletePhysicalFile = true): Promise<boolean> {
     const manifest = await this.getManifest();
-    const item = manifest.items.find((i) => i.id === id);
+    const item = manifest.items.find((i) => i.id === id || i.filename === id);
 
-    if (!item) return false;
-
-    // Remove file
-    try {
-      const filePath = safeResolvePath(config.MEDIA_PATH, item.filename);
-      await deleteFileSafe(filePath);
-    } catch {
-      // Ignore if file missing
+    if (!item) {
+      // Check if unmanifested physical file exists on disk
+      try {
+        const filePath = safeResolvePath(config.MEDIA_PATH, id);
+        if (await pathExists(filePath)) {
+          if (deletePhysicalFile) {
+            await deleteFileSafe(filePath);
+            const generatedFile = path.join(config.OUTPUT_PATH, 'media', id);
+            await deleteFileSafe(generatedFile);
+          }
+          return true;
+        }
+      } catch {}
+      return false;
     }
 
-    manifest.items = manifest.items.filter((i) => i.id !== id);
+    if (deletePhysicalFile) {
+      // Remove file from media storage
+      try {
+        const filePath = safeResolvePath(config.MEDIA_PATH, item.filename);
+        await deleteFileSafe(filePath);
+      } catch {
+        // Ignore if file missing
+      }
+
+      // Remove file from generated output directory
+      try {
+        const generatedFile = path.join(config.OUTPUT_PATH, 'media', item.filename);
+        await deleteFileSafe(generatedFile);
+      } catch {
+        // Ignore if file missing
+      }
+    }
+
+    manifest.items = manifest.items.filter((i) => i.id !== item.id && i.filename !== item.filename);
     await writeJsonAtomic(this.getManifestPath(), manifest, MediaManifestSchema);
     return true;
   }

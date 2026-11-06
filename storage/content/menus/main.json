@@ -2,63 +2,17 @@
   "id": "menu_main",
   "name": "Main Navigation",
   "slug": "main",
+  "location": "header",
+  "locations": ["header", "footer"],
   "items": [
     {
-      "id": "m_home",
-      "label": "Home",
+      "id": "m_catalog",
+      "label": "Explore Catalog",
       "url": "/",
       "target": "_self",
-      "children": []
-    },
-    {
-      "id": "m_about",
-      "label": "About",
-      "url": "/about-us",
-      "target": "_self",
-      "children": []
-    },
-    {
-      "id": "m_blog",
-      "label": "Blog",
-      "url": "/blog",
-      "target": "_self",
-      "children": []
-    },
-    {
-      "id": "m_contact",
-      "label": "Contact",
-      "url": "/contact",
-      "target": "_self",
-      "children": []
-    },
-    {
-      "id": "item_1789494917310_n9lg",
-      "label": "Features",
-      "url": "/features",
-      "target": "_self",
-      "children": []
-    },
-    {
-      "id": "item_1789495453887_49gd",
-      "label": "testing",
-      "url": "/testing",
-      "target": "_self",
-      "children": []
-    },
-    {
-      "id": "item_1789826673314_fzbs",
-      "label": "farm",
-      "url": "/farm",
-      "target": "_self",
-      "children": []
-    },
-    {
-      "id": "item_1789826674252_9duq",
-      "label": "Products",
-      "url": "/products",
-      "target": "_self",
+      "noLink": false,
       "children": []
     }
   ],
-  "updatedAt": "2026-09-25T10:43:48.405Z"
+  "updatedAt": "2026-10-14T20:58:00.000Z"
 }

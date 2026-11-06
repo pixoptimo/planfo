@@ -60,13 +60,14 @@
   "seo": {
     "title": "Ultra-Fast Developer Keyboard | Hardware Store",
     "description": "Custom mechanical keyboard tuned for ergonomics.",
-    "canonical": "http://localhost:4000/products/ultra-fast-developer-keyboard",
+    "canonical": "http://localhost:3000/products/ultra-fast-developer-keyboard",
     "ogTitle": "Ultra-Fast Developer Keyboard",
     "ogDescription": "Custom mechanical keyboard tuned for ergonomics.",
     "ogImage": "",
-    "robots": "index,follow"
+    "robots": "index,follow",
+    "noIndex": false
   },
-  "createdAt": "2026-09-15T17:41:29.424Z",
-  "updatedAt": "2026-09-15T17:41:29.424Z",
-  "publishedAt": "2026-09-15T17:41:29.424Z"
+  "createdAt": "2026-10-14T08:12:06.354Z",
+  "updatedAt": "2026-10-14T08:12:06.354Z",
+  "publishedAt": "2026-10-14T08:12:06.354Z"
 }

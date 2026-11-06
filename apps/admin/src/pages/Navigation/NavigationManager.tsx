@@ -1,15 +1,127 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, ArrowUp, ArrowDown, Save, Menu as MenuIcon, CornerDownRight, CheckCircle2, AlertCircle } from 'lucide-react';
-import type { Menu, MenuItem } from '@cms/schemas';
+import {
+  Plus,
+  Trash2,
+  ArrowUp,
+  ArrowDown,
+  Save,
+  Menu as MenuIcon,
+  CornerDownRight,
+  CheckCircle2,
+  AlertCircle,
+  Link as LinkIcon,
+  Layers,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  X,
+  Compass,
+  Tag,
+  BookOpen,
+  Package,
+  Search,
+  GripVertical,
+  Settings,
+  Check
+} from 'lucide-react';
+import type { Menu, MenuItem, Page, Post } from '@cms/schemas';
 import { api } from '../../api/client.js';
 
+interface CategoryItem {
+  id: string;
+  name: string;
+  slug: string;
+}
+
+interface BlueprintMeta {
+  id: string;
+  name: string;
+  slug: string;
+  icon?: string;
+  entryCount?: number;
+}
+
+interface BlueprintEntryItem {
+  id: string;
+  title: string;
+  slug: string;
+  status?: string;
+}
+
 export const NavigationManager: React.FC = () => {
+  const [activeTab, setActiveTab] = useState<'edit' | 'locations'>('edit');
+
+  const [menus, setMenus] = useState<Menu[]>([]);
+  const [selectedSlug, setSelectedSlug] = useState<string>('main');
   const [menu, setMenu] = useState<Menu>({
     id: 'menu_main',
     name: 'Main Navigation',
     slug: 'main',
+    location: 'header',
+    locations: ['header', 'footer'],
     items: [],
     updatedAt: new Date().toISOString()
+  });
+
+  // Source Data
+  const [pages, setPages] = useState<Page[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [blueprints, setBlueprints] = useState<BlueprintMeta[]>([]);
+  const [blueprintEntriesMap, setBlueprintEntriesMap] = useState<Record<string, BlueprintEntryItem[]>>({});
+  const [activeBlueprintSlug, setActiveBlueprintSlug] = useState<string>('templates');
+
+  // Selection states
+  const [selectedPageIds, setSelectedPageIds] = useState<string[]>([]);
+  const [selectedPostIds, setSelectedPostIds] = useState<string[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>([]);
+  const [selectedBlueprintEntryIds, setSelectedBlueprintEntryIds] = useState<string[]>([]);
+
+  // Search filters
+  const [pageSearch, setPageSearch] = useState('');
+  const [postSearch, setPostSearch] = useState('');
+  const [categorySearch, setCategorySearch] = useState('');
+  const [blueprintSearch, setBlueprintSearch] = useState('');
+
+  // Accordion Open/Closed States (All items are accordions)
+  const [accordionsOpen, setAccordionsOpen] = useState<{
+    pages: boolean;
+    posts: boolean;
+    categories: boolean;
+    blueprints: boolean;
+    custom: boolean;
+  }>({
+    pages: true,
+    posts: false,
+    categories: false,
+    blueprints: false,
+    custom: false
+  });
+
+  const toggleAccordion = (key: keyof typeof accordionsOpen) => {
+    setAccordionsOpen((prev) => ({ ...prev, [key]: !prev[key] }));
+  };
+
+  // Expanded menu item cards in structure tree
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
+
+  // Custom Link Form State
+  const [customLinkLabel, setCustomLinkLabel] = useState('');
+  const [customLinkUrl, setCustomLinkUrl] = useState('/');
+  const [customLinkNoLink, setCustomLinkNoLink] = useState(false);
+
+  // New Menu Modal State
+  const [isCreatingMenu, setIsCreatingMenu] = useState(false);
+  const [newMenuName, setNewMenuName] = useState('');
+  const [newMenuLocations, setNewMenuLocations] = useState<string[]>([]);
+
+  // Manage Locations state
+  const [locationAssignments, setLocationAssignments] = useState<{
+    header: string;
+    footer: string;
+  }>({
+    header: 'main',
+    footer: 'main'
   });
 
   const [loading, setLoading] = useState(true);
@@ -18,17 +130,142 @@ export const NavigationManager: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    loadMenu();
+    loadAllData();
   }, []);
 
-  const loadMenu = async () => {
+  const loadAllData = async () => {
     try {
-      const data = await api.get<Menu>('/api/menus/main');
-      setMenu(data);
-    } catch {
-      //
+      setLoading(true);
+      const [menusData, pagesData, postsData, categoriesData, blueprintsData] = await Promise.all([
+        api.get<Menu[]>('/api/menus'),
+        api.get<Page[]>('/api/pages').catch(() => [] as Page[]),
+        api.get<any>('/api/posts').then((res) => (Array.isArray(res) ? res : res?.posts || [])).catch(() => [] as Post[]),
+        api.get<any>('/api/categories').then((res) => (Array.isArray(res) ? res : res?.categories || [])).catch(() => [] as CategoryItem[]),
+        api.get<any[]>('/api/blueprints').catch(() => [] as BlueprintMeta[])
+      ]);
+
+      setMenus(menusData);
+      setPages(pagesData.filter((p) => p.status === 'published' || p.status === 'draft'));
+      setPosts(postsData);
+      setCategories(categoriesData);
+
+      // Filter custom blueprints (exclude built-in pages & posts which have their own accordions)
+      const customBps = (blueprintsData || []).filter(
+        (b) => b.slug !== 'pages' && b.slug !== 'posts'
+      );
+      setBlueprints(customBps);
+
+      // Fetch entries for custom blueprints
+      const bpMap: Record<string, BlueprintEntryItem[]> = {};
+      await Promise.all(
+        customBps.map(async (bp) => {
+          try {
+            const res = await api.get<{ blueprint: any; entries: any[] }>(`/api/blueprints/${bp.slug}/entries`);
+            bpMap[bp.slug] = (res.entries || []).map((e: any) => ({
+              id: e.id || e.slug,
+              title: e.title || e.name || 'Untitled',
+              slug: e.slug,
+              status: e.status
+            }));
+          } catch {
+            bpMap[bp.slug] = [];
+          }
+        })
+      );
+      setBlueprintEntriesMap(bpMap);
+
+      if (customBps.length > 0) {
+        setActiveBlueprintSlug(customBps[0].slug);
+      }
+
+      // Active menu
+      const active = menusData.find((m) => m.slug === selectedSlug) || menusData[0];
+      if (active) {
+        setSelectedSlug(active.slug);
+        setMenu(active);
+      }
+
+      // Location assignments
+      const headerMenu = menusData.find((m) => m.locations?.includes('header') || m.location === 'header');
+      const footerMenu = menusData.find((m) => m.locations?.includes('footer') || m.location === 'footer');
+      setLocationAssignments({
+        header: headerMenu ? headerMenu.slug : 'main',
+        footer: footerMenu ? footerMenu.slug : 'main'
+      });
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to load navigation data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSelectMenu = (slug: string) => {
+    setSelectedSlug(slug);
+    const target = menus.find((m) => m.slug === slug);
+    if (target) {
+      setMenu(target);
+      setError(null);
+      setSuccess(null);
+    }
+  };
+
+  const handleCreateMenu = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newMenuName.trim()) return;
+
+    try {
+      setSaving(true);
+      setError(null);
+      const created = await api.post<Menu>('/api/menus', {
+        name: newMenuName.trim(),
+        locations: newMenuLocations,
+        location: newMenuLocations[0] || '',
+        items: []
+      });
+
+      const updatedList = await api.get<Menu[]>('/api/menus');
+      setMenus(updatedList);
+      setSelectedSlug(created.slug);
+      setMenu(created);
+      setIsCreatingMenu(false);
+      setNewMenuName('');
+      setNewMenuLocations([]);
+      setSuccess(`Menu "${created.name}" created! Add items from the left.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to create menu');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteMenu = async () => {
+    if (menu.slug === 'main') {
+      alert('The Main Navigation menu cannot be deleted.');
+      return;
+    }
+    if (!confirm(`Delete the menu "${menu.name}"?`)) return;
+
+    try {
+      setSaving(true);
+      setError(null);
+      await api.delete(`/api/menus/${menu.slug}`);
+      const updatedList = await api.get<Menu[]>('/api/menus');
+      setMenus(updatedList);
+      const fallback = updatedList[0] || {
+        id: 'menu_main',
+        name: 'Main Navigation',
+        slug: 'main',
+        locations: ['header', 'footer'],
+        items: [],
+        updatedAt: new Date().toISOString()
+      };
+      setSelectedSlug(fallback.slug);
+      setMenu(fallback);
+      setSuccess(`Menu "${menu.name}" deleted.`);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to delete menu');
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -38,17 +275,152 @@ export const NavigationManager: React.FC = () => {
     setSuccess(null);
 
     try {
-      const updated = await api.put<Menu>('/api/menus/main', {
+      const updated = await api.put<Menu>(`/api/menus/${menu.slug}`, {
         name: menu.name,
+        locations: menu.locations || [],
+        location: menu.locations?.[0] || '',
         items: menu.items
       });
       setMenu(updated);
-      setSuccess('Navigation menu saved successfully!');
+
+      const updatedList = await api.get<Menu[]>('/api/menus');
+      setMenus(updatedList);
+      setSuccess(`Menu "${updated.name}" saved! Site updated.`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save navigation menu');
+      setError(err instanceof Error ? err.message : 'Failed to save menu');
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleSaveLocations = async () => {
+    try {
+      setSaving(true);
+      setError(null);
+      setSuccess(null);
+
+      for (const m of menus) {
+        const nextLocs: string[] = [];
+        if (locationAssignments.header === m.slug) nextLocs.push('header');
+        if (locationAssignments.footer === m.slug) nextLocs.push('footer');
+
+        await api.put(`/api/menus/${m.slug}`, {
+          name: m.name,
+          locations: nextLocs,
+          location: nextLocs[0] || '',
+          items: m.items
+        });
+      }
+
+      const refreshed = await api.get<Menu[]>('/api/menus');
+      setMenus(refreshed);
+      const active = refreshed.find((m) => m.slug === selectedSlug) || refreshed[0];
+      if (active) setMenu(active);
+
+      setSuccess('Theme display locations updated!');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to save menu locations');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // Add Pages
+  const handleAddPagesToMenu = () => {
+    if (selectedPageIds.length === 0) return;
+    const selected = pages.filter((p) => selectedPageIds.includes(p.id));
+
+    const newItems: MenuItem[] = selected.map((page) => ({
+      id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      label: page.title,
+      url: page.slug === 'home' ? '/' : `/${page.slug}`,
+      target: '_self',
+      noLink: false,
+      children: []
+    }));
+
+    setMenu({ ...menu, items: [...menu.items, ...newItems] });
+    setSelectedPageIds([]);
+    setSuccess(`Added ${newItems.length} page(s).`);
+  };
+
+  // Add Posts
+  const handleAddPostsToMenu = () => {
+    if (selectedPostIds.length === 0) return;
+    const selected = posts.filter((p) => selectedPostIds.includes(p.id));
+
+    const newItems: MenuItem[] = selected.map((post) => ({
+      id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      label: post.title,
+      url: `/blog/${post.slug}`,
+      target: '_self',
+      noLink: false,
+      children: []
+    }));
+
+    setMenu({ ...menu, items: [...menu.items, ...newItems] });
+    setSelectedPostIds([]);
+    setSuccess(`Added ${newItems.length} post(s).`);
+  };
+
+  // Add Categories
+  const handleAddCategoriesToMenu = () => {
+    if (selectedCategoryIds.length === 0) return;
+    const selected = categories.filter((c) => selectedCategoryIds.includes(c.id));
+
+    const newItems: MenuItem[] = selected.map((cat) => ({
+      id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      label: cat.name,
+      url: `/category/${cat.slug}`,
+      target: '_self',
+      noLink: false,
+      children: []
+    }));
+
+    setMenu({ ...menu, items: [...menu.items, ...newItems] });
+    setSelectedCategoryIds([]);
+    setSuccess(`Added ${newItems.length} category item(s).`);
+  };
+
+  // Add Blueprint Entries
+  const handleAddBlueprintEntriesToMenu = () => {
+    if (selectedBlueprintEntryIds.length === 0) return;
+    const entries = blueprintEntriesMap[activeBlueprintSlug] || [];
+    const selected = entries.filter((e) => selectedBlueprintEntryIds.includes(e.id || e.slug));
+
+    const newItems: MenuItem[] = selected.map((entry) => ({
+      id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      label: entry.title,
+      url: `/${activeBlueprintSlug}/${entry.slug}`,
+      target: '_self',
+      noLink: false,
+      children: []
+    }));
+
+    setMenu({ ...menu, items: [...menu.items, ...newItems] });
+    setSelectedBlueprintEntryIds([]);
+    setSuccess(`Added ${newItems.length} item(s) from ${activeBlueprintSlug}.`);
+  };
+
+  // Add Custom Link
+  const handleAddCustomLink = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!customLinkLabel.trim()) return;
+
+    const newItem: MenuItem = {
+      id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      label: customLinkLabel.trim(),
+      url: customLinkNoLink ? '#' : (customLinkUrl.trim() || '/'),
+      target: '_self',
+      noLink: customLinkNoLink,
+      children: []
+    };
+
+    setMenu({ ...menu, items: [...menu.items, newItem] });
+    setCustomLinkLabel('');
+    setCustomLinkUrl('/');
+    setCustomLinkNoLink(false);
+    setSuccess(`Added "${newItem.label}".`);
   };
 
   const addItem = () => {
@@ -57,9 +429,15 @@ export const NavigationManager: React.FC = () => {
       label: 'New Link',
       url: '/',
       target: '_self',
+      noLink: false,
       children: []
     };
     setMenu({ ...menu, items: [...menu.items, newItem] });
+    setExpandedItems((prev) => ({ ...prev, [newItem.id]: true }));
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedItems((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
   const updateItem = (index: number, partial: Partial<MenuItem>) => {
@@ -84,17 +462,45 @@ export const NavigationManager: React.FC = () => {
     setMenu({ ...menu, items: newItems });
   };
 
+  const indentItem = (index: number) => {
+    if (index === 0) return;
+    const newItems = [...menu.items];
+    const itemToIndent = newItems[index];
+    const prevItem = newItems[index - 1];
+
+    const updatedChildren = [...(prevItem.children || []), itemToIndent];
+    newItems[index - 1] = { ...prevItem, children: updatedChildren };
+    newItems.splice(index, 1);
+
+    setMenu({ ...menu, items: newItems });
+    setExpandedItems((prev) => ({ ...prev, [prevItem.id]: true }));
+  };
+
+  const outdentChildItem = (parentIndex: number, childIndex: number) => {
+    const parent = menu.items[parentIndex];
+    const childToOutdent = parent.children![childIndex];
+
+    const updatedChildren = parent.children!.filter((_, idx) => idx !== childIndex);
+    const newItems = [...menu.items];
+    newItems[parentIndex] = { ...parent, children: updatedChildren };
+    newItems.splice(parentIndex + 1, 0, childToOutdent);
+
+    setMenu({ ...menu, items: newItems });
+  };
+
   const addChildItem = (parentIndex: number) => {
     const parent = menu.items[parentIndex];
     const newChild: MenuItem = {
       id: `child_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-      label: 'Dropdown Item',
+      label: 'Dropdown Link',
       url: '/',
-      target: '_self'
+      target: '_self',
+      noLink: false
     };
 
     const newChildren = [...(parent.children || []), newChild];
     updateItem(parentIndex, { children: newChildren });
+    setExpandedItems((prev) => ({ ...prev, [parent.id]: true }));
   };
 
   const updateChildItem = (parentIndex: number, childIndex: number, partial: Partial<MenuItem>) => {
@@ -110,162 +516,1214 @@ export const NavigationManager: React.FC = () => {
     updateItem(parentIndex, { children: newChildren });
   };
 
+  const toggleLocation = (loc: string) => {
+    const currentLocs = menu.locations || [];
+    const nextLocs = currentLocs.includes(loc)
+      ? currentLocs.filter((l) => l !== loc)
+      : [...currentLocs, loc];
+    setMenu({ ...menu, locations: nextLocs, location: nextLocs[0] || '' });
+  };
+
   if (loading) {
-    return <div className="text-center py-20 text-slate-500">Loading navigation structure...</div>;
+    return (
+      <div className="flex flex-col items-center justify-center py-24 text-slate-400 space-y-3">
+        <Compass className="w-8 h-8 animate-spin text-brand-400" />
+        <p className="text-sm font-medium">Loading navigation menus...</p>
+      </div>
+    );
   }
 
+  // Filtered lists
+  const filteredPages = pages.filter((p) =>
+    p.title.toLowerCase().includes(pageSearch.toLowerCase()) || p.slug.toLowerCase().includes(pageSearch.toLowerCase())
+  );
+  const filteredPosts = posts.filter((p) =>
+    p.title.toLowerCase().includes(postSearch.toLowerCase()) || p.slug.toLowerCase().includes(postSearch.toLowerCase())
+  );
+  const filteredCategories = categories.filter((c) =>
+    c.name.toLowerCase().includes(categorySearch.toLowerCase()) || c.slug.toLowerCase().includes(categorySearch.toLowerCase())
+  );
+  const currentBlueprintEntries = (blueprintEntriesMap[activeBlueprintSlug] || []).filter((e) =>
+    e.title.toLowerCase().includes(blueprintSearch.toLowerCase()) || e.slug.toLowerCase().includes(blueprintSearch.toLowerCase())
+  );
+
   return (
-    <div className="space-y-6 w-full">
+    <div className="space-y-6 w-full max-w-7xl mx-auto pb-12">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-4">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">Navigation Manager</h1>
-          <p className="text-xs text-slate-400 mt-1">Configure main website navbar links, custom URLs, and multi-level dropdown menus</p>
+          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center space-x-2.5">
+            <Compass className="w-6 h-6 text-brand-400" />
+            <span>Navigation Menus</span>
+          </h1>
+          <p className="text-xs text-slate-400 mt-1">
+            Manage site menus, dropdown hierarchies, and theme display locations.
+          </p>
         </div>
 
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2.5">
           <button
             type="button"
-            onClick={addItem}
-            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition"
+            onClick={() => setIsCreatingMenu(true)}
+            className="px-3.5 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition border border-slate-700"
           >
             <Plus className="w-4 h-4 text-brand-400" />
-            <span>Add Menu Item</span>
+            <span>Create New Menu</span>
           </button>
 
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={saving}
-            className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
-          >
-            <Save className="w-4 h-4" />
-            <span>{saving ? 'Saving...' : 'Save Navigation'}</span>
-          </button>
+          {activeTab === 'edit' ? (
+            <button
+              type="button"
+              onClick={handleSave}
+              disabled={saving}
+              className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+            >
+              <Save className="w-4 h-4" />
+              <span>{saving ? 'Saving...' : 'Save Menu'}</span>
+            </button>
+          ) : (
+            <button
+              type="button"
+              onClick={handleSaveLocations}
+              disabled={saving}
+              className="px-4 py-2 bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+            >
+              <Save className="w-4 h-4" />
+              <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+            </button>
+          )}
         </div>
       </div>
 
+      {/* Tabs */}
+      <div className="flex items-center space-x-1 border-b border-slate-800">
+        <button
+          type="button"
+          onClick={() => setActiveTab('edit')}
+          className={`px-4 py-2.5 text-xs font-bold transition border-b-2 flex items-center space-x-2 ${
+            activeTab === 'edit'
+              ? 'border-brand-500 text-brand-400 bg-slate-900/40 rounded-t-lg'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <MenuIcon className="w-4 h-4" />
+          <span>Edit Menus</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab('locations')}
+          className={`px-4 py-2.5 text-xs font-bold transition border-b-2 flex items-center space-x-2 ${
+            activeTab === 'locations'
+              ? 'border-brand-500 text-brand-400 bg-slate-900/40 rounded-t-lg'
+              : 'border-transparent text-slate-400 hover:text-slate-200'
+          }`}
+        >
+          <Layers className="w-4 h-4" />
+          <span>Manage Locations</span>
+        </button>
+      </div>
+
+      {/* Feedback Messages */}
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+        <div className="p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
       {success && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
+        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           <span>{success}</span>
         </div>
       )}
 
-      {/* Menu items tree */}
-      <div className="space-y-4">
-        {menu.items.length === 0 ? (
-          <div className="bg-slate-900 border border-slate-800 rounded-xl p-12 text-center text-slate-500">
-            No navigation items. Click "Add Menu Item" above to add your first link.
+      {/* Create New Menu Dialog */}
+      {isCreatingMenu && (
+        <form
+          onSubmit={handleCreateMenu}
+          className="p-5 bg-slate-900 border border-brand-500/40 rounded-xl space-y-4 shadow-xl shadow-brand-500/10"
+        >
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+              <Plus className="w-4 h-4 text-brand-400" />
+              <span>Create New Navigation Menu</span>
+            </h3>
+            <button
+              type="button"
+              onClick={() => setIsCreatingMenu(false)}
+              className="text-slate-400 hover:text-white"
+            >
+              <X className="w-4 h-4" />
+            </button>
           </div>
-        ) : (
-          menu.items.map((item, idx) => (
-            <div key={item.id} className="bg-slate-900 border border-slate-800 rounded-xl p-4 space-y-3">
-              {/* Item row */}
-              <div className="flex flex-wrap sm:flex-nowrap items-center gap-3">
-                <div className="w-6 text-center text-xs font-mono text-slate-500 font-bold">
-                  {idx + 1}
-                </div>
 
-                <input
-                  type="text"
-                  value={item.label}
-                  onChange={(e) => updateItem(idx, { label: e.target.value })}
-                  placeholder="Link Text"
-                  className="w-full sm:w-48 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white font-semibold focus:outline-none focus:border-brand-500"
-                />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                Menu Name *
+              </label>
+              <input
+                type="text"
+                required
+                value={newMenuName}
+                onChange={(e) => setNewMenuName(e.target.value)}
+                placeholder="e.g. Header Nav, Footer Nav, Socials"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
+              />
+            </div>
 
-                <input
-                  type="text"
-                  value={item.url}
-                  onChange={(e) => updateItem(idx, { url: e.target.value })}
-                  placeholder="URL (e.g. /about-us or https://...)"
-                  className="w-full sm:flex-1 bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
-                />
-
-                <select
-                  value={item.target || '_self'}
-                  onChange={(e) => updateItem(idx, { target: e.target.value as any })}
-                  className="bg-slate-950 border border-slate-800 rounded-lg px-2 py-1.5 text-xs text-slate-300"
-                >
-                  <option value="_self">Same Window</option>
-                  <option value="_blank">New Tab (_blank)</option>
-                </select>
-
-                <div className="flex items-center space-x-1">
-                  <button
-                    type="button"
-                    onClick={() => moveItem(idx, 'up')}
-                    disabled={idx === 0}
-                    className="p-1.5 text-slate-400 hover:text-white disabled:opacity-25"
-                  >
-                    <ArrowUp className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => moveItem(idx, 'down')}
-                    disabled={idx === menu.items.length - 1}
-                    className="p-1.5 text-slate-400 hover:text-white disabled:opacity-25"
-                  >
-                    <ArrowDown className="w-3.5 h-3.5" />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => removeItem(idx)}
-                    className="p-1.5 text-slate-400 hover:text-red-400"
-                  >
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-              </div>
-
-              {/* Dropdown / Children sub-items */}
-              <div className="pl-9 space-y-2">
-                {(item.children || []).map((child, childIdx) => (
-                  <div key={child.id} className="flex items-center gap-2 bg-slate-950/70 p-2 rounded-lg border border-slate-800/80">
-                    <CornerDownRight className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-                    <input
-                      type="text"
-                      value={child.label}
-                      onChange={(e) => updateChildItem(idx, childIdx, { label: e.target.value })}
-                      placeholder="Sub-link Label"
-                      className="w-40 bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs text-white"
-                    />
-                    <input
-                      type="text"
-                      value={child.url}
-                      onChange={(e) => updateChildItem(idx, childIdx, { url: e.target.value })}
-                      placeholder="Sub-link URL"
-                      className="flex-1 bg-slate-900 border border-slate-800 rounded px-2 py-1 text-xs font-mono text-slate-300"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => removeChildItem(idx, childIdx)}
-                      className="p-1 text-slate-400 hover:text-red-400"
-                    >
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  </div>
-                ))}
-
-                <button
-                  type="button"
-                  onClick={() => addChildItem(idx)}
-                  className="text-[11px] text-brand-400 hover:underline flex items-center space-x-1 pt-1"
-                >
-                  <Plus className="w-3 h-3" />
-                  <span>Add dropdown child link</span>
-                </button>
+            <div>
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-2">
+                Display Location
+              </label>
+              <div className="flex flex-wrap gap-4 pt-1">
+                <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newMenuLocations.includes('header')}
+                    onChange={(e) => {
+                      if (e.target.checked) setNewMenuLocations([...newMenuLocations, 'header']);
+                      else setNewMenuLocations(newMenuLocations.filter((l) => l !== 'header'));
+                    }}
+                    className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                  />
+                  <span>Header Navigation</span>
+                </label>
+                <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={newMenuLocations.includes('footer')}
+                    onChange={(e) => {
+                      if (e.target.checked) setNewMenuLocations([...newMenuLocations, 'footer']);
+                      else setNewMenuLocations(newMenuLocations.filter((l) => l !== 'footer'));
+                    }}
+                    className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                  />
+                  <span>Footer Navigation</span>
+                </label>
               </div>
             </div>
-          ))
-        )}
-      </div>
+          </div>
+
+          <div className="flex justify-end space-x-2 pt-2 border-t border-slate-800">
+            <button
+              type="button"
+              onClick={() => setIsCreatingMenu(false)}
+              className="px-3.5 py-1.5 bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs rounded-lg font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              disabled={saving || !newMenuName.trim()}
+              className="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg transition disabled:opacity-50"
+            >
+              Create Menu
+            </button>
+          </div>
+        </form>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 1: EDIT MENUS (WordPress-style Left Accordions + Right Menu Structure)  */}
+      {/* ========================================================================= */}
+      {activeTab === 'edit' && (
+        <div className="space-y-6">
+          {/* Menu Selector Bar */}
+          <div className="p-3.5 bg-slate-900 border border-slate-800 rounded-xl flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <div className="flex flex-wrap items-center gap-3">
+              <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center space-x-1.5">
+                <MenuIcon className="w-4 h-4 text-brand-400" />
+                <span>Select a menu to edit:</span>
+              </label>
+              <div className="relative">
+                <select
+                  value={selectedSlug}
+                  onChange={(e) => handleSelectMenu(e.target.value)}
+                  className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-semibold pr-8 focus:outline-none focus:border-brand-500"
+                >
+                  {menus.map((m) => {
+                    const locs = m.locations && m.locations.length > 0 ? ` (${m.locations.join(', ')})` : '';
+                    return (
+                      <option key={m.slug} value={m.slug}>
+                        {m.name}
+                        {locs}
+                      </option>
+                    );
+                  })}
+                </select>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2.5 top-2.5 pointer-events-none" />
+              </div>
+              <button
+                type="button"
+                onClick={() => handleSelectMenu(selectedSlug)}
+                className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold rounded-lg transition"
+              >
+                Select
+              </button>
+              <span className="text-xs text-slate-500">or</span>
+              <button
+                type="button"
+                onClick={() => setIsCreatingMenu(true)}
+                className="text-xs text-brand-400 hover:underline font-semibold"
+              >
+                create a new menu
+              </button>
+            </div>
+
+            {menu.slug !== 'main' && (
+              <button
+                type="button"
+                onClick={handleDeleteMenu}
+                className="text-xs text-red-400 hover:text-red-300 hover:underline flex items-center space-x-1 self-start md:self-auto"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Delete this menu</span>
+              </button>
+            )}
+          </div>
+
+          {/* Two-Column Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            {/* ------------------------------------------------------------- */}
+            {/* LEFT COLUMN: All Accordions (Pages, Posts, Categories, Blueprints, Custom) */}
+            {/* ------------------------------------------------------------- */}
+            <div className="lg:col-span-4 space-y-3">
+              <div className="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1">
+                Add Menu Items
+              </div>
+
+              {/* Accordion 1: Pages */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion('pages')}
+                  className="w-full p-3 flex items-center justify-between text-left hover:bg-slate-800/50 transition"
+                >
+                  <div className="flex items-center space-x-2">
+                    <FileText className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold text-white uppercase tracking-wider">Pages</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
+                      {pages.length}
+                    </span>
+                  </div>
+                  {accordionsOpen.pages ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </button>
+
+                {accordionsOpen.pages && (
+                  <div className="p-3 pt-0 border-t border-slate-800/80 space-y-2.5">
+                    {pages.length > 4 && (
+                      <div className="relative mt-2.5">
+                        <Search className="w-3 h-3 text-slate-500 absolute left-2.5 top-2 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={pageSearch}
+                          onChange={(e) => setPageSearch(e.target.value)}
+                          placeholder="Search pages..."
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-brand-500"
+                        />
+                      </div>
+                    )}
+
+                    <div className="max-h-48 overflow-y-auto space-y-1 p-2 border border-slate-800 rounded-lg bg-slate-950/80 mt-2">
+                      {filteredPages.length === 0 ? (
+                        <div className="text-[11px] text-slate-500 p-2 text-center">No pages found</div>
+                      ) : (
+                        filteredPages.map((p) => {
+                          const isChecked = selectedPageIds.includes(p.id);
+                          return (
+                            <label
+                              key={p.id}
+                              className="flex items-center space-x-2 text-xs text-slate-300 hover:text-white cursor-pointer py-1 px-1.5 rounded hover:bg-slate-800/60"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  if (e.target.checked) setSelectedPageIds([...selectedPageIds, p.id]);
+                                  else setSelectedPageIds(selectedPageIds.filter((id) => id !== p.id));
+                                }}
+                                className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                              />
+                              <span className="truncate flex-1 font-medium">{p.title}</span>
+                              <span className="text-[10px] text-slate-500 font-mono">/{p.slug}</span>
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (selectedPageIds.length === filteredPages.length) setSelectedPageIds([]);
+                          else setSelectedPageIds(filteredPages.map((p) => p.id));
+                        }}
+                        className="text-[11px] text-slate-400 hover:text-slate-200 underline"
+                      >
+                        {selectedPageIds.length === filteredPages.length && filteredPages.length > 0
+                          ? 'Deselect All'
+                          : 'Select All'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleAddPagesToMenu}
+                        disabled={selectedPageIds.length === 0}
+                        className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-brand-400 text-xs font-semibold rounded-lg transition disabled:opacity-40"
+                      >
+                        Add to Menu
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Accordion 2: Posts */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion('posts')}
+                  className="w-full p-3 flex items-center justify-between text-left hover:bg-slate-800/50 transition"
+                >
+                  <div className="flex items-center space-x-2">
+                    <BookOpen className="w-4 h-4 text-blue-400" />
+                    <span className="text-xs font-bold text-white uppercase tracking-wider">Posts</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
+                      {posts.length}
+                    </span>
+                  </div>
+                  {accordionsOpen.posts ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </button>
+
+                {accordionsOpen.posts && (
+                  <div className="p-3 pt-0 border-t border-slate-800/80 space-y-2.5">
+                    {posts.length > 4 && (
+                      <div className="relative mt-2.5">
+                        <Search className="w-3 h-3 text-slate-500 absolute left-2.5 top-2 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={postSearch}
+                          onChange={(e) => setPostSearch(e.target.value)}
+                          placeholder="Search posts..."
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-brand-500"
+                        />
+                      </div>
+                    )}
+
+                    <div className="max-h-48 overflow-y-auto space-y-1 p-2 border border-slate-800 rounded-lg bg-slate-950/80 mt-2">
+                      {filteredPosts.length === 0 ? (
+                        <div className="text-[11px] text-slate-500 p-2 text-center">No posts found</div>
+                      ) : (
+                        filteredPosts.map((p) => {
+                          const isChecked = selectedPostIds.includes(p.id);
+                          return (
+                            <label
+                              key={p.id}
+                              className="flex items-center space-x-2 text-xs text-slate-300 hover:text-white cursor-pointer py-1 px-1.5 rounded hover:bg-slate-800/60"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  if (e.target.checked) setSelectedPostIds([...selectedPostIds, p.id]);
+                                  else setSelectedPostIds(selectedPostIds.filter((id) => id !== p.id));
+                                }}
+                                className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                              />
+                              <span className="truncate flex-1 font-medium">{p.title}</span>
+                              <span className="text-[10px] text-slate-500 font-mono">/blog/{p.slug}</span>
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (selectedPostIds.length === filteredPosts.length) setSelectedPostIds([]);
+                          else setSelectedPostIds(filteredPosts.map((p) => p.id));
+                        }}
+                        className="text-[11px] text-slate-400 hover:text-slate-200 underline"
+                      >
+                        {selectedPostIds.length === filteredPosts.length && filteredPosts.length > 0
+                          ? 'Deselect All'
+                          : 'Select All'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleAddPostsToMenu}
+                        disabled={selectedPostIds.length === 0}
+                        className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-brand-400 text-xs font-semibold rounded-lg transition disabled:opacity-40"
+                      >
+                        Add to Menu
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Accordion 3: Categories */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion('categories')}
+                  className="w-full p-3 flex items-center justify-between text-left hover:bg-slate-800/50 transition"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Tag className="w-4 h-4 text-amber-400" />
+                    <span className="text-xs font-bold text-white uppercase tracking-wider">Categories</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
+                      {categories.length}
+                    </span>
+                  </div>
+                  {accordionsOpen.categories ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </button>
+
+                {accordionsOpen.categories && (
+                  <div className="p-3 pt-0 border-t border-slate-800/80 space-y-2.5">
+                    {categories.length > 4 && (
+                      <div className="relative mt-2.5">
+                        <Search className="w-3 h-3 text-slate-500 absolute left-2.5 top-2 pointer-events-none" />
+                        <input
+                          type="text"
+                          value={categorySearch}
+                          onChange={(e) => setCategorySearch(e.target.value)}
+                          placeholder="Search categories..."
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-brand-500"
+                        />
+                      </div>
+                    )}
+
+                    <div className="max-h-48 overflow-y-auto space-y-1 p-2 border border-slate-800 rounded-lg bg-slate-950/80 mt-2">
+                      {filteredCategories.length === 0 ? (
+                        <div className="text-[11px] text-slate-500 p-2 text-center">No categories found</div>
+                      ) : (
+                        filteredCategories.map((c) => {
+                          const isChecked = selectedCategoryIds.includes(c.id);
+                          return (
+                            <label
+                              key={c.id}
+                              className="flex items-center space-x-2 text-xs text-slate-300 hover:text-white cursor-pointer py-1 px-1.5 rounded hover:bg-slate-800/60"
+                            >
+                              <input
+                                type="checkbox"
+                                checked={isChecked}
+                                onChange={(e) => {
+                                  if (e.target.checked) setSelectedCategoryIds([...selectedCategoryIds, c.id]);
+                                  else setSelectedCategoryIds(selectedCategoryIds.filter((id) => id !== c.id));
+                                }}
+                                className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                              />
+                              <span className="truncate flex-1 font-medium">{c.name}</span>
+                              <span className="text-[10px] text-slate-500 font-mono">/category/{c.slug}</span>
+                            </label>
+                          );
+                        })
+                      )}
+                    </div>
+
+                    <div className="flex items-center justify-between pt-0.5">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (selectedCategoryIds.length === filteredCategories.length) setSelectedCategoryIds([]);
+                          else setSelectedCategoryIds(filteredCategories.map((c) => c.id));
+                        }}
+                        className="text-[11px] text-slate-400 hover:text-slate-200 underline"
+                      >
+                        {selectedCategoryIds.length === filteredCategories.length && filteredCategories.length > 0
+                          ? 'Deselect All'
+                          : 'Select All'}
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={handleAddCategoriesToMenu}
+                        disabled={selectedCategoryIds.length === 0}
+                        className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-brand-400 text-xs font-semibold rounded-lg transition disabled:opacity-40"
+                      >
+                        Add to Menu
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Accordion 4: Blueprints */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion('blueprints')}
+                  className="w-full p-3 flex items-center justify-between text-left hover:bg-slate-800/50 transition"
+                >
+                  <div className="flex items-center space-x-2">
+                    <Package className="w-4 h-4 text-purple-400" />
+                    <span className="text-xs font-bold text-white uppercase tracking-wider">Blueprints</span>
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-400 font-mono">
+                      {blueprints.length}
+                    </span>
+                  </div>
+                  {accordionsOpen.blueprints ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </button>
+
+                {accordionsOpen.blueprints && (
+                  <div className="p-3 pt-0 border-t border-slate-800/80 space-y-2.5">
+                    {blueprints.length === 0 ? (
+                      <div className="text-[11px] text-slate-500 py-3 text-center">No custom blueprints found</div>
+                    ) : (
+                      <>
+                        {/* Blueprint Selector */}
+                        <div className="flex items-center space-x-2 mt-2.5">
+                          <select
+                            value={activeBlueprintSlug}
+                            onChange={(e) => {
+                              setActiveBlueprintSlug(e.target.value);
+                              setSelectedBlueprintEntryIds([]);
+                            }}
+                            className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1 text-xs text-white font-semibold focus:outline-none focus:border-brand-500"
+                          >
+                            {blueprints.map((bp) => {
+                              const count = (blueprintEntriesMap[bp.slug] || []).length;
+                              return (
+                                <option key={bp.slug} value={bp.slug}>
+                                  {bp.name} ({count})
+                                </option>
+                              );
+                            })}
+                          </select>
+                        </div>
+
+                        {currentBlueprintEntries.length > 4 && (
+                          <div className="relative">
+                            <Search className="w-3 h-3 text-slate-500 absolute left-2.5 top-2 pointer-events-none" />
+                            <input
+                              type="text"
+                              value={blueprintSearch}
+                              onChange={(e) => setBlueprintSearch(e.target.value)}
+                              placeholder={`Search ${activeBlueprintSlug}...`}
+                              className="w-full bg-slate-950 border border-slate-800 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-brand-500"
+                            />
+                          </div>
+                        )}
+
+                        <div className="max-h-48 overflow-y-auto space-y-1 p-2 border border-slate-800 rounded-lg bg-slate-950/80">
+                          {currentBlueprintEntries.length === 0 ? (
+                            <div className="text-[11px] text-slate-500 p-2 text-center">No entries in this blueprint</div>
+                          ) : (
+                            currentBlueprintEntries.map((e) => {
+                              const id = e.id || e.slug;
+                              const isChecked = selectedBlueprintEntryIds.includes(id);
+                              return (
+                                <label
+                                  key={id}
+                                  className="flex items-center space-x-2 text-xs text-slate-300 hover:text-white cursor-pointer py-1 px-1.5 rounded hover:bg-slate-800/60"
+                                >
+                                  <input
+                                    type="checkbox"
+                                    checked={isChecked}
+                                    onChange={(evt) => {
+                                      if (evt.target.checked) setSelectedBlueprintEntryIds([...selectedBlueprintEntryIds, id]);
+                                      else setSelectedBlueprintEntryIds(selectedBlueprintEntryIds.filter((item) => item !== id));
+                                    }}
+                                    className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                                  />
+                                  <span className="truncate flex-1 font-medium">{e.title}</span>
+                                  <span className="text-[10px] text-slate-500 font-mono">/{activeBlueprintSlug}/{e.slug}</span>
+                                </label>
+                              );
+                            })
+                          )}
+                        </div>
+
+                        <div className="flex items-center justify-between pt-0.5">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (selectedBlueprintEntryIds.length === currentBlueprintEntries.length) setSelectedBlueprintEntryIds([]);
+                              else setSelectedBlueprintEntryIds(currentBlueprintEntries.map((e) => e.id || e.slug));
+                            }}
+                            className="text-[11px] text-slate-400 hover:text-slate-200 underline"
+                          >
+                            {selectedBlueprintEntryIds.length === currentBlueprintEntries.length && currentBlueprintEntries.length > 0
+                              ? 'Deselect All'
+                              : 'Select All'}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={handleAddBlueprintEntriesToMenu}
+                            disabled={selectedBlueprintEntryIds.length === 0}
+                            className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-brand-400 text-xs font-semibold rounded-lg transition disabled:opacity-40"
+                          >
+                            Add to Menu
+                          </button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Accordion 5: Custom Link */}
+              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                <button
+                  type="button"
+                  onClick={() => toggleAccordion('custom')}
+                  className="w-full p-3 flex items-center justify-between text-left hover:bg-slate-800/50 transition"
+                >
+                  <div className="flex items-center space-x-2">
+                    <LinkIcon className="w-4 h-4 text-cyan-400" />
+                    <span className="text-xs font-bold text-white uppercase tracking-wider">Custom Link</span>
+                  </div>
+                  {accordionsOpen.custom ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
+                </button>
+
+                {accordionsOpen.custom && (
+                  <form onSubmit={handleAddCustomLink} className="p-3 pt-0 border-t border-slate-800/80 space-y-2.5">
+                    <div className="mt-2.5">
+                      <label className="block text-[11px] font-semibold text-slate-300 uppercase mb-1">
+                        Link Text *
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        value={customLinkLabel}
+                        onChange={(e) => setCustomLinkLabel(e.target.value)}
+                        placeholder="e.g. Products, About Us"
+                        className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                      />
+                    </div>
+
+                    <label className="flex items-center space-x-2 cursor-pointer p-1.5 rounded-lg bg-slate-950 border border-slate-800">
+                      <input
+                        type="checkbox"
+                        checked={customLinkNoLink}
+                        onChange={(e) => setCustomLinkNoLink(e.target.checked)}
+                        className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                      />
+                      <span className="text-[11px] font-medium text-slate-300">
+                        No Link (Dropdown Trigger Only)
+                      </span>
+                    </label>
+
+                    {!customLinkNoLink && (
+                      <div>
+                        <label className="block text-[11px] font-semibold text-slate-300 uppercase mb-1">
+                          URL / Path
+                        </label>
+                        <input
+                          type="text"
+                          value={customLinkUrl}
+                          onChange={(e) => setCustomLinkUrl(e.target.value)}
+                          placeholder="/path or https://..."
+                          className="w-full bg-slate-950 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
+                        />
+                      </div>
+                    )}
+
+                    <div className="pt-0.5 flex justify-end">
+                      <button
+                        type="submit"
+                        disabled={!customLinkLabel.trim()}
+                        className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-brand-400 text-xs font-semibold rounded-lg transition disabled:opacity-40"
+                      >
+                        Add Custom Link
+                      </button>
+                    </div>
+                  </form>
+                )}
+              </div>
+
+              {/* Fast Blank Item */}
+              <button
+                type="button"
+                onClick={addItem}
+                className="w-full py-2 bg-slate-950 border border-dashed border-slate-800 hover:border-brand-500/50 hover:bg-slate-900/50 text-slate-400 hover:text-white text-xs font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition"
+              >
+                <Plus className="w-3.5 h-3.5 text-brand-400" />
+                <span>Add Blank Item</span>
+              </button>
+            </div>
+
+            {/* ------------------------------------------------------------- */}
+            {/* RIGHT COLUMN: Menu Structure (Cards Tree & Menu Settings)     */}
+            {/* ------------------------------------------------------------- */}
+            <div className="lg:col-span-8 space-y-4">
+              <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm">
+                {/* Header */}
+                <div className="p-4 bg-slate-900/90 border-b border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="flex items-center space-x-3 flex-1">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wider whitespace-nowrap">
+                      Menu Name:
+                    </label>
+                    <input
+                      type="text"
+                      value={menu.name}
+                      onChange={(e) => setMenu({ ...menu, name: e.target.value })}
+                      className="bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-sm font-bold text-white focus:outline-none focus:border-brand-500 w-full max-w-sm"
+                    />
+                  </div>
+
+                  <div className="flex items-center space-x-2">
+                    <button
+                      type="button"
+                      onClick={addItem}
+                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition"
+                    >
+                      <Plus className="w-3.5 h-3.5 text-brand-400" />
+                      <span>Add Item</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="px-4 py-1.5 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
+                    >
+                      <Save className="w-3.5 h-3.5" />
+                      <span>{saving ? 'Saving...' : 'Save Menu'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Subtitle / Counter */}
+                <div className="px-4 py-2 bg-slate-950/40 border-b border-slate-800/80 text-[11px] text-slate-400 flex items-center justify-between">
+                  <span>Reorder and arrange menu items. Click an item to edit options.</span>
+                  <span className="font-mono text-slate-500">{menu.items.length} item(s)</span>
+                </div>
+
+                {/* Tree Items */}
+                <div className="p-4 space-y-2.5">
+                  {menu.items.length === 0 ? (
+                    <div className="p-10 text-center text-slate-500 space-y-2 border border-dashed border-slate-800 rounded-xl">
+                      <Compass className="w-8 h-8 text-slate-600 mx-auto" />
+                      <p className="text-xs font-semibold text-slate-300">This menu has no items.</p>
+                      <p className="text-[11px] text-slate-500">
+                        Select pages, posts, categories, or blueprints from the left to add items.
+                      </p>
+                    </div>
+                  ) : (
+                    menu.items.map((item, idx) => {
+                      const isExpanded = Boolean(expandedItems[item.id]);
+                      const hasSub = Array.isArray(item.children) && item.children.length > 0;
+
+                      return (
+                        <div
+                          key={item.id}
+                          className="bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-xl overflow-hidden transition"
+                        >
+                          {/* Row Header */}
+                          <div className="p-2.5 sm:p-3 bg-slate-900/60 flex items-center justify-between gap-2 select-none">
+                            <div
+                              onClick={() => toggleExpand(item.id)}
+                              className="flex items-center space-x-2.5 flex-1 cursor-pointer truncate"
+                            >
+                              <GripVertical className="w-4 h-4 text-slate-600 hover:text-slate-400 flex-shrink-0" />
+                              <span className="text-xs font-bold text-white tracking-tight truncate">{item.label}</span>
+
+                              {item.noLink ? (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
+                                  Dropdown Trigger
+                                </span>
+                              ) : (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 font-mono truncate max-w-xs">
+                                  {item.url || '/'}
+                                </span>
+                              )}
+
+                              {hasSub && (
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-brand-500/10 text-brand-400 font-semibold">
+                                  {item.children!.length} sub-link(s)
+                                </span>
+                              )}
+                            </div>
+
+                            <div className="flex items-center space-x-1 flex-shrink-0">
+                              {idx > 0 && (
+                                <button
+                                  type="button"
+                                  onClick={() => indentItem(idx)}
+                                  title="Indent as sub-item of previous item"
+                                  className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-brand-400 text-[10px] font-semibold rounded transition flex items-center space-x-1"
+                                >
+                                  <CornerDownRight className="w-3 h-3" />
+                                  <span className="hidden sm:inline">Sub-item</span>
+                                </button>
+                              )}
+
+                              <button
+                                type="button"
+                                onClick={() => moveItem(idx, 'up')}
+                                disabled={idx === 0}
+                                title="Move Up"
+                                className="p-1 text-slate-400 hover:text-white disabled:opacity-20"
+                              >
+                                <ArrowUp className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => moveItem(idx, 'down')}
+                                disabled={idx === menu.items.length - 1}
+                                title="Move Down"
+                                className="p-1 text-slate-400 hover:text-white disabled:opacity-20"
+                              >
+                                <ArrowDown className="w-3.5 h-3.5" />
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => toggleExpand(item.id)}
+                                title="Edit Item"
+                                className="p-1 text-slate-400 hover:text-white"
+                              >
+                                {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => removeItem(idx)}
+                                title="Remove Item"
+                                className="p-1 text-slate-400 hover:text-red-400"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Expanded Settings */}
+                          {isExpanded && (
+                            <div className="p-3.5 border-t border-slate-800/80 bg-slate-950/90 space-y-3">
+                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-slate-400 uppercase mb-1">
+                                    Navigation Label
+                                  </label>
+                                  <input
+                                    type="text"
+                                    value={item.label}
+                                    onChange={(e) => updateItem(idx, { label: e.target.value })}
+                                    className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500 font-semibold"
+                                  />
+                                </div>
+
+                                <div>
+                                  <label className="block text-[11px] font-semibold text-slate-400 uppercase mb-1">
+                                    URL Destination
+                                  </label>
+                                  {item.noLink ? (
+                                    <div className="bg-slate-900/50 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs text-slate-500 italic">
+                                      Dropdown Trigger (No URL)
+                                    </div>
+                                  ) : (
+                                    <input
+                                      type="text"
+                                      value={item.url || ''}
+                                      onChange={(e) => updateItem(idx, { url: e.target.value })}
+                                      placeholder="/"
+                                      className="w-full bg-slate-900 border border-slate-800 rounded-lg px-2.5 py-1.5 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
+                                    />
+                                  )}
+                                </div>
+                              </div>
+
+                              <div className="flex flex-wrap items-center gap-4 pt-1">
+                                <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+                                  <input
+                                    type="checkbox"
+                                    checked={Boolean(item.noLink)}
+                                    onChange={(e) => {
+                                      const isNoLink = e.target.checked;
+                                      updateItem(idx, {
+                                        noLink: isNoLink,
+                                        url: isNoLink ? '#' : item.url === '#' ? '/' : item.url
+                                      });
+                                    }}
+                                    className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                                  />
+                                  <span>No Link (Dropdown trigger only)</span>
+                                </label>
+
+                                {!item.noLink && (
+                                  <label className="flex items-center space-x-2 text-xs text-slate-300 cursor-pointer">
+                                    <input
+                                      type="checkbox"
+                                      checked={item.target === '_blank'}
+                                      onChange={(e) =>
+                                        updateItem(idx, { target: e.target.checked ? '_blank' : '_self' })
+                                      }
+                                      className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                                    />
+                                    <span>Open link in new tab</span>
+                                  </label>
+                                )}
+                              </div>
+
+                              <div className="flex items-center justify-between pt-1 border-t border-slate-800/80">
+                                <button
+                                  type="button"
+                                  onClick={() => removeItem(idx)}
+                                  className="text-[11px] text-red-400 hover:text-red-300 hover:underline"
+                                >
+                                  Remove Item
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => toggleExpand(item.id)}
+                                  className="text-[11px] text-slate-400 hover:text-white"
+                                >
+                                  Close
+                                </button>
+                              </div>
+                            </div>
+                          )}
+
+                          {/* Children Sub-links */}
+                          <div className="pl-6 pr-3 pb-2.5 space-y-2 border-l-2 border-brand-500/20 ml-6 my-2">
+                            {(item.children || []).map((child, childIdx) => (
+                              <div
+                                key={child.id}
+                                className="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-slate-900 p-2 rounded-lg border border-slate-800"
+                              >
+                                <CornerDownRight className="w-3.5 h-3.5 text-brand-400 flex-shrink-0" />
+                                <input
+                                  type="text"
+                                  value={child.label}
+                                  onChange={(e) => updateChildItem(idx, childIdx, { label: e.target.value })}
+                                  placeholder="Sub-link Label"
+                                  className="w-full sm:w-44 bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs text-white font-semibold"
+                                />
+                                <input
+                                  type="text"
+                                  value={child.url || ''}
+                                  onChange={(e) => updateChildItem(idx, childIdx, { url: e.target.value })}
+                                  placeholder="Sub-link URL"
+                                  className="w-full sm:flex-1 bg-slate-950 border border-slate-800 rounded px-2 py-1 text-xs font-mono text-slate-300"
+                                />
+                                <select
+                                  value={child.target || '_self'}
+                                  onChange={(e) => updateChildItem(idx, childIdx, { target: e.target.value as any })}
+                                  className="bg-slate-950 border border-slate-800 rounded px-2 py-1 text-[11px] text-slate-300"
+                                >
+                                  <option value="_self">Same Tab</option>
+                                  <option value="_blank">New Tab</option>
+                                </select>
+
+                                <button
+                                  type="button"
+                                  onClick={() => outdentChildItem(idx, childIdx)}
+                                  title="Outdent to top-level menu item"
+                                  className="px-2 py-1 text-[10px] bg-slate-800 hover:bg-slate-700 text-slate-300 rounded transition"
+                                >
+                                  Outdent
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => removeChildItem(idx, childIdx)}
+                                  title="Remove Sub-link"
+                                  className="p-1 text-slate-400 hover:text-red-400 ml-auto"
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </button>
+                              </div>
+                            ))}
+
+                            <button
+                              type="button"
+                              onClick={() => addChildItem(idx)}
+                              className="text-[11px] text-brand-400 hover:underline flex items-center space-x-1.5 pt-0.5 font-semibold"
+                            >
+                              <Plus className="w-3 h-3" />
+                              <span>Add sub-link</span>
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
+                </div>
+
+                {/* Menu Settings */}
+                <div className="p-4 bg-slate-950/60 border-t border-slate-800 space-y-3">
+                  <div className="flex items-center space-x-2">
+                    <Settings className="w-4 h-4 text-brand-400" />
+                    <h3 className="text-xs font-bold text-white uppercase tracking-wider">Display Location</h3>
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label
+                      className={`p-3 rounded-xl border cursor-pointer flex items-center space-x-3 transition ${
+                        (menu.locations || []).includes('header')
+                          ? 'bg-brand-500/10 border-brand-500/50 text-white'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={(menu.locations || []).includes('header')}
+                        onChange={() => toggleLocation('header')}
+                        className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                      />
+                      <span className="text-xs font-bold text-white">Header Navigation</span>
+                    </label>
+
+                    <label
+                      className={`p-3 rounded-xl border cursor-pointer flex items-center space-x-3 transition ${
+                        (menu.locations || []).includes('footer')
+                          ? 'bg-brand-500/10 border-brand-500/50 text-white'
+                          : 'bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={(menu.locations || []).includes('footer')}
+                        onChange={() => toggleLocation('footer')}
+                        className="rounded border-slate-700 bg-slate-900 text-brand-500 focus:ring-0"
+                      />
+                      <span className="text-xs font-bold text-white">Footer Navigation</span>
+                    </label>
+                  </div>
+
+                  {/* Actions */}
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-800">
+                    {menu.slug !== 'main' ? (
+                      <button
+                        type="button"
+                        onClick={handleDeleteMenu}
+                        className="text-xs text-red-400 hover:text-red-300 hover:underline flex items-center space-x-1"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                        <span>Delete Menu</span>
+                      </button>
+                    ) : (
+                      <span className="text-[11px] text-slate-500 italic">Primary Main Navigation</span>
+                    )}
+
+                    <button
+                      type="button"
+                      onClick={handleSave}
+                      disabled={saving}
+                      className="px-5 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+                    >
+                      <Save className="w-4 h-4" />
+                      <span>{saving ? 'Saving...' : 'Save Menu'}</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* TAB 2: MANAGE LOCATIONS                                                   */}
+      {/* ========================================================================= */}
+      {activeTab === 'locations' && (
+        <div className="bg-slate-900 border border-slate-800 rounded-xl overflow-hidden shadow-sm space-y-4">
+          <div className="p-4 border-b border-slate-800">
+            <h2 className="text-base font-bold text-white flex items-center space-x-2">
+              <Layers className="w-5 h-5 text-brand-400" />
+              <span>Theme Display Locations</span>
+            </h2>
+          </div>
+
+          <div className="p-4 overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="border-b border-slate-800 text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+                  <th className="pb-3 px-3">Location</th>
+                  <th className="pb-3 px-3">Assigned Menu</th>
+                  <th className="pb-3 px-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-800/80 text-xs text-slate-300">
+                <tr className="hover:bg-slate-800/30 transition">
+                  <td className="py-3 px-3 font-semibold text-white">Header Navigation</td>
+                  <td className="py-3 px-3">
+                    <select
+                      value={locationAssignments.header}
+                      onChange={(e) =>
+                        setLocationAssignments({ ...locationAssignments, header: e.target.value })
+                      }
+                      className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-semibold focus:outline-none focus:border-brand-500 w-full max-w-xs"
+                    >
+                      <option value="">— Select a Menu —</option>
+                      {menus.map((m) => (
+                        <option key={m.slug} value={m.slug}>
+                          {m.name} ({m.items.length} items)
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="py-3 px-3 text-right">
+                    {locationAssignments.header && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleSelectMenu(locationAssignments.header);
+                          setActiveTab('edit');
+                        }}
+                        className="text-xs text-brand-400 hover:underline font-semibold"
+                      >
+                        Edit Menu
+                      </button>
+                    )}
+                  </td>
+                </tr>
+
+                <tr className="hover:bg-slate-800/30 transition">
+                  <td className="py-3 px-3 font-semibold text-white">Footer Navigation</td>
+                  <td className="py-3 px-3">
+                    <select
+                      value={locationAssignments.footer}
+                      onChange={(e) =>
+                        setLocationAssignments({ ...locationAssignments, footer: e.target.value })
+                      }
+                      className="bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 text-xs text-white font-semibold focus:outline-none focus:border-brand-500 w-full max-w-xs"
+                    >
+                      <option value="">— Select a Menu —</option>
+                      {menus.map((m) => (
+                        <option key={m.slug} value={m.slug}>
+                          {m.name} ({m.items.length} items)
+                        </option>
+                      ))}
+                    </select>
+                  </td>
+                  <td className="py-3 px-3 text-right">
+                    {locationAssignments.footer && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          handleSelectMenu(locationAssignments.footer);
+                          setActiveTab('edit');
+                        }}
+                        className="text-xs text-brand-400 hover:underline font-semibold"
+                      >
+                        Edit Menu
+                      </button>
+                    )}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="p-4 bg-slate-950/60 border-t border-slate-800 flex justify-end">
+            <button
+              type="button"
+              onClick={handleSaveLocations}
+              disabled={saving}
+              className="px-5 py-2 bg-brand-500 hover:bg-brand-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+            >
+              <Check className="w-4 h-4" />
+              <span>{saving ? 'Saving...' : 'Save Changes'}</span>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

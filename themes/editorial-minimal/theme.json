@@ -2,7 +2,7 @@
   "id": "editorial-minimal",
   "name": "Editorial Minimal",
   "version": "1.0.0",
-  "author": "Aero Design Labs",
+  "author": "Planfo Design Labs",
   "description": "Clean, light, distraction-free layout with elegant serif accents, optimized for reading and publishing.",
   "thumbnail": "assets/thumbnail.svg",
   "supportedPacks": ["pages", "articles"]

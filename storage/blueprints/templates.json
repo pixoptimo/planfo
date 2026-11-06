@@ -1,0 +1,290 @@
+{
+  "id": "bp_templates",
+  "name": "UI Templates",
+  "singularName": "UI Template",
+  "slug": "templates",
+  "icon": "Layers",
+  "description": "Showcase catalog for modern UI templates, layouts, and web components.",
+  "hasCategories": true,
+  "hasTags": true,
+  "hasContentEditor": true,
+  "isBuiltIn": false,
+  "fields": [
+    {
+      "id": "fld_tagline",
+      "name": "tagline",
+      "label": "Tagline / Card Subtitle",
+      "type": "textarea",
+      "required": true,
+      "placeholder": "Ultra-lean autonomous telemetry cockpit with glowing glassmorphism...",
+      "description": "Short punchy summary displayed on cards and hero titles."
+    },
+    {
+      "id": "fld_badge",
+      "name": "badge",
+      "label": "Card Badge Text",
+      "type": "text",
+      "required": false,
+      "placeholder": "Trending / Popular / Award Winner / Editor's Choice",
+      "description": "Highlight pill shown at top of template preview card."
+    },
+    {
+      "id": "fld_badge_color",
+      "name": "badgeColor",
+      "label": "Badge Color Theme",
+      "type": "select",
+      "required": false,
+      "defaultValue": "purple",
+      "options": [
+        "purple",
+        "emerald",
+        "pink",
+        "gold",
+        "blue"
+      ],
+      "placeholder": "",
+      "description": "Color accent for badge (purple, emerald, pink, gold, blue)."
+    },
+    {
+      "id": "fld_price",
+      "name": "price",
+      "label": "Price Display",
+      "type": "text",
+      "required": false,
+      "defaultValue": "Free",
+      "placeholder": "Free or $49 PRO",
+      "description": "Display price tag on cards and detail sidebar."
+    },
+    {
+      "id": "fld_is_free",
+      "name": "isFree",
+      "label": "Is Free Template?",
+      "type": "boolean",
+      "required": false,
+      "defaultValue": true,
+      "placeholder": "",
+      "description": "Enables free filter pill on catalog explorer."
+    },
+    {
+      "id": "fld_demo_url",
+      "name": "demoUrl",
+      "label": "Demo Preview URL",
+      "type": "text",
+      "required": false,
+      "placeholder": "sample-templates/quantum-saas.html or external URL",
+      "description": "Iframe target loaded inside the interactive device simulator."
+    },
+    {
+      "id": "fld_download_file",
+      "name": "downloadFile",
+      "label": "Download File / Bundle URL",
+      "type": "text",
+      "required": false,
+      "placeholder": "sample-templates/quantum-saas.html or zip file URL",
+      "description": "Direct file triggered by Download Template button."
+    },
+    {
+      "id": "fld_version",
+      "name": "version",
+      "label": "Template Version",
+      "type": "text",
+      "required": false,
+      "defaultValue": "v1.0.0",
+      "placeholder": "v2.5.0",
+      "description": "Semantic release version number."
+    },
+    {
+      "id": "fld_author",
+      "name": "author",
+      "label": "Author / Studio",
+      "type": "text",
+      "required": false,
+      "defaultValue": "Pixoptimo Labs",
+      "placeholder": "Pixoptimo Labs",
+      "description": "Author or engineering team."
+    },
+    {
+      "id": "fld_license",
+      "name": "license",
+      "label": "License Type",
+      "type": "text",
+      "required": false,
+      "defaultValue": "MIT Commercial & Personal",
+      "placeholder": "MIT Commercial & Personal or Commercial License",
+      "description": "License grant for buyers or users."
+    },
+    {
+      "id": "fld_release_date",
+      "name": "releaseDate",
+      "label": "Release Date",
+      "type": "text",
+      "required": false,
+      "placeholder": "Sept 28, 2026",
+      "description": "Initial publication date."
+    },
+    {
+      "id": "fld_last_updated",
+      "name": "lastUpdated",
+      "label": "Last Updated",
+      "type": "text",
+      "required": false,
+      "placeholder": "Oct 08, 2026",
+      "description": "Latest release update date."
+    },
+    {
+      "id": "fld_rating",
+      "name": "rating",
+      "label": "Review Rating (out of 5)",
+      "type": "number",
+      "required": false,
+      "defaultValue": 4.98,
+      "placeholder": "4.98",
+      "description": "Numerical rating displayed with star icons."
+    },
+    {
+      "id": "fld_review_count",
+      "name": "reviewCount",
+      "label": "Total Review Count",
+      "type": "number",
+      "required": false,
+      "defaultValue": 342,
+      "placeholder": "342",
+      "description": "Number of verified user reviews."
+    },
+    {
+      "id": "fld_downloads",
+      "name": "downloads",
+      "label": "Download Count Display",
+      "type": "text",
+      "required": false,
+      "defaultValue": "14,290",
+      "placeholder": "14,290",
+      "description": "Total downloads statistic."
+    },
+    {
+      "id": "fld_file_size",
+      "name": "fileSize",
+      "label": "Bundle Size",
+      "type": "text",
+      "required": false,
+      "defaultValue": "14.2 KB (Gzipped)",
+      "placeholder": "14.2 KB (Gzipped)",
+      "description": "Bundle footprint display."
+    },
+    {
+      "id": "fld_tech_stack",
+      "name": "techStack",
+      "label": "Tech Stack Chips",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "HTML5 Semantic, Vanilla CSS3, Custom Properties, Zero Dependencies, SVG Visualizations",
+      "description": "Comma-separated list of technologies."
+    },
+    {
+      "id": "fld_browser_support",
+      "name": "browserSupport",
+      "label": "Browser Support",
+      "type": "text",
+      "required": false,
+      "defaultValue": "All Modern Browsers (Chrome, Safari, Firefox, Edge)",
+      "placeholder": "All Modern Browsers (Chrome, Safari, Firefox, Edge)",
+      "description": "Compatibility details displayed in Technical Specifications sidebar."
+    },
+    {
+      "id": "fld_overview",
+      "name": "overview",
+      "label": "Tab 1: Overview & Design Philosophy",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Detailed description and design philosophy displayed under the Overview & Features tab...",
+      "description": "Comprehensive design philosophy, architectural choices, and concept behind the template."
+    },
+    {
+      "id": "fld_features",
+      "name": "features",
+      "label": "Tab 1: Key Features Checklist",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "Sub-20ms Time-to-Interactive on mobile\nResponsive CSS Grid metrics cockpit\nCurated HSL color palette\nFully accessible WCAG 2.1 AAA color contrast compliance",
+      "description": "Enter each feature bullet on a new line."
+    },
+    {
+      "id": "fld_file_structure",
+      "name": "fileStructure",
+      "label": "Tab 2: Package File Architecture",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "index.html // Core template markup\nassets/ // Theme styling & assets\n  css/style.css // Design tokens & layout\n  js/main.js // Vanilla interactions\nREADME.md // Setup and documentation",
+      "description": "File tree structure rendered in the File Architecture tab. Indent sub-files with spaces."
+    },
+    {
+      "id": "fld_quick_start",
+      "name": "quickStartCode",
+      "label": "Tab 3: Quick Start Code Snippet",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "<link rel=\"stylesheet\" href=\"assets/css/styles.css\">\n<script src=\"assets/js/app.js\" defer></script>",
+      "description": "Code snippet displayed in the Documentation tab."
+    },
+    {
+      "id": "fld_css_tokens",
+      "name": "cssTokens",
+      "label": "Tab 3: CSS Custom Properties / Tokens",
+      "type": "textarea",
+      "required": false,
+      "placeholder": ":root {\n  --bg: #07090e;\n  --accent: #6366f1;\n}",
+      "description": "CSS design tokens snippet in Documentation tab."
+    },
+    {
+      "id": "fld_changelog",
+      "name": "changelog",
+      "label": "Tab 4: Changelog & Release Notes",
+      "type": "textarea",
+      "required": false,
+      "placeholder": "v2.5.0 (Oct 08, 2026): Added mobile fluid grid clamp() scaling.\nv2.0.0 (Sept 28, 2026): Initial release.",
+      "description": "Release history rendered in the Changelog tab. Enter each version update on a new line."
+    },
+    {
+      "id": "fld_lh_performance",
+      "name": "lighthousePerformance",
+      "label": "Lighthouse: Performance Score",
+      "type": "number",
+      "required": false,
+      "defaultValue": 100,
+      "placeholder": "100",
+      "description": "Google Lighthouse Performance rating (0-100)."
+    },
+    {
+      "id": "fld_lh_accessibility",
+      "name": "lighthouseAccessibility",
+      "label": "Lighthouse: Accessibility Score",
+      "type": "number",
+      "required": false,
+      "defaultValue": 100,
+      "placeholder": "100",
+      "description": "Google Lighthouse Accessibility rating (0-100)."
+    },
+    {
+      "id": "fld_lh_best_practices",
+      "name": "lighthouseBestPractices",
+      "label": "Lighthouse: Best Practices Score",
+      "type": "number",
+      "required": false,
+      "defaultValue": 100,
+      "placeholder": "100",
+      "description": "Google Lighthouse Best Practices rating (0-100)."
+    },
+    {
+      "id": "fld_lh_seo",
+      "name": "lighthouseSeo",
+      "label": "Lighthouse: SEO Score",
+      "type": "number",
+      "required": false,
+      "defaultValue": 100,
+      "placeholder": "100",
+      "description": "Google Lighthouse SEO rating (0-100)."
+    }
+  ],
+  "createdAt": "2026-10-10T00:00:00.000Z",
+  "updatedAt": "2026-10-18T00:00:00.000Z"
+}

@@ -1,6 +1,8 @@
+import { triggerStaticBuild } from "../storage/buildTrigger.js";
 import { Router, type Request, type Response } from 'express';
 import { CreatePostSchema, UpdatePostSchema, type Post } from '@cms/schemas';
 import { PostStore } from '../storage/postStore.js';
+import { TrashStore } from '../storage/trashStore.js';
 import { RevisionStore } from '../storage/revisionStore.js';
 import { requireAuth, requirePermission } from '../auth/middleware.js';
 import { slugify, makeUniqueSlug, logger } from '@cms/utils';
@@ -66,7 +68,8 @@ postRouter.post('/', requirePermission('posts.create'), async (req: Request, res
       ogTitle: '',
       ogDescription: '',
       ogImage: '',
-      robots: 'index,follow'
+      robots: 'index,follow',
+      noIndex: false
     },
     createdAt: now,
     updatedAt: now,
@@ -76,6 +79,7 @@ postRouter.post('/', requirePermission('posts.create'), async (req: Request, res
   await PostStore.save(newPost);
   logger.audit('Post Created', { id: newPost.id, slug: newPost.slug, user: req.user?.email });
 
+  triggerStaticBuild().catch(() => {});
   res.status(201).json({ success: true, data: newPost });
 });
 
@@ -132,6 +136,7 @@ postRouter.put('/:slug', requirePermission('posts.update'), async (req: Request,
   }
 
   logger.audit('Post Updated', { id: updatedPost.id, slug: updatedPost.slug, user: req.user?.email });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: updatedPost });
 });
 
@@ -147,8 +152,10 @@ postRouter.delete('/:slug', requirePermission('posts.delete'), async (req: Reque
     return;
   }
 
+  await TrashStore.moveToTrash('post', current, req.user?.email);
   await PostStore.delete(current.slug);
   logger.audit('Post Deleted', { id: current.id, slug: current.slug, user: req.user?.email });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: { message: `Post "${current.slug}" deleted successfully` } });
 });
 
@@ -186,5 +193,6 @@ postRouter.post('/:slug/revisions/:revisionId/restore', requirePermission('revis
   );
 
   logger.audit('Post Revision Restored', { id: restoredPost.id, slug: restoredPost.slug, fromVersion: revision.version });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: restoredPost, message: `Restored to version ${revision.version}` });
 });

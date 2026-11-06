@@ -323,11 +323,11 @@ export const ThemesPage: React.FC = () => {
                   </div>
 
                   <p className="text-xs text-slate-400 mt-1 line-clamp-2">
-                    {theme.description || 'Custom theme for Aero CMS.'}
+                    {theme.description || 'Custom theme for Planfo CMS.'}
                   </p>
 
                   <div className="mt-3 flex items-center justify-between text-[11px] text-slate-500">
-                    <span>By {theme.author || 'Aero Community'}</span>
+                    <span>By {theme.author || 'Planfo Community'}</span>
                   </div>
 
                   {/* Supported Content Blueprints */}
@@ -423,7 +423,7 @@ export const ThemesPage: React.FC = () => {
                 <span className="font-semibold text-white">"{confirmDeleteTheme.name}"</span>?
                 {confirmDeleteTheme.isActive && (
                   <span className="block mt-2.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-medium text-[11px] text-left">
-                    ⚠️ Note: This theme is currently active. Deleting it will automatically revert the site to the core default theme (<strong className="text-white">Aero Modern</strong>) and rebuild your site.
+                    ⚠️ Note: This theme is currently active. Deleting it will automatically revert the site to the core default theme (<strong className="text-white">Planfo Default</strong>) and rebuild your site.
                   </span>
                 )}
               </p>
@@ -471,7 +471,7 @@ export const ThemesPage: React.FC = () => {
               <h3 className="text-lg font-bold text-white">Remove All Uploaded Themes</h3>
               <p className="text-xs text-slate-400 leading-relaxed">
                 This will permanently delete all custom and uploaded theme folders from the filesystem.
-                The active theme will immediately revert to the default <span className="text-white font-semibold">Aero Modern</span> theme and the static website will be regenerated.
+                The active theme will immediately revert to the default <span className="text-white font-semibold">Planfo Default</span> theme and the static website will be regenerated.
               </p>
             </div>
             <div className="flex items-center space-x-3 pt-2">

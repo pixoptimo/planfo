@@ -1,0 +1,26 @@
+<!-- Planfo Default Theme — Page Template -->
+<article class="page-article">
+  <header class="page-header">
+    <div class="container">
+      <h1 class="page-title"><%= page.title %></h1>
+      <% if (page.publishedAt || page.createdAt) { %>
+        <div class="page-meta">
+          <span>Published on <%= formatDate(page.publishedAt || page.createdAt) %></span>
+        </div>
+      <% } %>
+    </div>
+  </header>
+
+  <div class="container page-content">
+    <% if (page.featuredImage) { %>
+      <div class="featured-image-wrap">
+        <img src="<%= page.featuredImage %>" alt="<%= page.title %>" loading="lazy">
+      </div>
+    <% } %>
+
+    <div class="prose">
+      <%- renderContent(page.content) %>
+    </div>
+
+  </div>
+</article>

@@ -47,6 +47,11 @@ export interface PublishResult {
     assetsCopied: number;
     sitemapGenerated: boolean;
     robotsGenerated: boolean;
+    cssFilesCompressed?: number;
+    jsFilesCompressed?: number;
+    htmlFilesCompressed?: number;
+    unwantedFilesPurged?: number;
+    bytesSaved?: number;
   };
   outputPath: string;
   deployment?: {

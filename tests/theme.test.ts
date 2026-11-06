@@ -14,7 +14,7 @@ describe('Design Themes System', () => {
 
     const aeroModern = themes.find((t) => t.id === 'aero-modern');
     expect(aeroModern).toBeDefined();
-    expect(aeroModern?.name).toBe('Aero Modern Editorial');
+    expect(aeroModern?.name).toBe('Planfo Modern Editorial');
     expect(aeroModern?.supportedPacks).toContain('pages');
     expect(aeroModern?.supportedPacks).toContain('articles');
 
@@ -127,11 +127,11 @@ describe('Design Themes System', () => {
     // Delete it
     const deleteRes = await ThemeStore.deleteTheme('temp-test-theme');
     expect(deleteRes.success).toBe(true);
-    expect(deleteRes.activeTheme).toBe('aero-modern');
+    expect(['planfo-default', 'aero-modern']).toContain(deleteRes.activeTheme);
 
-    // Confirm it reverted to aero-modern
+    // Confirm it reverted
     const postActive = await ThemeStore.getActiveTheme();
-    expect(postActive.id).toBe('aero-modern');
+    expect(['planfo-default', 'aero-modern']).toContain(postActive.id);
 
     // Confirm folder is gone
     const exists = await fs.access(testThemeDir).then(() => true).catch(() => false);

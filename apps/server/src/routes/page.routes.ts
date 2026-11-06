@@ -1,9 +1,11 @@
 import { Router, type Request, type Response } from 'express';
 import { CreatePageSchema, UpdatePageSchema, type Page } from '@cms/schemas';
 import { PageStore } from '../storage/pageStore.js';
+import { TrashStore } from '../storage/trashStore.js';
 import { RevisionStore } from '../storage/revisionStore.js';
 import { requireAuth, requirePermission } from '../auth/middleware.js';
 import { slugify, makeUniqueSlug, logger } from '@cms/utils';
+import { triggerStaticBuild } from '../storage/buildTrigger.js';
 
 export const pageRouter = Router();
 
@@ -55,6 +57,7 @@ pageRouter.post('/', requirePermission('pages.create'), async (req: Request, res
     template: parseResult.data.template || 'default',
     content: parseResult.data.content || { blocks: [] },
     featuredImage: parseResult.data.featuredImage || '',
+    noIndex: parseResult.data.noIndex ?? false,
     seo: parseResult.data.seo || {
       title: parseResult.data.title,
       description: '',
@@ -62,7 +65,8 @@ pageRouter.post('/', requirePermission('pages.create'), async (req: Request, res
       ogTitle: '',
       ogDescription: '',
       ogImage: '',
-      robots: 'index,follow'
+      robots: 'index,follow',
+      noIndex: false
     },
     createdAt: now,
     updatedAt: now,
@@ -128,6 +132,7 @@ pageRouter.put('/:slug', requirePermission('pages.update'), async (req: Request,
   }
 
   logger.audit('Page Updated', { id: updatedPage.id, slug: updatedPage.slug, user: req.user?.email });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: updatedPage });
 });
 
@@ -143,8 +148,10 @@ pageRouter.delete('/:slug', requirePermission('pages.delete'), async (req: Reque
     return;
   }
 
+  await TrashStore.moveToTrash('page', current, req.user?.email);
   await PageStore.delete(current.slug);
   logger.audit('Page Deleted', { id: current.id, slug: current.slug, user: req.user?.email });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: { message: `Page "${current.slug}" deleted successfully` } });
 });
 

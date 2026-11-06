@@ -30,7 +30,9 @@ export class UserStore {
       users.find(
         (u) =>
           u.email.toLowerCase() === query ||
-          (u.name && u.name.toLowerCase() === query)
+          u.email.toLowerCase().split('@')[0] === query ||
+          (u.name && u.name.toLowerCase() === query) ||
+          (query === 'admin' && u.role === 'admin' && u.active)
       ) || null
     );
   }

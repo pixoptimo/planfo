@@ -1,0 +1,54 @@
+{
+  "id": "menu_footer",
+  "name": "Footer Navigation",
+  "slug": "footer",
+  "location": "footer",
+  "locations": [
+    "footer"
+  ],
+  "items": [
+    {
+      "id": "mf_home",
+      "label": "Home",
+      "url": "/",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "mf_about",
+      "label": "About",
+      "url": "/about-us",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "mf_products",
+      "label": "Catalog",
+      "url": "/products",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "mf_contact",
+      "label": "Contact",
+      "url": "/contact",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "mf_privacy",
+      "label": "Privacy Policy",
+      "url": "/privacy.html",
+      "target": "_self",
+      "children": []
+    },
+    {
+      "id": "mf_terms",
+      "label": "Terms of Service",
+      "url": "/terms.html",
+      "target": "_self",
+      "children": []
+    }
+  ],
+  "updatedAt": "2026-10-14T17:28:32.076Z"
+}

@@ -1,0 +1,35 @@
+<article class="post-detail">
+  <div class="container article-reading-container">
+    <header class="article-header">
+      <span class="card-category"><%= post.category %></span>
+      <h1 class="post-title"><%= post.title %></h1>
+      <div class="hero-meta" style="justify-content: center; margin-top: 16px;">
+        <span class="hero-author">By <%= post.author %></span>
+        <span>&bull;</span>
+        <time><%= formatDate(post.createdAt) %></time>
+      </div>
+      <% if (post.excerpt) { %>
+        <p class="hero-excerpt" style="margin: 20px auto 0; font-size: 1.25rem;"><%= post.excerpt %></p>
+      <% } %>
+    </header>
+
+    <% if (post.featuredImage) { %>
+      <div style="margin-bottom: 36px;">
+        <img src="<%= post.featuredImage %>" alt="<%= post.title %>" style="width: 100%; border-radius: var(--radius-md);">
+      </div>
+    <% } %>
+
+    <div class="article-content">
+      <%- renderContent(post.content) %>
+    </div>
+
+    <% if (post.tags && post.tags.length > 0) { %>
+      <div style="margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--color-border); display: flex; gap: 8px; align-items: center;">
+        <span style="font-size: 0.8rem; font-weight: 600; text-transform: uppercase; color: var(--color-text-muted);">Filed Under:</span>
+        <% post.tags.forEach(function(t) { %>
+          <a href="/blog/tag/<%= t %>" class="theme-badge">#<%= t %></a>
+        <% }); %>
+      </div>
+    <% } %>
+  </div>
+</article>

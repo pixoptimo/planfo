@@ -54,8 +54,9 @@ describe('GitHub Pages & Git Publisher Architecture', () => {
     expect(cnameContent.trim()).toBe('mybakery.com');
 
     // Verify publish manifest
+    expect(await pathExists(path.join(targetDir, '.planfo-publish-manifest.json'))).toBe(true);
     expect(await pathExists(path.join(targetDir, '.aero-publish-manifest.json'))).toBe(true);
-    const manifest = JSON.parse(await fs.readFile(path.join(targetDir, '.aero-publish-manifest.json'), 'utf-8'));
+    const manifest = JSON.parse(await fs.readFile(path.join(targetDir, '.planfo-publish-manifest.json'), 'utf-8'));
     expect(manifest.target).toBe('github-pages');
     expect(manifest.branch).toBe('gh-pages');
     expect(manifest.cname).toBe('https://mybakery.com/');

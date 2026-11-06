@@ -12,22 +12,38 @@ export function generateSitemapXml(
   pages: Page[],
   posts: Post[],
   products: Product[],
-  customBlueprints: Array<{ blueprint: { slug: string }; entries: Array<{ slug: string; status: string; updatedAt?: string; createdAt?: string }> }> = []
+  customBlueprints: Array<{ blueprint: { slug: string }; entries: Array<{ slug: string; status: string; updatedAt?: string; createdAt?: string }> }> = [],
+  isSiteWideNoIndex?: boolean
 ): string {
   const normalizedSiteUrl = siteUrl.replace(/\/+$/, '');
   const entries: SitemapEntry[] = [];
 
+  if (isSiteWideNoIndex) {
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+</urlset>`;
+  }
+
   // Home
-  entries.push({
-    loc: `${normalizedSiteUrl}/`,
-    lastmod: new Date().toISOString(),
-    changefreq: 'daily',
-    priority: 1.0
-  });
+  const homePage = pages.find((p) => p.slug === 'home');
+  const isHomeNoIndex = Boolean(
+    homePage?.noIndex ||
+    homePage?.seo?.noIndex ||
+    homePage?.seo?.robots?.includes('noindex')
+  );
+  if (!isHomeNoIndex) {
+    entries.push({
+      loc: `${normalizedSiteUrl}/`,
+      lastmod: homePage?.updatedAt || homePage?.createdAt || new Date().toISOString(),
+      changefreq: 'daily',
+      priority: 1.0
+    });
+  }
 
   // Pages
   for (const page of pages) {
-    if (page.status === 'published' && page.slug !== 'home') {
+    const isNoIndex = Boolean(page.noIndex || page.seo?.noIndex || page.seo?.robots?.includes('noindex'));
+    if (page.status === 'published' && page.slug !== 'home' && !isNoIndex) {
       entries.push({
         loc: `${normalizedSiteUrl}/${page.slug}`,
         lastmod: page.updatedAt || page.createdAt,

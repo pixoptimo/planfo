@@ -14,15 +14,18 @@ import { CategoryList } from './pages/Categories/CategoryList.js';
 import { MediaLibrary } from './pages/Media/MediaLibrary.js';
 import { NavigationManager } from './pages/Navigation/NavigationManager.js';
 import { SiteSettingsPage } from './pages/Settings/SiteSettingsPage.js';
+import { SeoSettingsPage } from './pages/Settings/SeoSettingsPage.js';
 import { UserManagement } from './pages/Users/UserManagement.js';
 import { BackupsPage } from './pages/Backups/BackupsPage.js';
 import { RevisionsPage } from './pages/Revisions/RevisionsPage.js';
+import { TrashPage } from './pages/Trash/TrashPage.js';
 import { ThemesPage } from './pages/Themes/ThemesPage.js';
 import { SetupWizard } from './pages/Setup/SetupWizard.js';
 import { BlueprintStudio } from './pages/Blueprints/BlueprintStudio.js';
 import { FeaturePacksPage } from './pages/Blueprints/FeaturePacksPage.js';
 import { DynamicEntryList } from './pages/Blueprints/DynamicEntryList.js';
 import { DynamicEntryEdit } from './pages/Blueprints/DynamicEntryEdit.js';
+import { DesignSystemPage } from './pages/DesignSystem/DesignSystemPage.js';
 import { api } from './api/client.js';
 
 const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
@@ -61,40 +64,12 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) =
 };
 
 const SmartProductRoute: React.FC = () => {
-  const [isCatalog, setIsCatalog] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    api.get<{ featurePacks?: { catalog?: boolean } }>('/api/settings')
-      .then((data) => {
-        setIsCatalog(!!data?.featurePacks?.catalog);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return null;
-  if (isCatalog) return <ProductList />;
-  return <Navigate to="/blueprints/products" replace />;
+  return <Navigate to="/blueprints/templates" replace />;
 };
 
 const SmartProductEditRoute: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  const [isCatalog, setIsCatalog] = React.useState(false);
-  const [loading, setLoading] = React.useState(true);
-
-  React.useEffect(() => {
-    api.get<{ featurePacks?: { catalog?: boolean } }>('/api/settings')
-      .then((data) => {
-        setIsCatalog(!!data?.featurePacks?.catalog);
-      })
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
-
-  if (loading) return null;
-  if (isCatalog) return <ProductEdit />;
-  return <Navigate to={`/blueprints/products/${slug || 'new'}`} replace />;
+  return <Navigate to={`/blueprints/templates/${slug || 'new'}`} replace />;
 };
 
 export const App: React.FC = () => {
@@ -116,20 +91,26 @@ export const App: React.FC = () => {
             }
           >
             <Route index element={<Dashboard />} />
+            <Route path="design-system" element={<DesignSystemPage />} />
+            <Route path="components-and-tokens" element={<DesignSystemPage />} />
             <Route path="pages" element={<PageList />} />
             <Route path="pages/:slug" element={<PageEdit />} />
             <Route path="posts" element={<PostList />} />
             <Route path="posts/:slug" element={<PostEdit />} />
             <Route path="products" element={<SmartProductRoute />} />
             <Route path="products/:slug" element={<SmartProductEditRoute />} />
+            <Route path="templates" element={<Navigate to="/blueprints/templates" replace />} />
+            <Route path="templates/:slug" element={<SmartProductEditRoute />} />
             <Route path="categories" element={<CategoryList />} />
             <Route path="media" element={<MediaLibrary />} />
             <Route path="navigation" element={<NavigationManager />} />
             <Route path="themes" element={<ThemesPage />} />
             <Route path="settings" element={<SiteSettingsPage />} />
+            <Route path="settings/seo" element={<SeoSettingsPage />} />
             <Route path="users" element={<UserManagement />} />
             <Route path="backups" element={<BackupsPage />} />
             <Route path="revisions" element={<RevisionsPage />} />
+            <Route path="trash" element={<TrashPage />} />
             <Route path="blueprints" element={<Navigate to="/blueprints/studio" replace />} />
             <Route path="blueprints/studio" element={<BlueprintStudio />} />
             <Route path="blueprints/feature-packs" element={<FeaturePacksPage />} />

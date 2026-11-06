@@ -41,7 +41,7 @@ export class ThemeStore {
             name: themeId.charAt(0).toUpperCase() + themeId.slice(1).replace(/-/g, ' '),
             version: '1.0.0',
             author: 'Custom Theme',
-            description: 'Custom static theme for Aero CMS',
+            description: 'Custom static theme for Planfo CMS',
             thumbnail: '',
             supportedPacks: ['pages', 'articles'],
             templates: ['default', 'landing']
@@ -53,7 +53,7 @@ export class ThemeStore {
           name: themeId.charAt(0).toUpperCase() + themeId.slice(1).replace(/-/g, ' '),
           version: '1.0.0',
           author: 'Custom Theme',
-          description: 'Custom static theme for Aero CMS',
+          description: 'Custom static theme for Planfo CMS',
           thumbnail: '',
           supportedPacks: ['pages', 'articles'],
           templates: ['default', 'landing']
@@ -66,26 +66,41 @@ export class ThemeStore {
         thumbnailUrl = `/api/themes/${themeId}/thumbnail`;
       }
 
-      // Read available templates from manifest or scan page/ directory
-      let templates = manifest.templates && manifest.templates.length > 0 ? [...manifest.templates] : [];
-      if (templates.length === 0) {
-        const pageDir = path.join(themeDir, 'page');
-        if (existsSync(pageDir)) {
-          try {
-            const pageFiles = await fs.readdir(pageDir);
-            templates = pageFiles
-              .filter((f) => f.endsWith('.html') || f.endsWith('.ejs'))
-              .map((f) => path.parse(f).name);
-          } catch {
-            // ignore
-          }
+      // Read available templates from manifest or scan theme directories
+      const templateSet = new Set<string>();
+      if (manifest.templates && Array.isArray(manifest.templates)) {
+        manifest.templates.forEach((t) => templateSet.add(t));
+      }
+
+      const pageDir = path.join(themeDir, 'page');
+      if (existsSync(pageDir)) {
+        try {
+          const pageFiles = await fs.readdir(pageDir);
+          pageFiles
+            .filter((f) => f.endsWith('.html') || f.endsWith('.ejs'))
+            .forEach((f) => templateSet.add(path.parse(f).name));
+        } catch {
+          // ignore
         }
       }
+
+      // Also scan root theme files that can serve as page templates
+      try {
+        const rootFiles = await fs.readdir(themeDir);
+        const ignored = new Set(['layout.html', 'index.html', '404.html', 'header.html', 'footer.html', 'theme.json']);
+        rootFiles
+          .filter((f) => (f.endsWith('.html') || f.endsWith('.ejs')) && !ignored.has(f))
+          .forEach((f) => templateSet.add(path.parse(f).name));
+      } catch {
+        // ignore
+      }
+
+      const templates = Array.from(templateSet);
       if (!templates.includes('default')) {
         templates.unshift('default');
       }
 
-      const isDefault = themeId === 'aero-modern';
+      const isDefault = themeId === 'planfo-default' || themeId === 'aero-modern';
 
       themes.push({
         ...manifest,
@@ -226,9 +241,8 @@ export class ThemeStore {
     await fs.rm(themeDir, { recursive: true, force: true });
     logger.info(`Deleted theme directory: ${themeDir}`);
 
-    let activeTheme = 'aero-modern';
+    let activeTheme = existsSync(path.join(this.getThemesPath(), 'planfo-default')) ? 'planfo-default' : 'aero-modern';
     if (wasActive) {
-      activeTheme = 'aero-modern';
       await SettingsStore.update({ activeTheme });
       logger.info(`Reverted active theme to "${activeTheme}" after deleting "${id}"`);
     }
@@ -244,8 +258,9 @@ export class ThemeStore {
   }> {
     try {
       const themesDir = this.getThemesPath();
+      const defaultThemeId = existsSync(path.join(themesDir, 'planfo-default')) ? 'planfo-default' : 'aero-modern';
       if (!existsSync(themesDir)) {
-        return { success: true, deletedCount: 0, activeTheme: 'aero-modern' };
+        return { success: true, deletedCount: 0, activeTheme: defaultThemeId };
       }
 
       const entries = await fs.readdir(themesDir, { withFileTypes: true });
@@ -263,16 +278,16 @@ export class ThemeStore {
         logger.info(`Deleted custom theme: ${themeId}`);
       }
 
-      // Revert active theme to aero-modern
-      await SettingsStore.update({ activeTheme: 'aero-modern' });
+      // Revert active theme to default
+      await SettingsStore.update({ activeTheme: defaultThemeId });
 
-      logger.info(`Removed all uploaded themes (${deletedCount} deleted). Active theme reset to aero-modern.`);
-      return { success: true, deletedCount, activeTheme: 'aero-modern' };
+      logger.info(`Removed all uploaded themes (${deletedCount} deleted). Active theme reset to ${defaultThemeId}.`);
+      return { success: true, deletedCount, activeTheme: defaultThemeId };
     } catch (err) {
       return {
         success: false,
         deletedCount: 0,
-        activeTheme: 'aero-modern',
+        activeTheme: 'planfo-default',
         error: err instanceof Error ? err.message : 'Failed to delete themes'
       };
     }

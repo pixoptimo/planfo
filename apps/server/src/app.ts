@@ -26,6 +26,8 @@ import { statsRouter } from './routes/stats.routes.js';
 import { previewRouter } from './routes/preview.routes.js';
 import { themeRouter } from './routes/theme.routes.js';
 import { blueprintRouter } from './routes/blueprint.routes.js';
+import { trashRouter } from './routes/trash.routes.js';
+import { demoRouter } from './routes/demo.routes.js';
 
 export function createApp(): express.Application {
   const app = express();
@@ -48,6 +50,58 @@ export function createApp(): express.Application {
     dotfiles: 'ignore',
     fallthrough: false
   }));
+
+  // When a user navigates to a demo directly in the browser address bar,
+  // Direct demo visits to the interactive device simulator studio
+  // Top-level browser navigation directly serves the simulator at the clean URL /demos/:slug/index.html.
+  // Direct raw file serving is preserved when loaded inside an iframe or with ?raw=true.
+  app.get(
+    [
+      '/demos/:slug',
+      '/demos/:slug/',
+      '/demos/:slug/index.html',
+      '/admin/demos/:slug',
+      '/admin/demos/:slug/',
+      '/admin/demos/:slug/index.html'
+    ],
+    (req, res, next) => {
+      const isIframe = req.headers['sec-fetch-dest'] === 'iframe';
+      const isRaw = req.query.raw === 'true' || req.query.raw === '1';
+      if (!isIframe && !isRaw) {
+        const demoHtmlPath = path.join(config.OUTPUT_PATH, 'demo.html');
+        if (fs.existsSync(demoHtmlPath)) {
+          return res.sendFile(demoHtmlPath);
+        }
+        const fallbackDemo = path.resolve(config.WORKSPACE_ROOT, 'themes/planfo-default/demo.html');
+        if (fs.existsSync(fallbackDemo)) {
+          return res.sendFile(fallbackDemo);
+        }
+      }
+      next();
+    }
+  );
+
+  // Serve extracted template demo bundles safely (supporting both /demos and /admin/demos)
+  app.use(['/demos', '/admin/demos'], express.static(config.DEMOS_PATH, {
+    maxAge: 0,
+    dotfiles: 'ignore',
+    setHeaders: (res) => {
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    },
+    fallthrough: true
+  }));
+
+  const fallbackDemosPath = path.resolve(config.WORKSPACE_ROOT, 'apps/server/storage/demos');
+  if (fs.existsSync(fallbackDemosPath)) {
+    app.use(['/demos', '/admin/demos'], express.static(fallbackDemosPath, {
+      maxAge: 0,
+      dotfiles: 'ignore',
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      },
+      fallthrough: false
+    }));
+  }
 
   // Health check endpoint
   app.get('/api/health', (_req, res) => {
@@ -89,6 +143,8 @@ export function createApp(): express.Application {
   app.use('/api/preview', previewRouter);
   app.use('/api/themes', themeRouter);
   app.use('/api/blueprints', blueprintRouter);
+  app.use('/api/trash', trashRouter);
+  app.use('/api/demos', demoRouter);
 
   // API 404 Handler for unknown endpoints under /api
   app.all('/api/*', (req, res) => {
@@ -115,7 +171,7 @@ export function createApp(): express.Application {
         <html lang="en">
         <head>
           <meta charset="UTF-8">
-          <title>Aero CMS Admin</title>
+          <title>Planfo CMS Admin</title>
           <style>
             body { font-family: system-ui, sans-serif; background: #0b0f19; color: #f1f5f9; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
             .box { text-align: center; max-width: 480px; padding: 2rem; background: #111827; border: 1px solid #1f2937; border-radius: 1rem; }
@@ -125,7 +181,7 @@ export function createApp(): express.Application {
         </head>
         <body>
           <div class="box">
-            <h1>Aero CMS Admin</h1>
+            <h1>Planfo CMS Admin</h1>
             <p>Admin panel assets not built yet. Run <code>npm run build --workspace=@cms/admin</code></p>
           </div>
         </body>
@@ -162,6 +218,23 @@ export function createApp(): express.Application {
     next();
   });
 
+  // Template Details Clean Route: /:slug/details -> serves details page for the template
+  app.get(/^\/{1,2}([^\/]+)\/details(?:\/|(?:\/index\.html))?$/, (req, res, next) => {
+    const slug = req.params[0];
+    if (!slug || ['admin', 'api', 'demos', 'assets', 'media'].includes(slug)) {
+      return next();
+    }
+    const templatePath = path.join(config.OUTPUT_PATH, 'templates', slug, 'index.html');
+    if (fs.existsSync(templatePath)) {
+      return res.sendFile(templatePath);
+    }
+    const detailsPath = path.join(config.OUTPUT_PATH, 'details.html');
+    if (fs.existsSync(detailsPath)) {
+      return res.sendFile(detailsPath);
+    }
+    return res.redirect(302, `/templates/${encodeURIComponent(slug)}`);
+  });
+
   // Public Static Website - Root Level
   app.use(express.static(config.OUTPUT_PATH, { extensions: ['html'] }));
 
@@ -177,7 +250,7 @@ export function createApp(): express.Application {
         <head>
           <meta charset="UTF-8">
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
-          <title>Page Not Found - Aero CMS</title>
+          <title>Page Not Found - Planfo CMS</title>
           <style>
             body { font-family: system-ui, -apple-system, sans-serif; background: #0b0f19; color: #f1f5f9; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
             .box { text-align: center; max-width: 480px; padding: 2.5rem; background: #111827; border: 1px solid #1f2937; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.5); }

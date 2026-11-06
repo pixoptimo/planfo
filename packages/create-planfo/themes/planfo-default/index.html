@@ -1,0 +1,110 @@
+<!-- Hero Section -->
+<section class="hero-catalog" aria-labelledby="heroHeading">
+  <div class="container">
+
+
+    <h1 class="hero-title" id="heroHeading">
+      <%- (page && page.title && page.title !== 'Home') ? page.title.replace(/\n/g, '<br>') : 'Pure HTML5 & Modern CSS<br>UI Templates Engineered to Wow' %>
+    </h1>
+
+    <p class="hero-description">
+      <%= (page && page.excerpt) ? page.excerpt : (site.description || 'Explore production-grade web templates built with pristine semantic markup, container queries, fluid typography, and zero-framework runtime overhead.') %>
+    </p>
+
+    <div class="hero-stats-bar">
+      <div class="stat-item">
+        <span>⚡ Performance:</span>
+        <strong>100/100 Lighthouse</strong>
+      </div>
+      <div class="stat-item">
+        <span>📦 Dependencies:</span>
+        <strong>0 KB (Pure Vanilla)</strong>
+      </div>
+      <div class="stat-item">
+        <span>📱 Responsive:</span>
+        <strong>Fluid All Devices</strong>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="catalog-controls" role="region" aria-label="Catalog Filtering and Search Controls">
+      <div class="filter-pills" role="tablist" aria-label="Filter templates by category">
+        <button class="filter-pill active" data-category="all" role="tab" id="filterAll" aria-selected="true">All Templates</button>
+        <button class="filter-pill" data-category="saas" role="tab" id="filterSaas">SaaS &amp; Dashboard</button>
+        <button class="filter-pill" data-category="fintech" role="tab" id="filterFintech">Fintech &amp; Web3</button>
+        <button class="filter-pill" data-category="agency" role="tab" id="filterAgency">Creative Studio</button>
+        <button class="filter-pill" data-category="ecommerce" role="tab" id="filterEcommerce">Luxury E-Commerce</button>
+      </div>
+
+      <div class="search-sort-row">
+        <div class="search-box">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input type="search" id="templateSearch" class="search-input" placeholder="Search by name, technology, or keywords..." aria-label="Search UI templates">
+        </div>
+
+        <div class="sort-select-wrapper">
+          <select id="templateSort" class="sort-select" aria-label="Sort templates">
+            <option value="featured">Featured First</option>
+            <option value="rating">Highest Rated</option>
+            <option value="downloads">Most Popular</option>
+            <option value="free">Free Templates First</option>
+          </select>
+          <svg class="sort-arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Templates Card View Grid -->
+<section class="container" aria-label="Template Catalog Grid">
+  <div class="templates-grid" id="templatesGrid">
+    <%
+      const catalogItems = (typeof templates !== 'undefined' && templates.length > 0)
+        ? templates
+        : (typeof products !== 'undefined' ? products : []);
+    %>
+
+    <% if (catalogItems && catalogItems.length > 0) { %>
+      <% catalogItems.forEach(function(item) { %>
+        <%
+          const d = item.data || {};
+          const itemImg = item.featuredImage || (item.images && item.images[0]) || (d.thumbnail || 'assets/images/quantum-saas.jpg');
+          const badgeText = d.badge || (d.isFree ? 'Free' : 'PRO');
+          const badgeColor = d.badgeColor || 'purple';
+          const priceText = d.price || (d.isFree ? 'Free' : '$49');
+          const taglineText = d.tagline || item.excerpt || item.shortDescription || '';
+        %>
+        <article class="template-card" id="card-<%= item.slug %>" data-category="<%= d.categorySlug || 'saas' %>" data-rating="<%= d.rating || 4.98 %>" data-downloads="<%= d.downloads || '10,000' %>" data-free="<%= d.isFree ? 'true' : 'false' %>">
+          <div class="card-thumbnail-box">
+            <img src="<%= itemImg %>" alt="<%= item.title %> preview" class="card-thumbnail" loading="lazy">
+            <span class="badge badge-<%= badgeColor %>"><%= badgeText %></span>
+            <span class="card-price-top"><%= priceText %></span>
+          </div>
+
+          <div class="card-content">
+            <h2 class="card-title">
+              <a href="<%= item.slug %>/details"><%= item.title %></a>
+            </h2>
+            <p class="card-description"><%= taglineText %></p>
+
+            <div class="card-meta">
+              <span class="card-rating">★ <%= d.rating || 4.98 %></span>
+              <span class="card-downloads"><%= d.downloads || '12,000+' %> users</span>
+            </div>
+
+            <div class="card-actions">
+              <a href="<%= item.slug %>/details" class="btn btn-details">Details</a>
+              <a href="demos/<%= item.slug %>/index.html" class="btn btn-demo">Live Demo</a>
+            </div>
+          </div>
+        </article>
+      <% }); %>
+    <% } %>
+  </div>
+</section>
+
+
+

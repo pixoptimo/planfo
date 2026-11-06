@@ -1,0 +1,50 @@
+{
+  "id": "tpl_quantum_saas",
+  "blueprintId": "templates",
+  "title": "Quantum — AI Telemetry & Workflow SaaS",
+  "slug": "quantum-saas",
+  "status": "published",
+  "publishedAt": "2026-10-11T19:53:30.748Z",
+  "category": "general",
+  "tags": [
+    "saas",
+    "dashboard",
+    "ai"
+  ],
+  "excerpt": "Ultra-lean autonomous telemetry cockpit with glowing glassmorphism and real-time SVG charts.",
+  "featuredImage": "assets/images/quantum-saas.jpg",
+  "data": {
+    "tagline": "Ultra-lean autonomous telemetry cockpit with glowing glassmorphism and real-time SVG charts.",
+    "badge": "Trending",
+    "badgeColor": "purple",
+    "category": "SaaS & Dashboard",
+    "categorySlug": "saas",
+    "price": "Free",
+    "isFree": true,
+    "demoUrl": "sample-templates/quantum-saas.html",
+    "downloadFile": "sample-templates/quantum-saas.html",
+    "version": "v2.5.0",
+    "releaseDate": "Sept 28, 2026",
+    "lastUpdated": "Oct 08, 2026",
+    "license": "MIT Commercial & Personal",
+    "author": "Pixoptimo Labs",
+    "rating": 4.98,
+    "reviewCount": 342,
+    "downloads": "14,290",
+    "fileSize": "14.2 KB (Gzipped)",
+    "techStack": "HTML5 Semantic, Vanilla CSS3, Custom Properties, Zero Dependencies, SVG Visualizations",
+    "features": "Sub-20ms Time-to-Interactive (TTI) on mobile networks\nDynamic responsive CSS Grid metrics cockpit with live SVG telemetry waves\nCurated HSL color palette with ambient background glow effects\nFully accessible WCAG 2.1 AAA color contrast compliance\nContainer queries and fluid CSS clamp() responsive typography",
+    "quickStartCode": "<!-- Drop into any web server or static host -->\n<link rel=\"stylesheet\" href=\"assets/css/quantum.css\">\n<script src=\"assets/js/cockpit.js\" defer></script>",
+    "cssTokens": ":root {\n  --bg-space: #07090e;\n  --card-surface: rgba(14, 18, 28, 0.75);\n  --border-glow: rgba(99, 102, 241, 0.25);\n  --accent-neon: #6366f1;\n  --accent-cyan: #06b6d4;\n  --text-main: #f8fafc;\n  --text-dim: #94a3b8;\n}",
+    "lighthousePerformance": 100,
+    "lighthouseAccessibility": 100,
+    "lighthouseBestPractices": 100,
+    "lighthouseSeo": 100,
+    "changelog": "v2.5.0 (Oct 08, 2026): Added mobile fluid grid clamp() scaling.\nv2.0.0 (Sept 28, 2026): Initial release with SVG charts."
+  },
+  "content": {
+    "blocks": []
+  },
+  "createdAt": "2026-10-11T19:53:30.748Z",
+  "updatedAt": "2026-10-11T20:16:53.887Z"
+}

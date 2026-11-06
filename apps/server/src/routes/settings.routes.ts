@@ -1,3 +1,4 @@
+import { triggerStaticBuild } from "../storage/buildTrigger.js";
 import { Router, type Request, type Response } from 'express';
 import { UpdateSiteSettingsSchema } from '@cms/schemas';
 import { SettingsStore } from '../storage/settingsStore.js';
@@ -28,6 +29,7 @@ settingsRouter.put('/', requirePermission('settings.update'), async (req: Reques
 
   const updated = await SettingsStore.update(parseResult.data);
   logger.audit('Settings Updated', { user: req.user?.email });
+  triggerStaticBuild().catch(() => {});
   res.json({ success: true, data: updated });
 });
 

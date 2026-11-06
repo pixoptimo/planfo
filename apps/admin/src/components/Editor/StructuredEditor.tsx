@@ -15,7 +15,8 @@ import {
   ArrowDown,
   Plus,
   Eye,
-  Edit3
+  Edit3,
+  LayoutGrid
 } from 'lucide-react';
 import type { StructuredContent, ContentBlock, ContentBlockType } from '@cms/schemas';
 import { renderStructuredContent } from '@cms/utils/dist/sanitizer.js';
@@ -46,6 +47,42 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
         break;
       case 'paragraph':
         newBlock = { id, type: 'paragraph', text: '' };
+        break;
+      case 'grid':
+        newBlock = {
+          id,
+          type: 'grid',
+          columns: 3,
+          items: [
+            {
+              id: `item_${Date.now()}_1`,
+              icon: '✨',
+              badge: 'Fast',
+              title: 'Feature One',
+              text: 'Detail about this key highlight or offering.',
+              buttonText: 'Learn More',
+              buttonUrl: '#'
+            },
+            {
+              id: `item_${Date.now()}_2`,
+              icon: '🚀',
+              badge: 'Scalable',
+              title: 'Feature Two',
+              text: 'Detail about this key highlight or offering.',
+              buttonText: 'Learn More',
+              buttonUrl: '#'
+            },
+            {
+              id: `item_${Date.now()}_3`,
+              icon: '🎯',
+              badge: 'Reliable',
+              title: 'Feature Three',
+              text: 'Detail about this key highlight or offering.',
+              buttonText: 'Learn More',
+              buttonUrl: '#'
+            }
+          ]
+        };
         break;
       case 'blockquote':
         newBlock = { id, type: 'blockquote', text: '', citation: '' };
@@ -156,6 +193,15 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
             </button>
             <button
               type="button"
+              onClick={() => addBlock('grid')}
+              className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs flex items-center gap-1 border border-brand-500/30"
+              title="Multi-Column Grid Cards"
+            >
+              <LayoutGrid className="w-3.5 h-3.5 text-brand-400" />
+              <span className="text-brand-300 font-medium">Grid</span>
+            </button>
+            <button
+              type="button"
               onClick={() => addBlock('image')}
               className="p-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs flex items-center gap-1"
               title="Image"
@@ -256,6 +302,14 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                   className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold rounded-lg text-xs"
                 >
                   + Add Heading
+                </button>
+                <button
+                  type="button"
+                  onClick={() => addBlock('grid')}
+                  className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-brand-300 border border-brand-500/30 font-semibold rounded-lg text-xs flex items-center gap-1.5"
+                >
+                  <LayoutGrid className="w-3.5 h-3.5" />
+                  <span>+ Add Grid Cards</span>
                 </button>
               </div>
             </div>
@@ -584,6 +638,203 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                     >
                       <Plus className="w-3.5 h-3.5" />
                       <span>Add table row</span>
+                    </button>
+                  </div>
+                )}
+
+                {block.type === 'grid' && (
+                  <div className="space-y-4">
+                    {/* Grid Configuration Controls */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 bg-slate-900/90 border border-slate-800 rounded-lg p-3">
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs font-semibold text-slate-300">Layout Columns:</span>
+                        <div className="flex items-center space-x-1 bg-slate-950 p-1 rounded border border-slate-800">
+                          {([2, 3, 4] as const).map((colCount) => (
+                            <button
+                              key={colCount}
+                              type="button"
+                              onClick={() => updateBlock(block.id, { columns: colCount })}
+                              className={`px-2.5 py-1 rounded text-xs font-semibold transition ${
+                                (block.columns || 3) === colCount
+                                  ? 'bg-brand-600 text-slate-950 shadow-sm'
+                                  : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              {colCount} Cols
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="flex items-center space-x-2">
+                        <span className="text-xs text-slate-400 font-mono">
+                          {block.items?.length || 0} Card{block.items?.length === 1 ? '' : 's'}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const currentItems = block.items || [];
+                            const newItem = {
+                              id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                              icon: '📌',
+                              badge: '',
+                              title: `Card ${currentItems.length + 1}`,
+                              text: 'Write card description or information here...',
+                              buttonText: '',
+                              buttonUrl: ''
+                            };
+                            updateBlock(block.id, { items: [...currentItems, newItem] });
+                          }}
+                          className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-brand-400 hover:text-brand-300 rounded text-xs font-medium flex items-center space-x-1"
+                        >
+                          <Plus className="w-3.5 h-3.5" />
+                          <span>Add Card</span>
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Cards List */}
+                    <div className="space-y-3">
+                      {(block.items || []).map((item, itemIdx) => (
+                        <div
+                          key={item.id || itemIdx}
+                          className="bg-slate-900 border border-slate-800 rounded-lg p-3.5 space-y-2.5 relative group/card hover:border-slate-700 transition"
+                        >
+                          <div className="flex items-center justify-between border-b border-slate-800/80 pb-2">
+                            <span className="text-xs font-semibold text-slate-400 flex items-center space-x-1.5">
+                              <span className="w-4 h-4 rounded-full bg-slate-800 text-[10px] flex items-center justify-center text-brand-400 font-mono font-bold">
+                                {itemIdx + 1}
+                              </span>
+                              <span>Column Item</span>
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const currentItems = block.items || [];
+                                updateBlock(block.id, {
+                                  items: currentItems.filter((_, idx) => idx !== itemIdx)
+                                });
+                              }}
+                              className="text-slate-400 hover:text-red-400 p-1 rounded transition"
+                              title="Delete Card"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                            <div className="sm:col-span-2">
+                              <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Icon / Emoji</label>
+                              <input
+                                type="text"
+                                value={item.icon || ''}
+                                onChange={(e) => {
+                                  const newItems = [...(block.items || [])];
+                                  newItems[itemIdx] = { ...newItems[itemIdx], icon: e.target.value };
+                                  updateBlock(block.id, { items: newItems });
+                                }}
+                                placeholder="✨ or 💡"
+                                className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-white"
+                              />
+                            </div>
+                            <div className="sm:col-span-3">
+                              <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Badge (Optional)</label>
+                              <input
+                                type="text"
+                                value={item.badge || ''}
+                                onChange={(e) => {
+                                  const newItems = [...(block.items || [])];
+                                  newItems[itemIdx] = { ...newItems[itemIdx], badge: e.target.value };
+                                  updateBlock(block.id, { items: newItems });
+                                }}
+                                placeholder="Popular, New, etc."
+                                className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-brand-300"
+                              />
+                            </div>
+                            <div className="sm:col-span-7">
+                              <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Title</label>
+                              <input
+                                type="text"
+                                value={item.title || ''}
+                                onChange={(e) => {
+                                  const newItems = [...(block.items || [])];
+                                  newItems[itemIdx] = { ...newItems[itemIdx], title: e.target.value };
+                                  updateBlock(block.id, { items: newItems });
+                                }}
+                                placeholder="Card headline or title"
+                                className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs font-semibold text-white"
+                              />
+                            </div>
+                          </div>
+
+                          <div>
+                            <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Content Text</label>
+                            <textarea
+                              rows={2}
+                              value={item.text || ''}
+                              onChange={(e) => {
+                                const newItems = [...(block.items || [])];
+                                newItems[itemIdx] = { ...newItems[itemIdx], text: e.target.value };
+                                updateBlock(block.id, { items: newItems });
+                              }}
+                              placeholder="Description or key points for this card..."
+                              className="w-full bg-slate-950 border border-slate-800 rounded p-2 text-xs text-slate-200"
+                            />
+                          </div>
+
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                            <div>
+                              <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Button Label (Optional)</label>
+                              <input
+                                type="text"
+                                value={item.buttonText || ''}
+                                onChange={(e) => {
+                                  const newItems = [...(block.items || [])];
+                                  newItems[itemIdx] = { ...newItems[itemIdx], buttonText: e.target.value };
+                                  updateBlock(block.id, { items: newItems });
+                                }}
+                                placeholder="Learn More, View Details..."
+                                className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-300"
+                              />
+                            </div>
+                            <div>
+                              <label className="block text-[10px] text-slate-400 uppercase tracking-wider mb-0.5">Button Link / URL (Optional)</label>
+                              <input
+                                type="text"
+                                value={item.buttonUrl || ''}
+                                onChange={(e) => {
+                                  const newItems = [...(block.items || [])];
+                                  newItems[itemIdx] = { ...newItems[itemIdx], buttonUrl: e.target.value };
+                                  updateBlock(block.id, { items: newItems });
+                                }}
+                                placeholder="/contact or https://..."
+                                className="w-full bg-slate-950 border border-slate-800 rounded px-2.5 py-1.5 text-xs font-mono text-slate-300"
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const currentItems = block.items || [];
+                        const newItem = {
+                          id: `item_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+                          icon: '⚡',
+                          badge: '',
+                          title: `Card ${currentItems.length + 1}`,
+                          text: 'Write card description or information here...',
+                          buttonText: '',
+                          buttonUrl: ''
+                        };
+                        updateBlock(block.id, { items: [...currentItems, newItem] });
+                      }}
+                      className="w-full py-2 border border-dashed border-slate-800 hover:border-slate-700 bg-slate-900/50 hover:bg-slate-900 text-xs text-brand-400 rounded-lg flex items-center justify-center space-x-1.5 transition"
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                      <span>Add Another Grid Card</span>
                     </button>
                   </div>
                 )}

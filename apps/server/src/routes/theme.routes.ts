@@ -168,7 +168,7 @@ themeRouter.delete('/', requirePermission('settings.update'), async (req: Reques
   res.json({
     success: true,
     data: {
-      message: `Removed ${result.deletedCount} uploaded themes. Active theme reset to aero-modern.`,
+      message: `Removed ${result.deletedCount} uploaded themes. Active theme reset to ${result.activeTheme}.`,
       deletedCount: result.deletedCount,
       activeTheme: result.activeTheme,
       themes: allThemes

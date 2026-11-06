@@ -150,4 +150,86 @@ describe('Content Management & Filesystem Storage', () => {
 
     await ProductStore.delete(slug);
   });
+
+  it('should support noIndex option on individual pages and exclude from sitemap', async () => {
+    const { generateSitemapXml } = await import('../apps/generator/src/sitemap.js');
+    const slug = `noindex-page-${Date.now()}`;
+    const page: Page = {
+      id: `page_${Date.now()}`,
+      title: 'Secret Internal Page',
+      slug,
+      status: 'published',
+      template: 'default',
+      content: { blocks: [] },
+      featuredImage: '',
+      noIndex: true,
+      seo: {
+        title: 'Secret Page',
+        description: 'Should not be indexed',
+        canonical: '',
+        ogTitle: '',
+        ogDescription: '',
+        ogImage: '',
+        robots: 'noindex,nofollow',
+        noIndex: true
+      },
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+      publishedAt: new Date().toISOString()
+    };
+
+    await PageStore.save(page);
+    const retrieved = await PageStore.getBySlug(slug);
+    expect(retrieved).not.toBeNull();
+    expect(retrieved?.noIndex).toBe(true);
+    expect(retrieved?.seo.robots).toBe('noindex,nofollow');
+
+    // Test sitemap generation excludes this page
+    const sitemap = generateSitemapXml('http://localhost:3000', [page], [], []);
+    expect(sitemap).not.toContain(`/${slug}`);
+
+    await PageStore.delete(slug);
+  });
+
+  it('should enforce noindex,nofollow across all pages when site-wide indexing is discouraged in settings', async () => {
+    const { TemplateCompiler } = await import('../apps/generator/src/compiler.js');
+    const { generateRobotsTxt } = await import('../apps/generator/src/robots.js');
+    const { generateSitemapXml } = await import('../apps/generator/src/sitemap.js');
+
+    const compiler = new TemplateCompiler('/tmp');
+
+    // Site settings with "discourage search engines" enabled
+    const siteSettings: any = {
+      siteName: 'Test Site',
+      siteUrl: 'http://localhost:3000',
+      tagline: 'Tagline',
+      defaultSEO: {
+        title: 'Test Site',
+        description: 'Test Site Desc',
+        robots: 'noindex,nofollow',
+        noIndex: true
+      }
+    };
+
+    // A normal page that previously had standard index,follow
+    const pageSeo: any = {
+      title: 'About Us',
+      description: 'About page',
+      robots: 'index,follow',
+      noIndex: false
+    };
+
+    const metaTags = compiler.renderMetaTags(pageSeo, siteSettings, 'About Us', 'About page');
+    expect(metaTags).toContain('<meta name="robots" content="noindex,nofollow">');
+    expect(metaTags).not.toContain('<meta name="robots" content="index,follow">');
+
+    // Verify robots.txt outputs Disallow: /
+    const robotsTxt = generateRobotsTxt(siteSettings.siteUrl, true);
+    expect(robotsTxt).toContain('Disallow: /');
+    expect(robotsTxt).not.toContain('Allow: /');
+
+    // Verify sitemap is cleared / empty urlset
+    const sitemap = generateSitemapXml(siteSettings.siteUrl, [], [], [], [], true);
+    expect(sitemap).not.toContain('<url>');
+  });
 });

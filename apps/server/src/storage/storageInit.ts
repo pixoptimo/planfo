@@ -1,7 +1,8 @@
 import path from 'node:path';
-import { ensureDir, pathExists, writeJsonAtomic } from '@cms/utils';
+import { ensureDir, pathExists, writeJsonAtomic, readJson, logger } from '@cms/utils';
+import { UsersFileSchema, type User, type UsersFile } from '@cms/schemas';
+import { hashPassword } from '../auth/password.js';
 import { config } from '../config/env.js';
-import { logger } from '@cms/utils';
 
 export async function initializeStorage(): Promise<void> {
   // Directories to ensure
@@ -22,6 +23,8 @@ export async function initializeStorage(): Promise<void> {
     config.SESSION_PATH,
     config.SETTINGS_PATH,
     config.BACKUP_PATH,
+    config.TRASH_PATH,
+    config.DEMOS_PATH,
     config.OUTPUT_PATH,
     config.TEMPLATES_PATH
   ];
@@ -32,8 +35,31 @@ export async function initializeStorage(): Promise<void> {
 
   // Base files initialization
   const usersPath = path.join(config.STORAGE_PATH, 'auth', 'users.json');
-  if (!(await pathExists(usersPath))) {
-    await writeJsonAtomic(usersPath, { users: [] });
+  let usersList: User[] = [];
+  if (await pathExists(usersPath)) {
+    try {
+      const data = await readJson<UsersFile>(usersPath, UsersFileSchema);
+      usersList = data.users;
+    } catch {}
+  }
+
+  const hasActiveAdmin = usersList.some((u) => u.role === 'admin' && u.active);
+  if (!hasActiveAdmin) {
+    const defaultPasswordHash = await hashPassword('admin123');
+    const now = new Date().toISOString();
+    const defaultAdmin: User = {
+      id: 'usr_admin_default',
+      email: 'admin@example.com',
+      name: 'admin',
+      passwordHash: defaultPasswordHash,
+      role: 'admin',
+      active: true,
+      createdAt: now,
+      updatedAt: now
+    };
+    usersList = [defaultAdmin, ...usersList.filter((u) => u.id !== 'usr_admin_default')];
+    await writeJsonAtomic(usersPath, { users: usersList }, UsersFileSchema);
+    logger.info('Auto-seeded default admin (admin / admin123) in storage/auth/users.json');
   }
 
   const categoriesPath = path.join(config.CONTENT_PATH, 'categories', 'index.json');
@@ -68,6 +94,8 @@ export async function initializeStorage(): Promise<void> {
       id: 'menu_main',
       name: 'Main Navigation',
       slug: 'main',
+      location: 'header',
+      locations: ['header'],
       items: [
         { id: 'm_home', label: 'Home', url: '/', target: '_self', children: [] },
         { id: 'm_about', label: 'About', url: '/about-us', target: '_self', children: [] },
@@ -79,19 +107,39 @@ export async function initializeStorage(): Promise<void> {
     });
   }
 
+  const footerMenuPath = path.join(config.CONTENT_PATH, 'menus', 'footer.json');
+  if (!(await pathExists(footerMenuPath))) {
+    await writeJsonAtomic(footerMenuPath, {
+      id: 'menu_footer',
+      name: 'Footer Navigation',
+      slug: 'footer',
+      location: 'footer',
+      locations: ['footer'],
+      items: [
+        { id: 'mf_home', label: 'Home', url: '/', target: '_self', children: [] },
+        { id: 'mf_about', label: 'About', url: '/about-us', target: '_self', children: [] },
+        { id: 'mf_products', label: 'Catalog', url: '/products', target: '_self', children: [] },
+        { id: 'mf_contact', label: 'Contact', url: '/contact', target: '_self', children: [] },
+        { id: 'mf_privacy', label: 'Privacy Policy', url: '/privacy.html', target: '_self', children: [] },
+        { id: 'mf_terms', label: 'Terms of Service', url: '/terms.html', target: '_self', children: [] }
+      ],
+      updatedAt: new Date().toISOString()
+    });
+  }
+
   const settingsPath = path.join(config.SETTINGS_PATH, 'site.json');
   if (!(await pathExists(settingsPath))) {
     await writeJsonAtomic(settingsPath, {
-      siteName: 'Aero Static CMS',
+      siteName: 'Planfo Static CMS',
       siteUrl: config.SITE_URL,
       tagline: 'Modern, high-performance static website powered by a file-based CMS.',
       logo: '',
       favicon: '',
       defaultSEO: {
-        title: 'Aero Static CMS - Blazing Fast Content Management',
+        title: 'Planfo Static CMS - Blazing Fast Content Management',
         description: 'Manage rich content with zero database overhead and deploy lightning-fast static HTML.',
         canonical: config.SITE_URL,
-        ogTitle: 'Aero Static CMS',
+        ogTitle: 'Planfo Static CMS',
         ogDescription: 'Manage rich content with zero database overhead.',
         ogImage: '',
         robots: 'index,follow'
@@ -103,7 +151,7 @@ export async function initializeStorage(): Promise<void> {
       analyticsId: '',
       timezone: 'UTC',
       language: 'en',
-      footerText: '© 2026 Aero Static CMS. Built with TypeScript and React.',
+      footerText: '© 2026 Planfo. Built with TypeScript and React.',
       updatedAt: new Date().toISOString()
     });
   }

@@ -10,6 +10,7 @@ import {
   ShieldCheck,
   CheckCircle2,
   AlertCircle,
+  AlertTriangle,
   Loader2,
   X,
   FileText,
@@ -30,6 +31,7 @@ import {
 import type { Blueprint, BlueprintField, BlueprintFieldType, SiteSettings } from '@cms/schemas';
 import { api } from '../../api/client.js';
 import { BLUEPRINT_ICONS, getBlueprintIcon } from '../../utils/blueprintIcons.js';
+import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { FEATURE_PACKS, type FeaturePackDefinition } from '../../data/featurePacks.js';
 
@@ -170,10 +172,7 @@ export const BlueprintStudio: React.FC = () => {
     if (!isEditing) {
       const autoSingular = val.endsWith('s') && val.length > 2 ? val.slice(0, -1) : val;
       setSingularName(autoSingular);
-      const autoSlug = val
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, '');
+      const autoSlug = slugify(val);
       setSlug(autoSlug);
     }
   };
@@ -221,7 +220,7 @@ export const BlueprintStudio: React.FC = () => {
     const payload = {
       name: name.trim(),
       singularName: singularName.trim(),
-      slug: slug.trim() || undefined,
+      slug: isEditing && editingSlug ? editingSlug : (slug.trim() || undefined),
       description: description.trim(),
       icon,
       hasCategories,
@@ -253,17 +252,39 @@ export const BlueprintStudio: React.FC = () => {
     }
   };
 
-  const handleDelete = async (bp: Blueprint) => {
+  const [blueprintToDelete, setBlueprintToDelete] = useState<Blueprint | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteClick = (bp: Blueprint) => {
     if (bp.isBuiltIn) return;
-    if (!confirm(`Are you sure you want to delete blueprint "${bp.name}"? Existing entries will remain in storage.`)) return;
+    setBlueprintToDelete(bp);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!blueprintToDelete || blueprintToDelete.isBuiltIn) return;
+
+    // Step 2: Browser alert / confirm box for final ok
+    const finalConfirmed = window.confirm(
+      `WARNING: PERMANENT DATA LOSS!\n\nBy deleting blueprint "${blueprintToDelete.name}", your entire schema structure and associated collection data may be permanently lost.\n\nClick OK to permanently delete, or Cancel to keep it.`
+    );
+    if (!finalConfirmed) return;
 
     try {
-      await api.delete(`/api/blueprints/${bp.slug}`);
-      setSuccess(`Blueprint "${bp.name}" deleted.`);
+      setIsDeleting(true);
+      await api.delete(`/api/blueprints/${blueprintToDelete.slug}`);
+      setSuccess(`Blueprint "${blueprintToDelete.name}" deleted successfully.`);
+      const deletedSlug = blueprintToDelete.slug;
+      setBlueprintToDelete(null);
+      if (isModalOpen && editingSlug === deletedSlug) {
+        setIsModalOpen(false);
+      }
       await loadBlueprints();
       window.dispatchEvent(new CustomEvent('blueprints-updated'));
+      window.dispatchEvent(new CustomEvent('trash-updated'));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Delete failed');
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -574,7 +595,7 @@ export const BlueprintStudio: React.FC = () => {
                       </button>
 
                       <button
-                        onClick={() => handleDelete(bp)}
+                        onClick={() => handleDeleteClick(bp)}
                         className="p-1.5 text-slate-400 hover:text-rose-400 rounded hover:bg-slate-800 transition"
                         title="Delete Blueprint"
                       >
@@ -678,16 +699,22 @@ export const BlueprintStudio: React.FC = () => {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    URL Slug Identifier *
+                    {isEditing ? 'Storage Folder & URL Slug (Locked)' : 'URL Slug Identifier *'}
                   </label>
                   <input
                     type="text"
                     required
+                    disabled={isEditing}
                     value={slug}
                     onChange={(e) => setSlug(e.target.value)}
-                    placeholder="e.g. testimonials"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500"
+                    placeholder="e.g. templates"
+                    className={`w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500 ${isEditing ? 'opacity-60 cursor-not-allowed' : ''}`}
                   />
+                  {isEditing && (
+                    <p className="text-[10px] text-slate-500 mt-1">
+                      Folder stays <span className="text-brand-400 font-mono">content/{editingSlug}</span> so all your existing items stay safe and connected.
+                    </p>
+                  )}
                 </div>
 
                 <div>
@@ -891,25 +918,101 @@ export const BlueprintStudio: React.FC = () => {
               </div>
 
               {/* Submit footer */}
-              <div className="pt-4 border-t border-slate-800 flex items-center justify-end space-x-3">
+              <div className="pt-4 border-t border-slate-800 flex items-center justify-between">
+                {isEditing && editingSlug && !builtIns.some((b) => b.slug === editingSlug) ? (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const bp = blueprints.find((b) => b.slug === editingSlug);
+                      if (bp) handleDeleteClick(bp);
+                    }}
+                    className="px-3.5 py-2 text-xs font-semibold text-rose-400 hover:text-white hover:bg-rose-500/20 border border-rose-500/30 rounded-xl flex items-center space-x-1.5 transition"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    <span>Delete Blueprint</span>
+                  </button>
+                ) : (
+                  <div />
+                )}
+
+                <div className="flex items-center space-x-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsModalOpen(false)}
+                    className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition"
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    type="submit"
+                    disabled={saving}
+                    className="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-xl flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+                  >
+                    {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                    <span>{isEditing ? 'Save Blueprint Schema' : 'Create Blueprint'}</span>
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Danger Confirmation Modal (Step 1 of 2) */}
+      {blueprintToDelete && (
+        <div className="fixed inset-0 z-[60] bg-black/80 backdrop-blur-sm flex items-center justify-center p-4">
+          <div className="bg-slate-900 border border-rose-500/30 rounded-2xl w-full max-w-md overflow-hidden shadow-2xl animate-in fade-in zoom-in-95 duration-150">
+            <div className="p-6">
+              <div className="flex items-start space-x-4">
+                <div className="w-12 h-12 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center flex-shrink-0 text-rose-400">
+                  <AlertTriangle className="w-6 h-6" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center space-x-2">
+                    <h3 className="text-base font-bold text-white">Delete Blueprint?</h3>
+                    <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/30 uppercase tracking-wider font-semibold">
+                      Danger
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-300 mt-2 leading-relaxed">
+                    Are you sure you want to delete the blueprint <strong className="text-white">"{blueprintToDelete.name}"</strong> (<code className="text-rose-400 font-mono text-[11px]">{blueprintToDelete.slug}</code>)?
+                  </p>
+                  <div className="mt-3.5 p-3.5 bg-rose-950/20 border border-rose-500/20 rounded-xl space-y-1.5">
+                    <p className="text-xs font-semibold text-rose-300 flex items-center gap-1.5">
+                      <span>Permanent Data Loss Warning</span>
+                    </p>
+                    <p className="text-[11px] text-slate-400 leading-relaxed">
+                      By deleting this blueprint, your entire schema structure and associated data will be removed. This action cannot be reversed.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 pt-4 border-t border-slate-800 flex items-center justify-end space-x-3">
                 <button
                   type="button"
-                  onClick={() => setIsModalOpen(false)}
-                  className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white transition"
+                  disabled={isDeleting}
+                  onClick={() => setBlueprintToDelete(null)}
+                  className="px-4 py-2 text-xs font-medium text-slate-400 hover:text-white rounded-xl hover:bg-slate-800 transition"
                 >
                   Cancel
                 </button>
-
                 <button
-                  type="submit"
-                  disabled={saving}
-                  className="px-5 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-xl flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+                  type="button"
+                  disabled={isDeleting}
+                  onClick={handleConfirmDelete}
+                  className="px-4 py-2 text-xs font-bold text-white rounded-xl bg-rose-600 hover:bg-rose-500 shadow-lg shadow-rose-600/30 flex items-center space-x-2 transition disabled:opacity-50"
                 >
-                  {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
-                  <span>{isEditing ? 'Save Blueprint Schema' : 'Create Blueprint'}</span>
+                  {isDeleting ? (
+                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  ) : (
+                    <Trash2 className="w-3.5 h-3.5" />
+                  )}
+                  <span>Delete Blueprint</span>
                 </button>
               </div>
-            </form>
+            </div>
           </div>
         </div>
       )}

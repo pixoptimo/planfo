@@ -9,7 +9,8 @@ import {
   Image as ImageIcon,
   Loader2,
   CheckCircle2,
-  AlertCircle
+  AlertCircle,
+  Sparkles
 } from 'lucide-react';
 import type { Page, RevisionMeta } from '@cms/schemas';
 import { api } from '../../api/client.js';
@@ -17,13 +18,17 @@ import { StructuredEditor } from '../../components/Editor/StructuredEditor.js';
 import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { StatusBadge } from '../../components/UI/StatusBadge.js';
+import { getMediaUrl } from '../../utils/media.js';
+import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
+import { getTemplatePreset } from '../../data/templatePresets.js';
 
 export const PageEdit: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
   const isNew = !slug || slug === 'new';
   const navigate = useNavigate();
   const { can } = useAuth();
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(!isNew);
 
   const [page, setPage] = useState<Partial<Page>>({
     title: '',
@@ -32,6 +37,7 @@ export const PageEdit: React.FC = () => {
     template: 'default',
     content: { blocks: [] },
     featuredImage: '',
+    noIndex: false,
     seo: {
       title: '',
       description: '',
@@ -39,7 +45,8 @@ export const PageEdit: React.FC = () => {
       ogTitle: '',
       ogDescription: '',
       ogImage: '',
-      robots: 'index,follow'
+      robots: 'index,follow',
+      noIndex: false
     }
   });
 
@@ -187,16 +194,6 @@ export const PageEdit: React.FC = () => {
                 <History className="w-3.5 h-3.5" />
                 <span>Revisions</span>
               </button>
-
-              <a
-                href={`/api/preview/page/${page.slug}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-brand-400 border border-slate-800 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition"
-              >
-                <Eye className="w-3.5 h-3.5" />
-                <span>Live Preview</span>
-              </a>
             </>
           )}
 
@@ -218,7 +215,7 @@ export const PageEdit: React.FC = () => {
               className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>Publish Page</span>
+              <span>{page.status === 'published' ? 'Update Page' : 'Publish Page'}</span>
             </button>
           )}
         </div>
@@ -249,20 +246,48 @@ export const PageEdit: React.FC = () => {
               type="text"
               required
               value={page.title || ''}
-              onChange={(e) => setPage({ ...page, title: e.target.value })}
+              onChange={(e) => {
+                const newTitle = e.target.value;
+                setPage((prev) => {
+                  const next = { ...prev, title: newTitle };
+                  if (!slugManuallyEdited || !prev.slug) {
+                    next.slug = slugify(newTitle);
+                  }
+                  return next;
+                });
+              }}
               placeholder="About Us, Contact, Features..."
               className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-base font-semibold text-white focus:outline-none focus:border-brand-500"
             />
           </div>
 
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              URL Slug
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                URL Slug
+              </label>
+              {page.title && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const auto = slugify(page.title || '');
+                    setPage((prev) => ({ ...prev, slug: auto }));
+                    setSlugManuallyEdited(false);
+                  }}
+                  className="text-[11px] text-brand-400 hover:text-brand-300 font-medium transition"
+                >
+                  Regenerate from Title
+                </button>
+              )}
+            </div>
             <input
               type="text"
               value={page.slug || ''}
-              onChange={(e) => setPage({ ...page, slug: e.target.value })}
+              onChange={(e) => {
+                const val = e.target.value;
+                setSlugManuallyEdited(val.trim().length > 0);
+                setPage((prev) => ({ ...prev, slug: val }));
+              }}
               placeholder="auto-generated-from-title"
               className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
             />
@@ -272,12 +297,32 @@ export const PageEdit: React.FC = () => {
         {/* Sidebar Controls */}
         <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
           <div>
-            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
-              Layout Template
-            </label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Layout Template
+              </label>
+            </div>
             <select
               value={page.template || 'default'}
-              onChange={(e) => setPage({ ...page, template: e.target.value })}
+              onChange={(e) => {
+                const newTemplate = e.target.value;
+                const preset = getTemplatePreset(newTemplate);
+                const currentBlocks = (page.content as any)?.blocks || [];
+                const isEmpty =
+                  currentBlocks.length === 0 ||
+                  (currentBlocks.length === 1 && !currentBlocks[0]?.text?.trim() && !currentBlocks[0]?.items?.length);
+
+                if (preset && isEmpty) {
+                  setPage((prev) => ({
+                    ...prev,
+                    template: newTemplate,
+                    content: { blocks: JSON.parse(JSON.stringify(preset.blocks)) }
+                  }));
+                  setSuccess(`Auto-filled sections and grid cards for "${preset.name}"!`);
+                } else {
+                  setPage((prev) => ({ ...prev, template: newTemplate }));
+                }
+              }}
               className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500 capitalize"
             >
               {Array.from(new Set(['default', ...availableTemplates, page.template || 'default'])).map((tpl) => (
@@ -286,6 +331,42 @@ export const PageEdit: React.FC = () => {
                 </option>
               ))}
             </select>
+
+            {(() => {
+              const currentPreset = getTemplatePreset(page.template || 'default');
+              if (!currentPreset) return null;
+              return (
+                <div className="mt-2 pt-2 border-t border-slate-800/80 flex items-center justify-between">
+                  <span className="text-[11px] text-slate-400 truncate max-w-[140px]" title={currentPreset.description}>
+                    Preset: <strong className="text-slate-200">{currentPreset.name}</strong>
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const currentBlocks = (page.content as any)?.blocks || [];
+                      if (
+                        currentBlocks.length > 0 &&
+                        !confirm(
+                          `Load "${currentPreset.name}" sections? This will populate the editor with starter sections and grid cards.`
+                        )
+                      ) {
+                        return;
+                      }
+                      setPage((prev) => ({
+                        ...prev,
+                        content: { blocks: JSON.parse(JSON.stringify(currentPreset.blocks)) }
+                      }));
+                      setSuccess(`Loaded "${currentPreset.name}" sections and grid cards!`);
+                    }}
+                    className="text-[11px] text-brand-400 hover:text-brand-300 font-medium flex items-center space-x-1 hover:underline"
+                    title="Load starter sections and multi-column grid cards"
+                  >
+                    <Sparkles className="w-3 h-3 text-brand-400" />
+                    <span>Load Sections</span>
+                  </button>
+                </div>
+              );
+            })()}
           </div>
 
           <div>
@@ -311,11 +392,62 @@ export const PageEdit: React.FC = () => {
               </div>
 
               {page.featuredImage && (
-                <div className="aspect-video bg-slate-950 rounded-lg overflow-hidden border border-slate-800">
-                  <img src={page.featuredImage} alt="Featured" className="w-full h-full object-cover" />
+                <div className="aspect-video bg-slate-950 rounded-lg overflow-hidden border border-slate-800 relative">
+                  <img
+                    src={getMediaUrl(page.featuredImage)}
+                    alt="Featured"
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = 'none';
+                    }}
+                  />
                 </div>
               )}
             </div>
+          </div>
+
+          {/* Search Engine Visibility / Indexing Directive */}
+          <div className="pt-3 border-t border-slate-800 space-y-2">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Search Engine Indexing
+              </label>
+              <span
+                className={`text-[10px] font-mono px-2 py-0.5 rounded font-bold ${
+                  page.noIndex || page.seo?.robots?.includes('noindex')
+                    ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                    : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                }`}
+              >
+                {page.noIndex || page.seo?.robots?.includes('noindex') ? 'No-Index' : 'Indexed'}
+              </span>
+            </div>
+
+            <label className="flex items-start space-x-2.5 p-3 bg-slate-950 border border-slate-800 rounded-lg cursor-pointer hover:border-slate-700 transition">
+              <input
+                type="checkbox"
+                checked={Boolean(page.noIndex || page.seo?.robots?.includes('noindex'))}
+                onChange={(e) => {
+                  const isChecked = e.target.checked;
+                  setPage((prev) => ({
+                    ...prev,
+                    noIndex: isChecked,
+                    seo: {
+                      ...prev.seo,
+                      noIndex: isChecked,
+                      robots: isChecked ? 'noindex,nofollow' : 'index,follow'
+                    } as any
+                  }));
+                }}
+                className="mt-0.5 rounded border-slate-700 text-brand-500 focus:ring-0 focus:ring-offset-0 bg-slate-900"
+              />
+              <div className="text-xs">
+                <span className="font-semibold text-slate-200 block">No-Index this page</span>
+                <span className="text-[11px] text-slate-400 block leading-relaxed mt-0.5">
+                  Applies <code className="text-amber-300 font-mono text-[10px]">noindex,nofollow</code> to hide this page from search engines and excludes it from sitemap.xml.
+                </span>
+              </div>
+            </label>
           </div>
         </div>
       </div>

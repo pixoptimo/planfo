@@ -123,6 +123,23 @@ export function renderBlockToHtml(block: ContentBlock): string {
       return `<pre class="cms-code-block"><code class="language-${lang}">${code}</code></pre>`;
     }
 
+    case 'grid': {
+      const cols = block.columns || 3;
+      const cards = (block.items || [])
+        .map((item) => {
+          const badgeHtml = item.badge ? `<span class="cms-grid-badge">${escapeHtml(item.badge)}</span>` : '';
+          const iconHtml = item.icon ? `<div class="cms-grid-icon">${escapeHtml(item.icon)}</div>` : '';
+          const titleHtml = item.title ? `<h3 class="cms-grid-title">${escapeHtml(item.title)}</h3>` : '';
+          const textHtml = item.text ? `<p class="cms-grid-text">${escapeHtml(item.text)}</p>` : '';
+          const btnHtml = item.buttonText
+            ? `<div class="cms-grid-action"><a href="${escapeAttribute(item.buttonUrl || '#')}" class="cms-btn cms-btn-primary cms-btn-sm">${escapeHtml(item.buttonText)}</a></div>`
+            : '';
+          return `<div class="cms-grid-card">\n${badgeHtml}\n${iconHtml}\n${titleHtml}\n${textHtml}\n${btnHtml}\n</div>`;
+        })
+        .join('\n');
+      return `<div class="cms-grid cms-grid-cols-${cols}">\n${cards}\n</div>`;
+    }
+
     default:
       return '';
   }

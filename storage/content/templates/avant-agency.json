@@ -1,0 +1,50 @@
+{
+  "id": "tpl_avant_agency",
+  "blueprintId": "templates",
+  "title": "Avant — Kinetic Studio & Digital Architecture",
+  "slug": "avant-agency",
+  "status": "published",
+  "publishedAt": "2026-10-11T19:53:30.748Z",
+  "category": "general",
+  "tags": [
+    "agency",
+    "portfolio",
+    "creative"
+  ],
+  "excerpt": "Bold typographic digital flagship with kinetic hover cards, holographic gradients, and fluid layout.",
+  "featuredImage": "assets/images/avant-agency.jpg",
+  "data": {
+    "tagline": "Bold typographic digital flagship with kinetic hover cards, holographic gradients, and fluid layout.",
+    "badge": "Award Winner",
+    "badgeColor": "pink",
+    "category": "Agency & Portfolio",
+    "categorySlug": "agency",
+    "price": "Free",
+    "isFree": true,
+    "demoUrl": "sample-templates/avant-agency.html",
+    "downloadFile": "sample-templates/avant-agency.html",
+    "version": "v1.8.0",
+    "releaseDate": "Jul 22, 2026",
+    "lastUpdated": "Sep 29, 2026",
+    "license": "MIT Commercial & Personal",
+    "author": "Pixoptimo Labs",
+    "rating": 4.99,
+    "reviewCount": 412,
+    "downloads": "18,900",
+    "fileSize": "12.8 KB (Gzipped)",
+    "techStack": "HTML5, Modern CSS, CSS Custom Properties, Fluid Typography, Hardware-Accelerated Transitions",
+    "features": "Avant-garde Syne typography with fluid clamp() scaling from 48px to 110px\nDynamic holographic CSS gradient reflections on card hover\nRefined micro-stagger animations for project cards\nZero JavaScript dependency footprint — 100% pure CSS motion\nFull dark mode aesthetic with obsidian ink backgrounds\nMobile-first responsive drawer menu and smooth scroll anchors",
+    "quickStartCode": "<!-- Plug and play into GitHub Pages, Cloudflare Pages, or Netlify -->\ngit clone https://github.com/pixoptimo/avant-studio.git\nopen avant-agency.html",
+    "cssTokens": ":root {\n  --bg: #050507;\n  --card-bg: rgba(255, 255, 255, 0.03);\n  --card-border: rgba(255, 255, 255, 0.12);\n  --font-display: 'Syne', sans-serif;\n  --font-body: 'Space Grotesk', sans-serif;\n  --accent-gradient: linear-gradient(135deg, #ff007f 0%, #7928ca 50%, #00dfd8 100%);\n}",
+    "lighthousePerformance": 100,
+    "lighthouseAccessibility": 100,
+    "lighthouseBestPractices": 100,
+    "lighthouseSeo": 100,
+    "changelog": "v1.8.0 (Sep 29, 2026): Enhanced smooth cubic-bezier transitions for card elevation.\nv1.0.0 (Jul 22, 2026): Initial release."
+  },
+  "content": {
+    "blocks": []
+  },
+  "createdAt": "2026-10-11T19:53:30.748Z",
+  "updatedAt": "2026-10-11T20:16:53.888Z"
+}

@@ -64,7 +64,7 @@ export type UpdateBlueprintInput = z.infer<typeof UpdateBlueprintSchema>;
 
 export const BlueprintEntrySchema = z.object({
   id: z.string(),
-  blueprintId: z.string(),
+  blueprintId: z.string().default('templates'),
   title: z.string().min(1, 'Title is required'),
   slug: z.string().min(1, 'Slug is required').regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'Invalid slug format'),
   status: z.enum(['draft', 'published']).default('draft'),
@@ -82,6 +82,7 @@ export const BlueprintEntrySchema = z.object({
 export type BlueprintEntry = z.infer<typeof BlueprintEntrySchema>;
 
 export const CreateBlueprintEntrySchema = z.object({
+  blueprintId: z.string().optional(),
   title: z.string().min(1, 'Title is required'),
   slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
   status: z.enum(['draft', 'published']).default('draft'),

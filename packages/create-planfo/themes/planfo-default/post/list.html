@@ -1,0 +1,55 @@
+<div class="blog-listing">
+  <div class="container">
+    <header class="editorial-hero" style="padding-bottom: 24px; margin-bottom: 40px;">
+      <span class="hero-kicker"><%= locals.blueprint ? blueprint.name : 'Dispatches & Publication' %></span>
+      <h1 class="hero-title" style="font-size: 2.75rem;">
+        <% if (locals.blueprint) { %>
+          <%= blueprint.name %>
+        <% } else if (locals.category) { %>
+          Dispatches &bull; <%= category.name %>
+        <% } else if (locals.tag) { %>
+          Tagged &bull; #<%= tag %>
+        <% } else { %>
+          All Editorial Dispatches
+        <% } %>
+      </h1>
+      <p class="hero-excerpt" style="font-size: 1.15rem;"><%= (locals.blueprint && blueprint.description) ? blueprint.description : 'Essays, announcements, and thoughtful notes.' %></p>
+
+      <% if (locals.categories && categories.length > 0) { %>
+        <div style="display: flex; gap: 10px; margin-top: 20px; flex-wrap: wrap;">
+          <a href="<%= locals.blueprint ? ('/' + blueprint.slug) : '/blog' %>" class="theme-badge" style="<%= !locals.category ? 'background: var(--color-border-dark); color: #fff;' : '' %>">All</a>
+          <% categories.forEach(function(c) { %>
+            <a href="<%= locals.blueprint ? ('/' + blueprint.slug + '/category/' + c.slug) : ('/blog/category/' + c.slug) %>" class="theme-badge" style="<%= (locals.category && category.slug === c.slug) ? 'background: var(--color-border-dark); color: #fff;' : '' %>">
+              <%= c.name %>
+            </a>
+          <% }); %>
+        </div>
+      <% } %>
+    </header>
+
+    <div class="blog-grid-container">
+      <% if (posts && posts.length > 0) { %>
+        <div class="editorial-grid">
+          <% posts.forEach(function(post) { %>
+            <article class="editorial-card">
+              <span class="card-category"><%= post.category %></span>
+              <h2 class="card-title">
+                <a href="<%= post.url || ('/blog/' + post.slug) %>"><%= post.title %></a>
+              </h2>
+              <p class="card-excerpt"><%= post.excerpt %></p>
+              <div class="card-footer">
+                <span>By <%= post.author %></span>
+                <time><%= formatDate(post.createdAt) %></time>
+              </div>
+            </article>
+          <% }); %>
+        </div>
+      <% } else { %>
+        <div style="text-align: center; padding: 60px 0; color: var(--color-text-muted);">
+          <p>No entries found in this section.</p>
+          <a href="<%= locals.blueprint ? ('/' + blueprint.slug) : '/blog' %>" class="theme-badge" style="margin-top: 16px; display: inline-block;">Back to All <%= locals.blueprint ? blueprint.name : 'Dispatches' %></a>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>

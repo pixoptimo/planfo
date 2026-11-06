@@ -1,3 +1,4 @@
+import { triggerStaticBuild } from "../storage/buildTrigger.js";
 import { Router, type Request, type Response } from 'express';
 import {
   CreateBlueprintSchema,
@@ -8,26 +9,16 @@ import {
   type BlueprintEntry
 } from '@cms/schemas';
 import { BlueprintStore, BlueprintEntryStore } from '../storage/blueprintStore.js';
+import { TrashStore } from '../storage/trashStore.js';
 import { requireAuth, requirePermission } from '../auth/middleware.js';
 import { slugify, makeUniqueSlug, logger } from '@cms/utils';
 import { StaticSiteGenerator } from '@cms/generator';
+import { DemoStore } from '../storage/demoStore.js';
 import { config } from '../config/env.js';
 
 export const blueprintRouter = Router();
 
-async function triggerStaticBuild(): Promise<void> {
-  try {
-    const generator = new StaticSiteGenerator({
-      storagePath: config.STORAGE_PATH,
-      templatesPath: config.TEMPLATES_PATH,
-      outputPath: config.OUTPUT_PATH
-    });
-    await generator.build();
-    logger.info('Static site automatically rebuilt after blueprint modification');
-  } catch (err) {
-    logger.error('Failed to regenerate site upon blueprint change', { error: String(err) });
-  }
-}
+
 
 blueprintRouter.use(requireAuth);
 
@@ -218,6 +209,7 @@ blueprintRouter.delete('/:slug', requirePermission('blueprints.delete'), async (
       return;
     }
 
+    await TrashStore.moveToTrash('blueprint', existing, req.user?.email);
     await BlueprintStore.delete(slug);
 
     logger.audit('Blueprint deleted', {
@@ -421,6 +413,7 @@ blueprintRouter.put('/:slug/entries/:entrySlug', requirePermission('blueprints.e
 
     const updated: BlueprintEntry = {
       ...existing,
+      blueprintId: existing.blueprintId || blueprintSlug,
       title: parseResult.data.title ?? existing.title,
       slug: targetSlug,
       status: newStatus,
@@ -436,6 +429,13 @@ blueprintRouter.put('/:slug/entries/:entrySlug', requirePermission('blueprints.e
     };
 
     await BlueprintEntryStore.save(blueprintSlug, updated, existing.slug);
+
+    // If demo was previously an extracted ZIP and now user replaced it with a URL or cleared it:
+    const oldDemo = String(existing.data?.demoUrl || '');
+    const newDemo = String(updated.data?.demoUrl || '');
+    if (oldDemo.startsWith('demos/') && (!newDemo.startsWith('demos/') || !newDemo)) {
+      DemoStore.deleteDemo(existing.slug).catch(() => {});
+    }
 
     logger.audit('Blueprint entry updated', {
       blueprintSlug,
@@ -478,7 +478,13 @@ blueprintRouter.delete('/:slug/entries/:entrySlug', requirePermission('blueprint
       return;
     }
 
+    await TrashStore.moveToTrash('blueprint-entry', existing, req.user?.email, blueprintSlug);
     await BlueprintEntryStore.delete(blueprintSlug, entrySlug);
+
+    const demoUrl = String(existing.data?.demoUrl || '');
+    if (demoUrl.startsWith('demos/')) {
+      DemoStore.deleteDemo(existing.slug).catch(() => {});
+    }
 
     logger.audit('Blueprint entry deleted', {
       blueprintSlug,

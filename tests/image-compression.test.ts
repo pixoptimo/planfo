@@ -128,4 +128,38 @@ describe('Image Compression & WebP Conversion Pipeline', () => {
     await MediaStore.deleteItem(mediaItem.id);
     expect(await MediaStore.getById(mediaItem.id)).toBeNull();
   });
+
+  it('should preserve .ico favicon files without converting them to WebP', async () => {
+    const fakeIcoBuffer = Buffer.from([0x00, 0x00, 0x01, 0x00, 0x01, 0x00, 0x10, 0x10]);
+    const result = await optimizeImage(fakeIcoBuffer, 'favicon.ico', 'image/x-icon');
+
+    expect(result.format).toBe('ico');
+    expect(result.mimeType).toBe('image/x-icon');
+    expect(result.filename.endsWith('.ico')).toBe(true);
+    expect(result.buffer).toEqual(fakeIcoBuffer);
+  });
+
+  it('should preserve favicon PNG files without converting them to WebP', async () => {
+    const rawFaviconBuffer = await sharp({
+      create: {
+        width: 32,
+        height: 32,
+        channels: 4,
+        background: { r: 124, g: 58, b: 237, alpha: 1 }
+      }
+    })
+      .png()
+      .toBuffer();
+
+    const result = await optimizeImage(rawFaviconBuffer, 'favicon.png', 'image/png');
+
+    expect(result.format).toBe('png');
+    expect(result.mimeType).toBe('image/png');
+    expect(result.filename.endsWith('.png')).toBe(true);
+
+    const meta = await sharp(result.buffer).metadata();
+    expect(meta.format).toBe('png');
+    expect(meta.width).toBe(32);
+    expect(meta.height).toBe(32);
+  });
 });

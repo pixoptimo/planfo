@@ -141,17 +141,38 @@ export async function listJsonFiles(dirPath: string): Promise<string[]> {
 
 /**
  * Recursively copies a directory from src to dest.
+ * Automatically ignores OS junk (.DS_Store, Thumbs.db, etc.)
  */
-export async function copyDirRecursive(src: string, dest: string): Promise<void> {
+export async function copyDirRecursive(
+  src: string,
+  dest: string,
+  options?: { filter?: (name: string, isDirectory: boolean) => boolean }
+): Promise<void> {
   await ensureDir(dest);
   const entries = await fs.readdir(src, { withFileTypes: true });
-
   for (const entry of entries) {
+    const name = entry.name;
+    const lowerName = name.toLowerCase();
+    if (
+      name === '.DS_Store' ||
+      name === 'Thumbs.db' ||
+      name.startsWith('._') ||
+      name.startsWith('.Spotlight') ||
+      name === '__MACOSX' ||
+      lowerName.startsWith('thumbnail.') || // Theme preview thumbnail for CMS
+      lowerName === 'theme.json' || // Theme metadata for CMS
+      lowerName === 'theme.config.json'
+    ) {
+      continue;
+    }
+    if (options?.filter && !options.filter(name, entry.isDirectory())) {
+      continue;
+    }
     const srcPath = path.join(src, entry.name);
     const destPath = path.join(dest, entry.name);
 
     if (entry.isDirectory()) {
-      await copyDirRecursive(srcPath, destPath);
+      await copyDirRecursive(srcPath, destPath, options);
     } else if (entry.isFile()) {
       await fs.copyFile(srcPath, destPath);
     }
@@ -161,9 +182,10 @@ export async function copyDirRecursive(src: string, dest: string): Promise<void>
 /**
  * Performs an atomic directory swap.
  * Given a staging directory and a live target directory:
- * 1. Backs up live directory to .backup (if live exists)
- * 2. Renames staging directory to live directory
- * 3. Removes backup directory
+ * 1. Preserves version control (.git) and publish manifests into staging directory
+ * 2. Backs up live directory to .backup (if live exists)
+ * 3. Renames staging directory to live directory
+ * 4. Removes backup directory
  * If anything fails, restores the live directory from backup.
  */
 export async function atomicDirectorySwap(
@@ -182,7 +204,33 @@ export async function atomicDirectorySwap(
 
   try {
     if (liveExists) {
-      await fs.rename(liveTargetDir, backupDir);
+      // 1. Preserve version control (.git) if present in live target and not yet in staging
+      const liveGit = path.join(liveTargetDir, '.git');
+      const stagingGit = path.join(stagingDir, '.git');
+      if ((await pathExists(liveGit)) && !(await pathExists(stagingGit))) {
+        try {
+          await fs.rename(liveGit, stagingGit);
+        } catch {
+          await fs.cp(liveGit, stagingGit, { recursive: true });
+        }
+      }
+
+      // Preserve publish manifests if present
+      for (const manifestName of ['.planfo-publish-manifest.json', '.aero-publish-manifest.json']) {
+        const liveManifest = path.join(liveTargetDir, manifestName);
+        const stagingManifest = path.join(stagingDir, manifestName);
+        if ((await pathExists(liveManifest)) && !(await pathExists(stagingManifest))) {
+          await fs.copyFile(liveManifest, stagingManifest).catch(() => {});
+        }
+      }
+
+      try {
+        await fs.rename(liveTargetDir, backupDir);
+      } catch (err: unknown) {
+        if ((err as NodeJS.ErrnoException).code !== 'ENOENT') {
+          throw err;
+        }
+      }
     }
 
     let renamed = false;

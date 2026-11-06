@@ -1,0 +1,1 @@
+document.addEventListener("DOMContentLoaded",()=>{const e=document.getElementById("mobile-menu-toggle"),t=document.getElementById("mobile-nav-drawer");e&&t&&e.addEventListener("click",()=>{const n=t.classList.toggle("open");e.setAttribute("aria-expanded",n?"true":"false")})});

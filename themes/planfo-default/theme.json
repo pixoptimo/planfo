@@ -1,10 +1,11 @@
 {
   "id": "planfo-default",
-  "name": "Planfo Default",
+  "name": "Planfo UI Templates Showcase",
   "version": "1.0.0",
-  "author": "Planfo CMS Team",
-  "description": "Clean, responsive, modern default theme for Planfo CMS Beta v0.1.",
+  "author": "Planfo & Pixoptimo Team",
+  "description": "High-performance, accessible modern UI templates catalog with live device simulator, multi-tab documentation, and zero-framework vanilla architecture.",
   "thumbnail": "assets/thumbnail.svg",
-  "supportedPacks": ["pages", "articles"],
-  "templates": ["default", "landing", "page"]
+  "supportedPacks": ["pages", "articles", "catalog"],
+  "templates": ["default", "landing", "page", "details", "demo", "privacy", "terms", "about", "contact"]
 }
+

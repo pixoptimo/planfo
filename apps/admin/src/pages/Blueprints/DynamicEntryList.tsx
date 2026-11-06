@@ -21,6 +21,7 @@ import type { Blueprint, BlueprintEntry } from '@cms/schemas';
 import { api } from '../../api/client.js';
 import { StatusBadge } from '../../components/UI/StatusBadge.js';
 import { getBlueprintIcon } from '../../utils/blueprintIcons.js';
+import { getMediaUrl } from '../../utils/media.js';
 import { useAuth } from '../../context/AuthContext.js';
 
 export const DynamicEntryList: React.FC = () => {
@@ -61,12 +62,13 @@ export const DynamicEntryList: React.FC = () => {
 
   const handleDelete = async (entrySlug: string, title: string) => {
     if (!blueprintSlug) return;
-    if (!confirm(`Are you sure you want to delete "${title}"?`)) return;
+    if (!confirm(`Are you sure you want to move "${title}" to Trash?`)) return;
 
     try {
       await api.delete(`/api/blueprints/${blueprintSlug}/entries/${entrySlug}`);
-      setSuccess(`Deleted "${title}" successfully.`);
+      setSuccess(`Moved "${title}" to Trash.`);
       setEntries(entries.filter((e) => e.slug !== entrySlug));
+      window.dispatchEvent(new CustomEvent('trash-updated'));
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Delete failed');
     }
@@ -283,11 +285,24 @@ export const DynamicEntryList: React.FC = () => {
                     <td className="px-5 py-4">
                       <div className="flex items-center space-x-3">
                         {entry.featuredImage ? (
-                          <img
-                            src={entry.featuredImage}
-                            alt=""
-                            className="w-10 h-10 rounded-lg object-cover bg-slate-950 border border-slate-800 flex-shrink-0"
-                          />
+                          <div className="w-10 h-10 rounded-lg overflow-hidden bg-slate-950 border border-slate-800 flex-shrink-0 flex items-center justify-center">
+                            <img
+                              src={getMediaUrl(entry.featuredImage)}
+                              alt=""
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.currentTarget.style.display = 'none';
+                                const parent = e.currentTarget.parentElement;
+                                if (parent) {
+                                  const fallback = parent.querySelector('.list-img-fallback');
+                                  if (fallback) (fallback as HTMLElement).style.display = 'flex';
+                                }
+                              }}
+                            />
+                            <div className="list-img-fallback hidden w-full h-full items-center justify-center text-slate-500">
+                              <ImageIcon className="w-4 h-4" />
+                            </div>
+                          </div>
                         ) : (
                           <div className="w-10 h-10 rounded-lg bg-slate-950 border border-slate-800 flex items-center justify-center text-slate-500 flex-shrink-0">
                             <ImageIcon className="w-4 h-4" />
@@ -322,7 +337,7 @@ export const DynamicEntryList: React.FC = () => {
                                 {val ? 'Yes' : 'No'}
                               </span>
                             ) : f.type === 'image' ? (
-                              <img src={String(val)} alt="" className="w-6 h-6 rounded object-cover" />
+                              <img src={getMediaUrl(String(val))} alt="" className="w-6 h-6 rounded object-cover" />
                             ) : (
                               <span className="truncate max-w-[150px] block font-mono text-[11px]">
                                 {String(val)}

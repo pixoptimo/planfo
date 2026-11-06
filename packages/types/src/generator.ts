@@ -3,11 +3,16 @@ import type { Page, Post, Product, Category, Menu, SiteSettings, StructuredConte
 export interface TemplateContext {
   site: SiteSettings;
   menu: Menu | null;
+  headerMenu?: Menu | null;
+  footerMenu?: Menu | null;
+  menus?: Menu[];
   page?: Page;
   post?: Post;
   product?: Product;
+  template?: any;
   posts?: Post[];
   products?: Product[];
+  templates?: any[];
   categories?: Category[];
   category?: Category;
   blueprint?: Blueprint;

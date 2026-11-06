@@ -1,17 +1,18 @@
 {
-  "siteName": "Aero Static CMS",
+  "siteName": "Planfo Static CMS",
   "siteUrl": "http://localhost:4000",
   "tagline": "Modern, high-performance static website powered by a file-based CMS.",
   "logo": "",
   "favicon": "",
   "defaultSEO": {
-    "title": "Aero Static CMS - Blazing Fast Content Management",
+    "title": "Planfo Static CMS - Blazing Fast Content Management",
     "description": "Manage rich content with zero database overhead and deploy lightning-fast static HTML.",
     "canonical": "http://localhost:4000",
-    "ogTitle": "Aero Static CMS",
+    "ogTitle": "Planfo Static CMS",
     "ogDescription": "Manage rich content with zero database overhead.",
     "ogImage": "",
-    "robots": "index,follow"
+    "robots": "index,follow",
+    "noIndex": false
   },
   "socialLinks": {
     "twitter": "https://twitter.com",
@@ -23,7 +24,7 @@
   "analyticsId": "",
   "timezone": "UTC",
   "language": "en",
-  "footerText": "© 2026 Aero Static CMS. Built with TypeScript and React.",
+  "footerText": "© 2026 Planfo. Built with TypeScript and React.",
   "featurePacks": {
     "catalog": true,
     "portfolio": true,
@@ -32,7 +33,7 @@
     "events": true,
     "faqs": true
   },
-  "activeTheme": "aero-modern",
+  "activeTheme": "planfo-default",
   "deployment": {
     "target": "local",
     "gitRepo": "",
@@ -43,5 +44,5 @@
     "customDomain": "",
     "autoPublishOnSave": false
   },
-  "updatedAt": "2026-10-10T12:50:39.377Z"
+  "updatedAt": "2026-10-19T15:02:35.018Z"
 }

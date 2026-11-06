@@ -16,7 +16,12 @@ import {
   Link as LinkIcon,
   Mail,
   Type,
-  FileText
+  FileText,
+  Globe,
+  Archive,
+  UploadCloud,
+  ExternalLink,
+  Play
 } from 'lucide-react';
 import type { Blueprint, BlueprintEntry, BlueprintField } from '@cms/schemas';
 import { api } from '../../api/client.js';
@@ -25,6 +30,8 @@ import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { StatusBadge } from '../../components/UI/StatusBadge.js';
 import { getBlueprintIcon } from '../../utils/blueprintIcons.js';
+import { getMediaUrl } from '../../utils/media.js';
+import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 
 export const DynamicEntryEdit: React.FC = () => {
@@ -32,6 +39,7 @@ export const DynamicEntryEdit: React.FC = () => {
   const isNew = !entrySlug || entrySlug === 'new';
   const navigate = useNavigate();
   const { can } = useAuth();
+  const [slugManuallyEdited, setSlugManuallyEdited] = useState(!isNew);
 
   const [blueprint, setBlueprint] = useState<Blueprint | null>(null);
   const [entry, setEntry] = useState<Partial<BlueprintEntry>>({
@@ -51,7 +59,8 @@ export const DynamicEntryEdit: React.FC = () => {
       ogTitle: '',
       ogDescription: '',
       ogImage: '',
-      robots: 'index,follow'
+      robots: 'index,follow',
+      noIndex: false
     }
   });
 
@@ -62,6 +71,57 @@ export const DynamicEntryEdit: React.FC = () => {
   const [success, setSuccess] = useState<string | null>(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [activeImageField, setActiveImageField] = useState<string | null>(null);
+  const [demoModes, setDemoModes] = useState<Record<string, 'url' | 'zip'>>({});
+  const [uploadingZip, setUploadingZip] = useState(false);
+  const [zipUploadMessage, setZipUploadMessage] = useState<{ text: string; error?: boolean } | null>(null);
+
+  const handleDemoZipUpload = async (fieldName: string, file: File) => {
+    setUploadingZip(true);
+    setZipUploadMessage(null);
+
+    try {
+      const targetSlug = entry.slug || entrySlug || blueprintSlug || 'template';
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('slug', targetSlug);
+
+      const res = await api.post<{
+        demoUrl: string;
+        downloadFile: string;
+        entryHtml: string;
+        filesCount: number;
+        totalSize: number;
+      }>('/api/demos/upload', formData);
+
+      if (res?.demoUrl) {
+        handleCustomFieldChange(fieldName, res.demoUrl);
+        if (blueprint?.fields.some((f) => f.name === 'downloadFile') && res.downloadFile) {
+          handleCustomFieldChange('downloadFile', res.downloadFile);
+        }
+        setZipUploadMessage({
+          text: `ZIP extracted (${res.filesCount} files). Entry point set to "${res.demoUrl}". Multi-page demo is live!`
+        });
+      }
+    } catch (err) {
+      setZipUploadMessage({
+        text: err instanceof Error ? err.message : 'ZIP upload and extraction failed',
+        error: true
+      });
+    } finally {
+      setUploadingZip(false);
+    }
+  };
+
+  const [siteUrl, setSiteUrl] = useState<string>('');
+
+  useEffect(() => {
+    api.get<{ siteUrl: string; cmsUrl: string }>('/api/system/info')
+      .then((info) => {
+        if (info?.siteUrl) setSiteUrl(info.siteUrl);
+        else if (info?.cmsUrl) setSiteUrl(info.cmsUrl);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     if (blueprintSlug) {
@@ -94,11 +154,8 @@ export const DynamicEntryEdit: React.FC = () => {
   const handleTitleChange = (val: string) => {
     setEntry((prev) => {
       const next = { ...prev, title: val };
-      if (isNew) {
-        next.slug = val
-          .toLowerCase()
-          .replace(/[^a-z0-9]+/g, '-')
-          .replace(/^-|-$/g, '');
+      if (!slugManuallyEdited || !prev.slug) {
+        next.slug = slugify(val);
       }
       return next;
     });
@@ -206,37 +263,35 @@ export const DynamicEntryEdit: React.FC = () => {
     <div className="space-y-6">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
-        <div className="flex items-center space-x-4">
+        <div className="flex items-center space-x-3">
           <Link
             to={`/blueprints/${blueprint.slug}`}
-            className="p-2 bg-slate-900 hover:bg-slate-800 text-slate-400 hover:text-white rounded-xl border border-slate-800 transition"
+            className="p-2 text-slate-400 hover:text-white bg-slate-900 border border-slate-800 rounded-lg transition"
             title={`Back to ${blueprint.name}`}
           >
             <ArrowLeft className="w-4 h-4" />
           </Link>
 
           <div>
-            <div className="flex items-center space-x-2 text-xs font-mono text-slate-400 mb-0.5">
-              <span>{blueprint.name}</span>
-              <span>/</span>
-              <span>{isNew ? 'New Record' : entry.slug}</span>
+            <div className="flex items-center space-x-2">
+              <h1 className="text-xl font-bold text-white tracking-tight">
+                {isNew ? `Create New ${blueprint.singularName}` : `Edit: ${entry.title || 'Untitled'}`}
+              </h1>
+              {!isNew && <StatusBadge status={entry.status || 'draft'} />}
             </div>
-            <h1 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-              <span>
-                {isNew ? `Create New ${blueprint.singularName}` : `Edit ${blueprint.singularName}`}
-              </span>
-              <StatusBadge status={entry.status || 'draft'} />
-            </h1>
+            <p className="text-xs text-slate-400 font-mono mt-0.5">
+              URL: /{blueprint.slug}/{entry.slug || 'slug-preview'}
+            </p>
           </div>
         </div>
 
         {/* Top actions */}
-        <div className="flex items-center space-x-3 self-start">
+        <div className="flex items-center space-x-2 self-start sm:self-auto">
           <button
             type="button"
             onClick={() => handleSave(false)}
             disabled={saving}
-            className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 font-semibold text-xs rounded-xl flex items-center space-x-2 border border-slate-800 transition disabled:opacity-50"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
             <span>Save Draft</span>
@@ -246,10 +301,10 @@ export const DynamicEntryEdit: React.FC = () => {
             type="button"
             onClick={() => handleSave(true)}
             disabled={saving}
-            className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-xl flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
+            className="px-4 py-2 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-1.5 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
           >
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-            <span>Publish</span>
+            <span>{entry.status === 'published' ? 'Update' : 'Publish'}</span>
           </button>
         </div>
       </div>
@@ -269,77 +324,425 @@ export const DynamicEntryEdit: React.FC = () => {
         </div>
       )}
 
-      {/* Main Grid */}
+      {/* Main Top Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column (Inputs, Dynamic Fields, Content) */}
-        <div className="lg:col-span-2 space-y-6">
-          {/* Base Fields Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                {blueprint.singularName} Title *
+        {/* Base Fields Card */}
+        <div className="lg:col-span-2 bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              {blueprint.singularName} Title *
+            </label>
+            <input
+              type="text"
+              required
+              value={entry.title || ""}
+              onChange={(e) => handleTitleChange(e.target.value)}
+              placeholder={`Enter ${blueprint.singularName.toLowerCase()} title...`}
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2.5 text-base font-semibold text-white focus:outline-none focus:border-brand-500"
+            />
+          </div>
+
+          <div>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                URL Slug *
               </label>
+              {entry.title && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    const auto = slugify(entry.title || '');
+                    setEntry((prev) => ({ ...prev, slug: auto }));
+                    setSlugManuallyEdited(false);
+                  }}
+                  className="text-[11px] text-brand-400 hover:text-brand-300 font-medium transition"
+                >
+                  Regenerate from Title
+                </button>
+              )}
+            </div>
+            <div className="flex items-center space-x-2">
+              <span className="text-xs font-mono text-slate-500 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800">
+                /{blueprint.slug}/
+              </span>
               <input
                 type="text"
                 required
-                value={entry.title || ''}
-                onChange={(e) => handleTitleChange(e.target.value)}
-                placeholder={`Enter ${blueprint.singularName.toLowerCase()} title...`}
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-brand-500 font-medium"
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                URL Slug *
-              </label>
-              <div className="flex items-center space-x-2">
-                <span className="text-xs font-mono text-slate-500 bg-slate-950 px-3 py-2 rounded-lg border border-slate-800">
-                  /{blueprint.slug}/
-                </span>
-                <input
-                  type="text"
-                  required
-                  value={entry.slug || ''}
-                  onChange={(e) => setEntry((prev) => ({ ...prev, slug: e.target.value }))}
-                  placeholder="url-friendly-slug"
-                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500"
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Summary / Excerpt
-              </label>
-              <textarea
-                rows={2}
-                value={entry.excerpt || ''}
-                onChange={(e) => setEntry((prev) => ({ ...prev, excerpt: e.target.value }))}
-                placeholder="Brief summary or introductory blurb..."
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-brand-500 resize-none"
+                value={entry.slug || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setSlugManuallyEdited(val.trim().length > 0);
+                  setEntry((prev) => ({ ...prev, slug: val }));
+                }}
+                placeholder="url-friendly-slug"
+                className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs font-mono text-slate-300 focus:outline-none focus:border-brand-500"
               />
             </div>
           </div>
 
-          {/* Dynamic Custom Fields Section */}
-          {blueprint.fields.length > 0 && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-5">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center space-x-2">
-                  <Sliders className="w-4 h-4 text-brand-400" />
-                  <h2 className="text-sm font-semibold text-slate-200 font-mono uppercase tracking-wider">
-                    Custom Attributes & Fields
-                  </h2>
-                </div>
-                <span className="text-[11px] font-mono text-slate-500">
-                  {blueprint.fields.length} Configured Fields
-                </span>
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              Summary / Excerpt
+            </label>
+            <textarea
+              rows={2}
+              value={entry.excerpt || ""}
+              onChange={(e) => setEntry((prev) => ({ ...prev, excerpt: e.target.value }))}
+              placeholder="Brief summary or introductory blurb..."
+              className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-xs text-slate-300 focus:outline-none focus:border-brand-500 resize-none"
+            />
+          </div>
+        </div>
+
+        {/* Sidebar Controls */}
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div>
+            <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+              Featured Hero Image
+            </label>
+            <div className="space-y-2">
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={entry.featuredImage || ""}
+                  onChange={(e) => setEntry((prev) => ({ ...prev, featuredImage: e.target.value }))}
+                  placeholder="/media/image.jpg"
+                  className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-slate-300 font-mono focus:outline-none focus:border-brand-500"
+                />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setActiveImageField(null);
+                    setShowMediaPicker(true);
+                  }}
+                  className="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg text-xs flex-shrink-0"
+                  title="Choose from Media Library or Upload"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                </button>
               </div>
 
-              <div className="space-y-4">
+              {entry.featuredImage && (
+                <div className="aspect-video bg-slate-950 rounded-lg overflow-hidden border border-slate-800 relative group">
+                  <img
+                    src={getMediaUrl(entry.featuredImage)}
+                    alt=""
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setEntry((prev) => ({ ...prev, featuredImage: "" }))}
+                    className="absolute top-2 right-2 p-1.5 bg-black/70 hover:bg-rose-600 text-white rounded-lg transition"
+                    title="Remove Image"
+                  >
+                    <X className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {(blueprint.hasCategories || blueprint.hasTags) && (
+            <div className="pt-2 border-t border-slate-800/80 space-y-3">
+              {blueprint.hasCategories && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Category
+                  </label>
+                  <input
+                    type="text"
+                    value={entry.category || ""}
+                    onChange={(e) => setEntry((prev) => ({ ...prev, category: e.target.value }))}
+                    placeholder="e.g. general, featured"
+                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                  />
+                </div>
+              )}
+
+              {blueprint.hasTags && (
+                <div>
+                  <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider mb-1">
+                    Tags
+                  </label>
+                  <div className="flex items-center space-x-2 mb-2">
+                    <input
+                      type="text"
+                      value={tagInput}
+                      onChange={(e) => setTagInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          e.preventDefault();
+                          handleAddTag();
+                        }
+                      }}
+                      placeholder="Add tag and press Enter..."
+                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleAddTag}
+                      className="px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 font-semibold"
+                    >
+                      Add
+                    </button>
+                  </div>
+                  <div className="flex flex-wrap gap-1.5">
+                    {entry.tags?.map((tag) => (
+                      <span
+                        key={tag}
+                        className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[11px] text-slate-300 font-mono"
+                      >
+                        <span>#{tag}</span>
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveTag(tag)}
+                          className="hover:text-rose-400 p-0.5"
+                        >
+                          <X className="w-2.5 h-2.5" />
+                        </button>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Dynamic Custom Fields Section */}
+      {blueprint.fields.length > 0 && (
+        <div className="bg-slate-900 border border-slate-800 rounded-xl p-5 space-y-4">
+          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div className="flex items-center space-x-2">
+              <Sliders className="w-4 h-4 text-brand-400" />
+              <h2 className="text-xs font-semibold text-slate-300 uppercase tracking-wider">
+                Custom Attributes & Fields
+              </h2>
+            </div>
+            <span className="text-[11px] font-mono text-slate-500">
+              {blueprint.fields.length} Configured Fields
+            </span>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {blueprint.fields.map((fld: BlueprintField) => {
                   const val = entry.data?.[fld.name] ?? fld.defaultValue ?? '';
+                  const isDemoField = fld.name === 'demoUrl' || fld.name === 'demo';
+
+                  if (isDemoField) {
+                    const currentMode =
+                      demoModes[fld.name] ||
+                      (typeof val === 'string' && val.startsWith('demos/') ? 'zip' : 'url');
+
+                    return (
+                      <div
+                        key={fld.id || fld.name}
+                        className="col-span-1 md:col-span-2 space-y-2.5 bg-slate-950/60 p-4 rounded-2xl border border-slate-800"
+                      >
+                        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800/80 pb-3">
+                          <div>
+                            <div className="flex items-center space-x-2">
+                              <label className="block text-xs font-bold text-white">
+                                {fld.label} {fld.required && <span className="text-rose-400">*</span>}
+                              </label>
+                              <span className="text-[10px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/20">
+                                Live Device Simulator
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-400 mt-0.5">
+                              Choose between a hosted live URL or uploading an extracted ZIP bundle for full multi-page navigation.
+                            </p>
+                          </div>
+
+                          {/* Toggle Switch */}
+                          <div className="inline-flex items-center p-1 bg-slate-900 border border-slate-700/80 rounded-xl self-start sm:self-auto">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDemoModes({ ...demoModes, [fld.name]: 'url' });
+                                setZipUploadMessage(null);
+                              }}
+                              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                                currentMode === 'url'
+                                  ? 'bg-brand-500 text-slate-950 shadow-sm'
+                                  : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              <Globe className="w-3.5 h-3.5" />
+                              <span>Live URL</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setDemoModes({ ...demoModes, [fld.name]: 'zip' });
+                                setZipUploadMessage(null);
+                              }}
+                              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition ${
+                                currentMode === 'zip'
+                                  ? 'bg-brand-500 text-slate-950 shadow-sm'
+                                  : 'text-slate-400 hover:text-white'
+                              }`}
+                            >
+                              <Archive className="w-3.5 h-3.5" />
+                              <span>ZIP Bundle (Multi-page)</span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Mode 1: Live URL */}
+                        {currentMode === 'url' && (
+                          <div className="space-y-2 pt-1">
+                            <div className="flex items-center space-x-2">
+                              <div className="relative flex-1">
+                                <Globe className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+                                <input
+                                  type="text"
+                                  required={fld.required}
+                                  value={val}
+                                  onChange={(e) => handleCustomFieldChange(fld.name, e.target.value)}
+                                  placeholder="https://my-demo-site.netlify.app or sample-templates/quantum-saas.html"
+                                  className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-9 pr-3.5 py-2 text-xs font-mono text-white focus:outline-none focus:border-brand-500"
+                                />
+                              </div>
+                              {val && (
+                                <a
+                                  href={val}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition flex-shrink-0"
+                                  title="Test URL in new window"
+                                >
+                                  <ExternalLink className="w-3.5 h-3.5" />
+                                  <span>Test URL</span>
+                                </a>
+                              )}
+                            </div>
+                            <p className="text-[11px] text-slate-400">
+                              Direct URL loaded inside the device preview simulator. Supports external sites or local static templates.
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Mode 2: ZIP Bundle */}
+                        {currentMode === 'zip' && (
+                          <div className="space-y-3 pt-1">
+                            {val && typeof val === 'string' && val.startsWith('demos/') && (
+                              <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl flex items-center justify-between">
+                                <div className="flex items-center space-x-2.5 min-w-0">
+                                  <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                                  <div className="min-w-0">
+                                    <div className="text-xs font-semibold text-emerald-300">
+                                      Active Extracted Multi-Page Demo
+                                    </div>
+                                    <div className="text-[11px] font-mono text-emerald-400/80 truncate">
+                                      Entry: {val}
+                                    </div>
+                                  </div>
+                                </div>
+                                <div className="flex items-center space-x-2 flex-shrink-0">
+                                  <a
+                                    href={`${siteUrl ? siteUrl.replace(/\/$/, '') : ''}/demos/${entry.slug || 'prefiop'}/index.html`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-3 py-1 bg-brand-600 hover:bg-brand-500 text-white rounded-lg text-xs font-semibold flex items-center space-x-1.5 shadow-sm transition"
+                                    title="Open interactive device simulator"
+                                  >
+                                    <Play className="w-3.5 h-3.5 fill-current" />
+                                    <span>Open Simulator</span>
+                                  </a>
+                                  <a
+                                    href={`${siteUrl ? siteUrl.replace(/\/$/, '') : ''}/${val.replace(/^\//, '')}?raw=true`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="px-2.5 py-1 bg-slate-800/80 hover:bg-slate-700 text-slate-300 rounded-lg text-xs font-medium flex items-center space-x-1 border border-slate-700 transition"
+                                    title="Open clean raw HTML in new tab"
+                                  >
+                                    <ExternalLink className="w-3 h-3" />
+                                    <span>Raw HTML</span>
+                                  </a>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleCustomFieldChange(fld.name, '')}
+                                    className="text-xs text-rose-400 hover:text-rose-300 px-2 py-1"
+                                  >
+                                    Clear
+                                  </button>
+                                </div>
+                              </div>
+                            )}
+
+                            <div className="border-2 border-dashed border-slate-800 hover:border-slate-700 bg-slate-900/40 rounded-xl p-5 text-center transition">
+                              <input
+                                type="file"
+                                id={`zip-upload-${fld.name}`}
+                                accept=".zip,application/zip"
+                                className="hidden"
+                                disabled={uploadingZip}
+                                onChange={async (e) => {
+                                  const file = e.target.files?.[0];
+                                  if (!file) return;
+                                  await handleDemoZipUpload(fld.name, file);
+                                  e.target.value = '';
+                                }}
+                              />
+                              <label
+                                htmlFor={`zip-upload-${fld.name}`}
+                                className="cursor-pointer flex flex-col items-center space-y-2"
+                              >
+                                {uploadingZip ? (
+                                  <div className="flex flex-col items-center space-y-1.5 py-2">
+                                    <Loader2 className="w-7 h-7 text-brand-400 animate-spin" />
+                                    <span className="text-xs text-slate-300 font-bold">
+                                      Extracting template archive & mapping files...
+                                    </span>
+                                    <span className="text-[11px] text-slate-500">
+                                      Preserving internal links, CSS, JavaScript, and asset trees
+                                    </span>
+                                  </div>
+                                ) : (
+                                  <>
+                                    <div className="w-11 h-11 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-300 shadow-sm">
+                                      <UploadCloud className="w-5 h-5 text-brand-400" />
+                                    </div>
+                                    <div className="text-xs font-bold text-white">
+                                      {val && typeof val === 'string' && val.startsWith('demos/')
+                                        ? 'Upload new ZIP to replace demo'
+                                        : 'Click to upload template ZIP bundle'}
+                                    </div>
+                                    <p className="text-[11px] text-slate-400 max-w-md leading-relaxed">
+                                      Upload a .zip containing <span className="text-white font-mono">index.html</span> and styles. Multi-page links (<span className="text-slate-300 font-mono">&lt;a href="about.html"&gt;</span>) will work seamlessly inside the demo simulator!
+                                    </p>
+                                  </>
+                                )}
+                              </label>
+                            </div>
+
+                            {zipUploadMessage && (
+                              <div
+                                className={`p-2.5 rounded-xl text-xs flex items-center space-x-2 ${
+                                  zipUploadMessage.error
+                                    ? 'bg-rose-500/10 border border-rose-500/20 text-rose-400'
+                                    : 'bg-emerald-500/10 border border-emerald-500/20 text-emerald-400'
+                                }`}
+                              >
+                                {zipUploadMessage.error ? (
+                                  <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                ) : (
+                                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                                )}
+                                <span>{zipUploadMessage.text}</span>
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  }
 
                   return (
                     <div key={fld.id || fld.name} className="space-y-1.5">
@@ -441,7 +844,7 @@ export const DynamicEntryEdit: React.FC = () => {
                           </div>
                           {val && (
                             <div className="relative inline-block border border-slate-800 rounded-lg overflow-hidden bg-slate-950">
-                              <img src={val} alt="" className="h-20 w-32 object-cover" />
+                              <img src={getMediaUrl(val)} alt="" className="h-20 w-32 object-cover" />
                               <button
                                 type="button"
                                 onClick={() => handleCustomFieldChange(fld.name, '')}
@@ -518,229 +921,37 @@ export const DynamicEntryEdit: React.FC = () => {
             </div>
           )}
 
-          {/* Structured Content Block Editor */}
-          {blueprint.hasContentEditor && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="flex items-center space-x-2">
-                  <Type className="w-4 h-4 text-brand-400" />
-                  <h2 className="text-sm font-semibold text-slate-200 font-mono uppercase tracking-wider">
-                    Structured Content Blocks
-                  </h2>
-                </div>
-                <span className="text-[11px] font-mono text-slate-500">
-                  {entry.content?.blocks?.length || 0} Blocks
-                </span>
-              </div>
-
-              <StructuredEditor
-                content={entry.content || { blocks: [] }}
-                onChange={(content) => setEntry((prev) => ({ ...prev, content }))}
-              />
-            </div>
-          )}
-
-          {/* SEO Metadata */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-6 space-y-4">
-            <h2 className="text-sm font-semibold text-slate-200 font-mono uppercase tracking-wider">
-              Search & Social Metadata
-            </h2>
-            <SEOFields
-              seo={
-                entry.seo || {
-                  title: '',
-                  description: '',
-                  canonical: '',
-                  ogTitle: '',
-                  ogDescription: '',
-                  ogImage: '',
-                  robots: 'index,follow'
-                }
-              }
-              onChange={(seo) => setEntry((prev) => ({ ...prev, seo }))}
-            />
-          </div>
+          
+      {/* Structured Content Block Editor */}
+      {blueprint.hasContentEditor && (
+        <div className="space-y-2">
+          <label className="block text-xs font-semibold text-slate-400 uppercase tracking-wider">
+            Structured Page Content
+          </label>
+          <StructuredEditor
+            content={entry.content || { blocks: [] }}
+            onChange={(content) => setEntry((prev) => ({ ...prev, content }))}
+          />
         </div>
+      )}
 
-        {/* Right Column / Sidebar */}
-        <div className="space-y-6">
-          {/* Publishing Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-            <h3 className="text-xs font-semibold text-slate-300 font-mono uppercase tracking-wider">
-              Publishing Status
-            </h3>
-
-            <div className="flex items-center justify-between p-3 bg-slate-950 rounded-xl border border-slate-800">
-              <span className="text-xs text-slate-400">Current Status:</span>
-              <StatusBadge status={entry.status || 'draft'} />
-            </div>
-
-            <div className="space-y-2 pt-2">
-              <button
-                type="button"
-                onClick={() => handleSave(true)}
-                disabled={saving}
-                className="w-full py-2.5 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-xl flex items-center justify-center space-x-2 shadow-lg shadow-brand-500/20 transition disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Send className="w-3.5 h-3.5" />}
-                <span>{entry.status === 'published' ? 'Update & Publish' : 'Publish Record'}</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => handleSave(false)}
-                disabled={saving}
-                className="w-full py-2.5 bg-slate-950 hover:bg-slate-800 text-slate-300 font-semibold text-xs rounded-xl flex items-center justify-center space-x-2 border border-slate-800 transition disabled:opacity-50"
-              >
-                <Save className="w-3.5 h-3.5" />
-                <span>Save Draft</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Featured Image */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-            <h3 className="text-xs font-semibold text-slate-300 font-mono uppercase tracking-wider">
-              Featured Image
-            </h3>
-
-            {entry.featuredImage ? (
-              <div className="space-y-2">
-                <div className="relative rounded-xl overflow-hidden border border-slate-800 aspect-video bg-slate-950">
-                  <img
-                    src={entry.featuredImage}
-                    alt=""
-                    className="w-full h-full object-cover"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setEntry((prev) => ({ ...prev, featuredImage: '' }))}
-                    className="absolute top-2 right-2 p-1.5 bg-black/70 hover:bg-rose-600 text-white rounded-lg transition"
-                  >
-                    <X className="w-3.5 h-3.5" />
-                  </button>
-                </div>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setActiveImageField(null);
-                    setShowMediaPicker(true);
-                  }}
-                  className="w-full py-1.5 bg-slate-950 hover:bg-slate-800 text-slate-300 text-xs rounded-lg border border-slate-800 transition"
-                >
-                  Change Image
-                </button>
-              </div>
-            ) : (
-              <button
-                type="button"
-                onClick={() => {
-                  setActiveImageField(null);
-                  setShowMediaPicker(true);
-                }}
-                className="w-full border-2 border-dashed border-slate-800 hover:border-slate-700 rounded-xl p-6 text-center text-slate-400 hover:text-white transition flex flex-col items-center justify-center space-y-2"
-              >
-                <ImageIcon className="w-6 h-6 text-slate-500" />
-                <span className="text-xs font-medium">Select Cover Image</span>
-              </button>
-            )}
-          </div>
-
-          {/* Categories & Tags */}
-          {(blueprint.hasCategories || blueprint.hasTags) && (
-            <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
-              <h3 className="text-xs font-semibold text-slate-300 font-mono uppercase tracking-wider">
-                Taxonomy & Tags
-              </h3>
-
-              {blueprint.hasCategories && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Category
-                  </label>
-                  <input
-                    type="text"
-                    value={entry.category || ''}
-                    onChange={(e) => setEntry((prev) => ({ ...prev, category: e.target.value }))}
-                    placeholder="e.g. general, featured, updates"
-                    className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-brand-500"
-                  />
-                </div>
-              )}
-
-              {blueprint.hasTags && (
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Tags
-                  </label>
-                  <div className="flex items-center space-x-2 mb-2">
-                    <input
-                      type="text"
-                      value={tagInput}
-                      onChange={(e) => setTagInput(e.target.value)}
-                      onKeyDown={(e) => {
-                        if (e.key === 'Enter') {
-                          e.preventDefault();
-                          handleAddTag();
-                        }
-                      }}
-                      placeholder="Add tag and press Enter..."
-                      className="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-brand-500"
-                    />
-                    <button
-                      type="button"
-                      onClick={handleAddTag}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs rounded-lg border border-slate-700 font-semibold"
-                    >
-                      Add
-                    </button>
-                  </div>
-
-                  <div className="flex flex-wrap gap-1.5">
-                    {entry.tags?.map((tag) => (
-                      <span
-                        key={tag}
-                        className="inline-flex items-center space-x-1 px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[11px] text-slate-300 font-mono"
-                      >
-                        <span>#{tag}</span>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveTag(tag)}
-                          className="hover:text-rose-400 p-0.5"
-                        >
-                          <X className="w-2.5 h-2.5" />
-                        </button>
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-          )}
-
-          {/* Blueprint Schema Context Card */}
-          <div className="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-3">
-            <div className="flex items-center space-x-2">
-              <IconComp className="w-4 h-4 text-brand-400" />
-              <h3 className="text-xs font-semibold text-slate-300 font-mono uppercase tracking-wider">
-                Blueprint Info
-              </h3>
-            </div>
-            <div className="text-xs text-slate-400 space-y-1.5 font-mono text-[11px]">
-              <div>Name: <span className="text-white">{blueprint.name}</span></div>
-              <div>Singular: <span className="text-white">{blueprint.singularName}</span></div>
-              <div>Slug: <span className="text-white">/{blueprint.slug}</span></div>
-              <div>Fields: <span className="text-white">{blueprint.fields.length}</span></div>
-            </div>
-            <Link
-              to="/blueprints/studio"
-              className="text-xs font-semibold text-brand-400 hover:text-brand-300 inline-flex items-center space-x-1 pt-1"
-            >
-              <span>Edit Blueprint Schema</span>
-              <span>→</span>
-            </Link>
-          </div>
-        </div>
+      {/* SEO Metadata */}
+      <div className="bg-slate-900 border border-slate-800 rounded-xl p-5">
+        <SEOFields
+          seo={
+            entry.seo || {
+              title: "",
+              description: "",
+              canonical: "",
+              ogTitle: "",
+              ogDescription: "",
+              ogImage: "",
+              robots: "index,follow",
+              noIndex: false
+            }
+          }
+          onChange={(seo) => setEntry((prev) => ({ ...prev, seo }))}
+        />
       </div>
 
       {/* Media Picker Modal */}

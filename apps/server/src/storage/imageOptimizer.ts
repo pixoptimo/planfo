@@ -52,6 +52,51 @@ export async function optimizeImage(
     };
   }
 
+  const lowerName = originalFilename.toLowerCase();
+  const isIco = ext === '.ico' || mimetype === 'image/x-icon' || mimetype === 'image/vnd.microsoft.icon';
+  const isFavicon = lowerName.includes('favicon') || lowerName.includes('fonticon') || lowerName.includes('fav-icon');
+
+  // If .ico (icon container), preserve exact ICO format without WebP conversion
+  if (isIco) {
+    const filename = `${cleanBaseName}-${timestamp}.ico`;
+    return {
+      buffer,
+      filename,
+      originalName: originalFilename,
+      mimeType: 'image/x-icon',
+      size: originalSize,
+      originalSize,
+      format: 'ico',
+      compressionRatio: 0
+    };
+  }
+
+  // If favicon/fonticon uploaded as PNG, keep format as PNG without converting to WebP
+  if (isFavicon && (ext === '.png' || mimetype === 'image/png')) {
+    const pipeline = sharp(buffer, { failOn: 'none' });
+    pipeline.rotate();
+    pipeline.png({ compressionLevel: 9 });
+    const optimizedBuffer = await pipeline.toBuffer();
+    const finalMetadata = await sharp(optimizedBuffer).metadata();
+    const newSize = optimizedBuffer.length;
+    const compressionRatio = originalSize > 0
+      ? Math.round(((originalSize - newSize) / originalSize) * 100)
+      : 0;
+    const filename = `${cleanBaseName}-${timestamp}.png`;
+    return {
+      buffer: optimizedBuffer,
+      filename,
+      originalName: originalFilename,
+      mimeType: 'image/png',
+      size: newSize,
+      originalSize,
+      width: finalMetadata.width,
+      height: finalMetadata.height,
+      format: 'png',
+      compressionRatio: Math.max(0, compressionRatio)
+    };
+  }
+
   const quality = options.quality ?? 80;
   const effort = options.effort ?? 4;
   const maxWidth = options.maxWidth ?? 2560;

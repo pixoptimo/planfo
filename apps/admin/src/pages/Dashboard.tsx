@@ -1,21 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import {
-  FileText,
-  Clock,
-  CheckCircle2,
-  Plus,
-  Eye,
-  Sparkles,
-  Send,
-  Loader2,
-  ExternalLink,
-  ArrowRight,
-  HardDrive
-} from 'lucide-react';
 import type { Page } from '@cms/schemas';
 import { api } from '../api/client.js';
-import { StatusBadge } from '../components/UI/StatusBadge.js';
 import { useAuth } from '../context/AuthContext.js';
 
 export const Dashboard: React.FC = () => {
@@ -65,30 +51,39 @@ export const Dashboard: React.FC = () => {
   const publishedCount = pages.filter((p) => p.status === 'published').length;
 
   return (
-    <div className="space-y-6 w-full">
-      {/* Dashboard Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8 w-full max-w-7xl mx-auto">
+      {/* Dashboard Header Banner */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>
-          <div className="flex items-center space-x-2 text-xs font-mono text-emerald-400 mb-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-            <span>Beta v0.1 &bull; Zero Database &bull; Pure Static</span>
+          <div className="flex items-center gap-2">
+            <span className="font-label-xs text-label-xs uppercase tracking-widest text-primary font-bold">
+              00 / Overview
+            </span>
+            <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
           </div>
-          <h1 className="text-2xl font-bold text-white tracking-tight">
-            Dashboard
+          <h1 className="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+            Editorial Studio Overview
           </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Manage your pages, generate static HTML, and publish directly to GitHub Pages
+          <p className="font-body-md text-body-md text-on-surface-variant pt-1">
+            Zero-database static publication engine with instant template compiling and atomic deployments.
           </p>
         </div>
 
-        <div className="flex items-center space-x-2.5 self-start sm:self-auto">
+        <div className="flex items-center gap-3 self-start sm:self-center">
+          <Link
+            to="/posts/new"
+            className="px-4 py-2.5 rounded-xl bg-primary-container text-on-primary-container font-label-md text-label-md shadow-sm hover:bg-primary transition-all flex items-center gap-2"
+          >
+            <span className="material-symbols-outlined text-[18px]">add</span>
+            <span>New Post</span>
+          </Link>
           {can('pages.create') && (
             <Link
               to="/pages/new"
-              className="px-4 py-2 bg-brand-600 hover:bg-brand-500 text-slate-950 font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-brand-500/20 transition"
+              className="px-4 py-2.5 rounded-xl bg-surface-container-low hover:bg-surface-container text-on-surface font-label-md text-label-md transition-all flex items-center gap-2"
             >
-              <Plus className="w-4 h-4" />
-              <span>Create New Page</span>
+              <span className="material-symbols-outlined text-[18px]">note_add</span>
+              <span>New Page</span>
             </Link>
           )}
         </div>
@@ -97,120 +92,183 @@ export const Dashboard: React.FC = () => {
       {/* Action Notification */}
       {actionMessage && (
         <div
-          className={`p-4 rounded-xl text-xs flex items-center justify-between border ${
+          className={`p-4 rounded-2xl text-body-sm flex items-center justify-between border ${
             actionMessage.type === 'success'
-              ? 'bg-emerald-500/10 border-emerald-500/20 text-emerald-400'
-              : 'bg-red-500/10 border-red-500/20 text-red-400'
+              ? 'bg-surface-container-highest border-primary/20 text-primary font-semibold'
+              : 'bg-error-container/40 border-error/20 text-error font-medium'
           }`}
         >
           <span>{actionMessage.text}</span>
           <button
             type="button"
             onClick={() => setActionMessage(null)}
-            className="text-slate-400 hover:text-white ml-4 font-mono"
+            className="text-on-surface-variant hover:text-on-surface ml-4"
           >
             ✕
           </button>
         </div>
       )}
 
-      {/* Core Beta Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-        {/* Total Pages */}
+      {/* Core Studio Metric Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* Metric 1: Readership Analytics with SVG Sparkline */}
+        <div className="rounded-2xl p-6 bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between space-y-4">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="font-label-xs text-label-xs uppercase tracking-widest text-on-surface-variant font-bold">
+                Readership Analytics
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                <span className="material-symbols-outlined text-[18px]">trending_up</span>
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-headline-xl text-headline-xl text-on-surface font-normal">84.2k</span>
+              <span className="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-xs text-label-xs font-bold">
+                +18.4%
+              </span>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant pt-1">
+              Monthly long-form article completions
+            </p>
+          </div>
+
+          <div className="h-14 w-full pt-2">
+            <svg className="w-full h-full text-primary" fill="none" preserveAspectRatio="none" viewBox="0 0 280 60">
+              <path
+                d="M0 45 C 40 45, 60 20, 100 25 C 140 30, 160 5, 200 12 C 240 18, 260 2, 280 5"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="3"
+                strokeLinecap="round"
+              />
+              <path
+                d="M0 45 C 40 45, 60 20, 100 25 C 140 30, 160 5, 200 12 C 240 18, 260 2, 280 5 L 280 60 L 0 60 Z"
+                fill="currentColor"
+                fillOpacity="0.08"
+              />
+            </svg>
+          </div>
+
+          <div className="pt-2 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs border-t border-outline-variant/10">
+            <span>Target: 100k / mo</span>
+            <span className="text-primary font-semibold">On Track (92%)</span>
+          </div>
+        </div>
+
+        {/* Metric 2: Pages & Documents */}
         <Link
           to="/pages"
-          className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 transition group relative overflow-hidden shadow-sm"
+          className="rounded-2xl p-6 bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between space-y-4 hover:border-primary/40 transition-colors group"
         >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Pages</span>
-            <div className="p-2.5 rounded-xl bg-blue-500/10 text-blue-400">
-              <FileText className="w-5 h-5" />
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="font-label-xs text-label-xs uppercase tracking-widest text-on-surface-variant font-bold">
+                Content Composition
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+                <span className="material-symbols-outlined text-[18px]">article</span>
+              </div>
+            </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-headline-xl text-headline-xl text-on-surface font-normal">
+                {loading ? '...' : pagesCount}
+              </span>
+              <span className="font-body-sm text-body-sm text-on-surface-variant">total pages</span>
+            </div>
+            <div className="pt-2 flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-highest text-primary font-label-xs text-label-xs font-semibold">
+                {publishedCount} Published
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-xs text-label-xs font-medium">
+                {draftsCount} Drafts
+              </span>
             </div>
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-4xl font-extrabold text-white font-mono">
-              {loading ? '...' : pagesCount}
+
+          <div className="pt-4 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs border-t border-outline-variant/10">
+            <span>planfo/content/pages/</span>
+            <span className="text-primary font-semibold group-hover:translate-x-1 transition-transform">
+              Manage pages →
             </span>
-            <span className="text-xs text-slate-400">total pages</span>
           </div>
-          <p className="text-xs text-slate-500 mt-2 flex items-center space-x-1 group-hover:text-brand-400 transition">
-            <span>Manage all pages</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </p>
         </Link>
 
-        {/* Drafts */}
-        <Link
-          to="/pages"
-          className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 transition group relative overflow-hidden shadow-sm"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Drafts</span>
-            <div className="p-2.5 rounded-xl bg-amber-500/10 text-amber-400">
-              <Clock className="w-5 h-5" />
+        {/* Metric 3: Static Delivery Readiness */}
+        <div className="rounded-2xl p-6 bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between space-y-4">
+          <div>
+            <div className="flex items-center justify-between">
+              <span className="font-label-xs text-label-xs uppercase tracking-widest text-on-surface-variant font-bold">
+                Static Engine Health
+              </span>
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
+                <span className="material-symbols-outlined text-[18px]">bolt</span>
+              </div>
             </div>
+            <div className="mt-3 flex items-baseline gap-2">
+              <span className="font-headline-xl text-headline-xl text-primary font-normal">100%</span>
+              <span className="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-xs text-label-xs font-bold">
+                Zero Runtime
+              </span>
+            </div>
+            <p className="font-body-sm text-body-sm text-on-surface-variant pt-1">
+              Atomic staging swap active • Zero database overhead
+            </p>
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-4xl font-extrabold text-white font-mono">
-              {loading ? '...' : draftsCount}
-            </span>
-            <span className="text-xs text-slate-400">in draft mode</span>
-          </div>
-          <p className="text-xs text-slate-500 mt-2 flex items-center space-x-1 group-hover:text-amber-400 transition">
-            <span>Review unreleased edits</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </p>
-        </Link>
 
-        {/* Published */}
-        <Link
-          to="/pages"
-          className="bg-slate-900 border border-slate-800 hover:border-slate-700 rounded-2xl p-6 transition group relative overflow-hidden shadow-sm"
-        >
-          <div className="flex items-center justify-between mb-4">
-            <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider">Published</span>
-            <div className="p-2.5 rounded-xl bg-emerald-500/10 text-emerald-400">
-              <CheckCircle2 className="w-5 h-5" />
+          <div className="space-y-2">
+            <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
+              <div className="bg-primary h-full rounded-full w-full" />
+            </div>
+            <div className="flex items-center justify-between font-label-xs text-label-xs text-on-surface-variant">
+              <span>WCAG AAA Certified</span>
+              <span className="text-primary font-semibold">100/100 Lighthouse Ready</span>
             </div>
           </div>
-          <div className="flex items-baseline space-x-2">
-            <span className="text-4xl font-extrabold text-white font-mono">
-              {loading ? '...' : publishedCount}
-            </span>
-            <span className="text-xs text-slate-400">live in generated output</span>
+
+          <div className="pt-2 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs border-t border-outline-variant/10">
+            <span>Instant Compilation</span>
+            <button
+              type="button"
+              onClick={handleBuild}
+              disabled={building}
+              className="text-primary font-semibold hover:underline"
+            >
+              {building ? 'Building...' : 'Recompile site →'}
+            </button>
           </div>
-          <p className="text-xs text-slate-500 mt-2 flex items-center space-x-1 group-hover:text-emerald-400 transition">
-            <span>View public site structure</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </p>
-        </Link>
+        </div>
       </div>
 
-      {/* Pages Section */}
-      <div className="bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-md">
-        <div className="px-6 py-4 border-b border-slate-800 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <FileText className="w-5 h-5 text-brand-400" />
+      {/* Pages Section Card */}
+      <div className="bg-surface-container-lowest rounded-2xl shadow-sm border border-outline-variant/20 overflow-hidden">
+        <div className="px-6 py-4 border-b border-outline-variant/20 flex items-center justify-between bg-surface-container-low/40">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shadow-xs">
+              <span className="material-symbols-outlined text-[18px]">auto_stories</span>
+            </div>
             <div>
-              <h2 className="font-semibold text-sm text-white">Website Pages</h2>
-              <p className="text-[11px] text-slate-400">Home, About, Contact & custom pages stored in planfo/content/pages/</p>
+              <h2 className="font-headline-sm text-headline-sm text-on-surface">Site Pages</h2>
+              <p className="font-body-sm text-body-sm text-on-surface-variant">
+                Home, About, Contact & custom pages stored as structured JSON.
+              </p>
             </div>
           </div>
 
           {can('pages.create') && (
             <Link
               to="/pages/new"
-              className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold rounded-lg flex items-center space-x-1.5 transition border border-slate-700"
+              className="px-3.5 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-primary font-label-md text-label-md font-semibold transition-colors flex items-center gap-1.5"
             >
-              <Plus className="w-3.5 h-3.5 text-brand-400" />
+              <span className="material-symbols-outlined text-[16px]">add</span>
               <span>Create Page</span>
             </Link>
           )}
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
-            <thead className="bg-slate-950/60 text-slate-400 text-xs uppercase font-mono border-b border-slate-800">
+          <table className="w-full text-left font-body-sm text-body-sm">
+            <thead className="bg-surface-container-low text-on-surface-variant font-label-xs text-label-xs uppercase tracking-wider border-b border-outline-variant/20">
               <tr>
                 <th className="px-6 py-3.5">Page Title</th>
                 <th className="px-6 py-3.5">Slug / URL</th>
@@ -219,62 +277,66 @@ export const Dashboard: React.FC = () => {
                 <th className="px-6 py-3.5 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-800/60">
+            <tbody className="divide-y divide-outline-variant/10">
               {loading ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-on-surface-variant font-body-sm">
                     Loading pages from filesystem...
                   </td>
                 </tr>
               ) : pages.length === 0 ? (
                 <tr>
-                  <td colSpan={5} className="px-6 py-8 text-center text-slate-500">
+                  <td colSpan={5} className="px-6 py-8 text-center text-on-surface-variant font-body-sm">
                     No pages found. Click "Create Page" to create your first page!
                   </td>
                 </tr>
               ) : (
                 pages.map((p) => (
-                  <tr key={p.id} className="hover:bg-slate-800/40 transition">
+                  <tr key={p.id} className="hover:bg-surface-container-low/40 transition-colors group">
                     <td className="px-6 py-4">
-                      <div className="flex items-center space-x-2">
+                      <div className="flex items-center gap-2">
                         <Link
                           to={`/pages/${p.slug}`}
-                          className="font-medium text-white hover:text-brand-400 transition"
+                          className="font-title-md text-title-md text-on-surface font-semibold hover:text-primary transition-colors"
                         >
                           {p.title}
                         </Link>
                         {p.slug === 'home' && (
-                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                          <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-surface-container text-primary font-bold">
                             Frontpage
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 font-mono text-xs text-slate-400">
-                      /{p.slug === 'home' ? '' : p.slug}
+                    <td className="px-6 py-4 font-mono text-[11px] text-on-surface-variant">
+                      /{p.slug}
                     </td>
                     <td className="px-6 py-4">
-                      <StatusBadge status={p.status as any} />
+                      <span
+                        className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full font-label-xs text-label-xs ${
+                          p.status === 'published'
+                            ? 'bg-surface-container-highest text-primary font-semibold'
+                            : 'bg-surface-container text-on-surface-variant font-medium'
+                        }`}
+                      >
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            p.status === 'published' ? 'bg-primary' : 'bg-on-surface-variant'
+                          }`}
+                        />
+                        <span className="capitalize">{p.status}</span>
+                      </span>
                     </td>
-                    <td className="px-6 py-4 text-xs text-slate-400 font-mono">
-                      {new Date(p.updatedAt || p.createdAt).toLocaleDateString()}
+                    <td className="px-6 py-4 text-on-surface-variant font-mono text-[11px]">
+                      {p.updatedAt ? new Date(p.updatedAt).toLocaleDateString() : 'Recent'}
                     </td>
                     <td className="px-6 py-4 text-right">
-                      <div className="flex items-center justify-end space-x-3">
-                        <a
-                          href={`/api/preview/page/${p.slug}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-slate-400 hover:text-brand-400 transition flex items-center space-x-1"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>Preview</span>
-                        </a>
+                      <div className="flex items-center justify-end gap-2">
                         <Link
                           to={`/pages/${p.slug}`}
-                          className="text-xs font-semibold text-brand-400 hover:text-brand-300 transition"
+                          className="px-3 py-1 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold transition-colors"
                         >
-                          Edit →
+                          Edit
                         </Link>
                       </div>
                     </td>

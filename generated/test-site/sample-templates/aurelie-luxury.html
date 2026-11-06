@@ -1,0 +1,150 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Aurélie — Haute Couture & Editorial Artisanal Maison</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet"><style>
+    :root {
+      --bg: #12100e;
+      --card-bg: #1a1714;
+      --border: rgba(212, 175, 55, 0.2);
+      --gold: #d4af37;
+      --gold-light: #f3e5ab;
+      --text: #f7f4ed;
+      --text-muted: #a69f95;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-sans: 'Montserrat', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-sans);
+      line-height: 1.6;
+    }
+    header {
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: rgba(18, 16, 14, 0.9);
+      backdrop-filter: blur(10px);
+      z-index: 50;
+    }
+    .brand {
+      font-family: var(--font-serif);
+      font-size: 2.2rem;
+      letter-spacing: 4px;
+      color: var(--gold-light);
+      text-decoration: none;
+      text-transform: uppercase;
+    }
+    nav a {
+      color: var(--text-muted);
+      text-decoration: none;
+      margin: 0 1.5rem;
+      font-size: 0.8rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: var(--gold); }
+    .cart-pill {
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      color: var(--gold);
+      border: 1px solid var(--border);
+      padding: 0.5rem 1.2rem;
+      border-radius: 999px;
+      cursor: pointer;
+    }
+
+    .hero {
+      padding: 6rem 3rem;
+      text-align: center;
+      max-width: 900px;
+      margin: 0 auto;
+    }
+    .hero-subtitle {
+      font-size: 0.85rem;
+      letter-spacing: 4px;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.5rem;
+    }
+    .hero h1 {
+      font-family: var(--font-serif);
+      font-size: clamp(3rem, 6vw, 5.5rem);
+      font-weight: 300;
+      line-height: 1.05;
+      margin-bottom: 2rem;
+      font-style: italic;
+    }
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      font-weight: 300;
+      margin-bottom: 3rem;
+      letter-spacing: 0.5px;
+    }
+
+    /* Product Grid */
+    .catalog {
+      max-width: 1300px;
+      margin: 0 auto 6rem;
+      padding: 0 2rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2.5rem;
+    }
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 1.5rem;
+      transition: transform 0.3s ease;
+    }
+    .product-card:hover {
+      transform: translateY(-6px);
+      border-color: var(--gold);
+    }
+    .product-img-box {
+      width: 100%;
+      height: 320px;
+      background: #24201b;
+      display: grid;
+      place-items: center;
+      margin-bottom: 1.5rem;
+      border: 1px solid rgba(255,255,255,0.05);
+      position: relative;
+      overflow: hidden;
+    }
+    .product-silhouette {
+      font-size: 5rem;
+      filter: grayscale(1) opacity(0.4);
+    }
+    .product-title {
+      font-family: var(--font-serif);
+      font-size: 1.5rem;
+      margin-bottom: 0.3rem;
+    }
+    .product-price {
+      color: var(--gold);
+      font-size: 0.95rem;
+      letter-spacing: 1px;
+      margin-bottom: 1.2rem;
+    }
+    .buy-btn {
+      width: 100%;
+      background: transparent;
+      border: 1px solid var(--gold);
+      color: var(--gold);
+      padding: 0.8rem;
+      font-size: 0.75rem;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+    .buy-btn:hover {
+      background: var(--gold);
+      color: #000;
+    }
+  </style></head><body><header><a href="#" class="brand">Aurélie</a><nav><a href="#atelier">L'Atelier</a><a href="#collection">Collection</a><a href="#archives">Archives</a><a href="#journal">Journal</a></nav><div class="cart-pill" onclick="alert('Item Added to Bag')">Bag (0)</div></header><main><section class="hero"><div class="hero-subtitle">Edition Automne &bull; Hiver 2026</div><h1>A Study in Architectural Refinement</h1><p>Precision tailoring sculpted from pure double-faced cashmere and hand-burnished bridle leather. Handcrafted in our Parisian ateliers.</p></section><section class="catalog" id="collection"><div class="product-card"><div class="product-img-box"><div class="product-silhouette">🧥</div></div><div class="product-title">The Alchemist Coat</div><div class="product-price">$4,800 USD</div><button class="buy-btn" onclick="alert('Added to Bag: The Alchemist Coat')">Acquire Piece</button></div><div class="product-card"><div class="product-img-box"><div class="product-silhouette">👗</div></div><div class="product-title">The Oracle Column Dress</div><div class="product-price">$3,900 USD</div><button class="buy-btn" onclick="alert('Added to Bag: The Oracle Column Dress')">Acquire Piece</button></div><div class="product-card"><div class="product-img-box"><div class="product-silhouette">👢</div></div><div class="product-title">The Monolith Boot</div><div class="product-price">$1,850 USD</div><button class="buy-btn" onclick="alert('Added to Bag: The Monolith Boot')">Acquire Piece</button></div><div class="product-card"><div class="product-img-box"><div class="product-silhouette">👜</div></div><div class="product-title">The Sculptural Crescent Bag</div><div class="product-price">$2,700 USD</div><button class="buy-btn" onclick="alert('Added to Bag: The Sculptural Crescent Bag')">Acquire Piece</button></div></section></main></body></html>

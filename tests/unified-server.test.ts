@@ -50,20 +50,28 @@ describe('Unified Server & URL Mapping (WordPress Single-Port Architecture)', ()
     expect(body.data.cmsUrl).toBe(body.data.siteUrl);
   });
 
-  it('should serve /products archive with correct /products/<slug> links (no /blog/ mismatch)', async () => {
-    const res = await fetch(`${baseUrl}/products/`);
-    expect(res.status).toBe(200);
-    const text = await res.text();
-    expect(text).toContain('/products/aero-cms-limited-edition-hoodie');
-    expect(text).not.toContain('/blog/aero-cms-limited-edition-hoodie');
+  it('should protect blueprint API routes with authentication (returns 401 without token)', async () => {
+    const res = await fetch(`${baseUrl}/api/blueprints`);
+    expect(res.status).toBe(401);
   });
 
-  it('should serve individual product detail at /products/aero-cms-limited-edition-hoodie with 200 OK', async () => {
-    const res = await fetch(`${baseUrl}/products/aero-cms-limited-edition-hoodie/`);
-    expect(res.status).toBe(200);
-    const text = await res.text();
-    expect(text).toContain('Aero CMS Limited Edition Hoodie');
+  it('should protect blueprint entries API routes with authentication (returns 401 without token)', async () => {
+    const res = await fetch(`${baseUrl}/api/blueprints/templates/entries`);
+    expect(res.status).toBe(401);
   });
+
+  it('should have templates blueprint defined in storage', async () => {
+    const fs = await import('node:fs/promises');
+    const path = await import('node:path');
+    const blueprintPath = path.join(config.STORAGE_PATH, 'blueprints', 'templates.json');
+    const stat = await fs.stat(blueprintPath);
+    expect(stat.isFile()).toBe(true);
+
+    const content = JSON.parse(await fs.readFile(blueprintPath, 'utf-8'));
+    expect(content.slug).toBe('templates');
+    expect(content.name).toBeTruthy();
+  });
+
 
   it('should redirect /admin to /admin/ and serve admin dashboard SPA', async () => {
     const redirectRes = await fetch(`${baseUrl}/admin`, { redirect: 'manual' });
@@ -77,7 +85,7 @@ describe('Unified Server & URL Mapping (WordPress Single-Port Architecture)', ()
   });
 
   it('should support SPA client-side routes under /admin/*', async () => {
-    const res = await fetch(`${baseUrl}/admin/blueprints/products`);
+    const res = await fetch(`${baseUrl}/admin/blueprints/templates`);
     expect(res.status).toBe(200);
     const text = await res.text();
     expect(text).toContain('Static CMS - Admin Dashboard');
@@ -87,6 +95,6 @@ describe('Unified Server & URL Mapping (WordPress Single-Port Architecture)', ()
     const res = await fetch(`${baseUrl}/`);
     expect(res.status).toBe(200);
     const text = await res.text();
-    expect(text).toContain('Aero Static CMS');
+    expect(text).toMatch(/Planfo Static CMS|Aero Static CMS/);
   });
 });

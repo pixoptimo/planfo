@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AVANT — Avant-Garde Digital Architecture & Creative Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@500;700;800&family=Space+Grotesk:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #050507;
+      --card-bg: rgba(255, 255, 255, 0.03);
+      --card-border: rgba(255, 255, 255, 0.12);
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Space Grotesk', sans-serif;
+      --accent-gradient: linear-gradient(135deg, #ff007f 0%, #7928ca 50%, #00dfd8 100%);
+      --text: #ffffff;
+      --text-subtle: #8e8e93;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.4;
+    }
+    header {
+      padding: 2rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      backdrop-filter: blur(20px);
+      background: rgba(5, 5, 7, 0.7);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      z-index: 99;
+    }
+    .logo {
+      font-family: var(--font-display);
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 2px;
+      color: #fff;
+      text-decoration: none;
+    }
+    nav a {
+      color: var(--text-subtle);
+      text-decoration: none;
+      margin-left: 2.5rem;
+      font-size: 0.95rem;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      transition: color 0.2s;
+    }
+    nav a:hover { color: #fff; }
+    .reach-btn {
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: 0.6rem 1.6rem;
+      border-radius: 999px;
+      color: #fff;
+      text-decoration: none;
+      font-size: 0.85rem;
+      letter-spacing: 1px;
+      transition: all 0.3s;
+    }
+    .reach-btn:hover {
+      background: #fff;
+      color: #000;
+    }
+
+    /* Hero */
+    .hero {
+      padding: 6rem 3rem 4rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    .hero h1 {
+      font-family: var(--font-display);
+      font-size: clamp(3rem, 7vw, 6.5rem);
+      line-height: 0.95;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: -2px;
+      margin-bottom: 2rem;
+    }
+    .hero p {
+      font-size: 1.35rem;
+      color: var(--text-subtle);
+      max-width: 600px;
+      margin-bottom: 3.5rem;
+      letter-spacing: -0.2px;
+    }
+
+    /* Projects Grid */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
+      gap: 2rem;
+      max-width: 1400px;
+      margin: 0 auto 6rem;
+      padding: 0 3rem;
+    }
+    .project-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 2.5rem;
+      position: relative;
+      overflow: hidden;
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s;
+      cursor: pointer;
+    }
+    .project-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: var(--accent-gradient);
+      opacity: 0;
+      transition: opacity 0.5s;
+      pointer-events: none;
+      filter: blur(40px);
+      z-index: 0;
+    }
+    .project-card:hover::before { opacity: 0.08; }
+    .card-num { font-size: 0.85rem; color: var(--text-subtle); margin-bottom: 1.5rem; }
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 2.2rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-transform: uppercase;
+    }
+    .card-meta {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-subtle);
+      font-size: 0.85rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 1.5rem;
+      margin-top: 3rem;
+    }
+
+    footer {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding: 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      color: var(--text-subtle);
+      font-size: 0.85rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <a href="#" class="logo">AVANT</a>
+    <nav>
+      <a href="#projects">Work</a>
+      <a href="#manifesto">Manifesto</a>
+      <a href="#services">Capabilities</a>
+      <a href="#contact" class="reach-btn">Initiate Project</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>Crafting the Future<br>of Digital Experiences</h1>
+      <p>An award-winning multidisciplinary digital studio shaping radical brands, physical-digital installations, and bespoke interactive web architecture.</p>
+    </section>
+
+    <section class="projects-grid" id="projects">
+      <div class="project-card">
+        <div class="card-num">01 / BRAND PLATFORM</div>
+        <div class="card-title">KINETIC FLOW</div>
+        <p style="color: var(--text-subtle);">Spatial computing UI design system for generative audio-visual hardware.</p>
+        <div class="card-meta">
+          <span>Interaction & 3D</span>
+          <span>Tokyo &bull; 2026</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="card-num">02 / INTERACTIVE ARTEFACT</div>
+        <div class="card-title">AETHERA OS</div>
+        <p style="color: var(--text-subtle);">Hypersonic dashboard and immersive kinetic typography interface.</p>
+        <div class="card-meta">
+          <span>Design System</span>
+          <span>Stockholm &bull; 2026</span>
+        </div>
+      </div>
+
+      <div class="project-card">
+        <div class="card-num">03 / DIGITAL ARCHITECTURE</div>
+        <div class="card-title">SPECTRA HUB</div>
+        <p style="color: var(--text-subtle);">Autonomous media curation platform with real-time vector styling.</p>
+        <div class="card-meta">
+          <span>WebGL & Motion</span>
+          <span>New York &bull; 2026</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <div>&copy; 2026 AVANT CREATIVE STUDIO. ALL RIGHTS RESERVED.</div>
+    <div>CRAFTED WITH SEMANTIC HTML5 & HIGH PRECISION CSS</div>
+  </footer>
+</body>
+</html>

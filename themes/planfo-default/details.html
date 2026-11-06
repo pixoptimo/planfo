@@ -1,0 +1,248 @@
+    <!-- Header & Breadcrumbs -->
+    <section class="details-page-header" aria-label="Template Header Information">
+      <nav class="breadcrumbs" aria-label="Breadcrumbs">
+        <a href="index.html">Home</a>
+        <span class="separator">/</span>
+        <a href="index.html">UI Templates</a>
+        <span class="separator">/</span>
+        <span id="crumbTemplateTitle" style="color: var(--text-main); font-weight: 600;">Loading...</span>
+      </nav>
+
+      <div class="details-hero-meta">
+        <div>
+          <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 0.75rem;">
+            <span class="badge badge-purple" id="detailsBadge">PRO</span>
+            <span class="meta-pill" id="detailsVersion">v2.0</span>
+          </div>
+
+          <h1 class="details-title" id="detailsTitle">Template Details &amp; Documentation</h1>
+          <p class="details-subtitle" id="detailsSubtitle">High-performance responsive template architecture.</p>
+
+          <div class="details-meta-pills">
+            <span class="meta-pill" id="detailsRating">★ 4.95 (150 reviews)</span>
+            <span class="meta-pill" id="detailsDownloads">12,000 downloads</span>
+            <span class="meta-pill">Updated: <strong id="detailsUpdated">Recent</strong></span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Featured Preview Showcase & Action Bar -->
+    <section class="featured-showcase-box" aria-label="Featured Template Showcase">
+      <div class="featured-image-container">
+        <img src="assets/images/quantum-saas.jpg" alt="Featured Template Showcase" class="featured-image" id="featuredImage">
+      </div>
+
+      <div class="featured-actions-bar">
+        <div class="price-tag-featured">
+          <span class="price-val" id="priceVal">Free</span>
+          <span class="price-type">/ Perpetual License</span>
+        </div>
+
+        <div class="action-buttons-group">
+          <a href="demo.html" class="btn btn-demo-featured" id="liveDemoBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+            Live Demo
+          </a>
+
+          <button class="btn btn-download-featured" id="downloadBtn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Download Template
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Detailed Content & Sidebar Layout -->
+    <div class="details-layout">
+      <!-- Main Content Column -->
+      <article>
+        <!-- Tab Navigation -->
+        <div class="tabs-nav" role="tablist" aria-label="Documentation Tabs">
+          <button class="tab-btn active" data-tab="overview" role="tab" id="tabBtnOverview">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+            Overview &amp; Features
+          </button>
+          <button class="tab-btn" data-tab="architecture" role="tab" id="tabBtnArchitecture">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+            File Architecture
+          </button>
+          <button class="tab-btn" data-tab="docs" role="tab" id="tabBtnDocs">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+            Documentation &amp; Rules
+          </button>
+          <button class="tab-btn" data-tab="changelog" role="tab" id="tabBtnChangelog">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 14 14"/></svg>
+            Changelog
+          </button>
+        </div>
+
+        <!-- Tab 1: Overview -->
+        <div class="tab-panel active" id="tab-overview" role="tabpanel" aria-labelledby="tabBtnOverview">
+          <section class="content-section">
+            <h2 class="content-section-title">Design Philosophy &amp; Architecture</h2>
+            <p id="detailedDescription">
+              Detailed description loading...
+            </p>
+          </section>
+
+          <section class="content-section">
+            <h3 class="content-section-title">Engineered Capabilities &amp; Key Features</h3>
+            <div class="features-checklist" id="featuresChecklist">
+              <!-- Rendered via details.js -->
+            </div>
+          </section>
+        </div>
+
+        <!-- Tab 2: File Architecture -->
+        <div class="tab-panel" id="tab-architecture" role="tabpanel" aria-labelledby="tabBtnArchitecture">
+          <section class="content-section">
+            <h2 class="content-section-title">Package File Structure</h2>
+            <p>
+              The template is packaged cleanly with zero build configurations required. Unpack the ZIP and immediately edit with any text editor or IDE:
+            </p>
+            <div class="file-tree-box" id="fileTreeContainer">
+              <!-- Rendered via details.js -->
+            </div>
+          </section>
+        </div>
+
+        <!-- Tab 3: Documentation & Rules -->
+        <div class="tab-panel" id="tab-docs" role="tabpanel" aria-labelledby="tabBtnDocs">
+          <section class="content-section">
+            <h2 class="content-section-title">Quick Start &amp; Deployment</h2>
+            <p>
+              Deploy within seconds. Simply drop the files into GitHub Pages, Cloudflare Pages, Vercel, or any Apache/Nginx web server:
+            </p>
+            <div class="code-block-wrapper">
+              <div class="code-header">
+                <span>HTML / Integration Snippet</span>
+                <button class="copy-code-btn" data-target="quickStartSnippet">Copy Code</button>
+              </div>
+              <pre class="code-block"><code id="quickStartSnippet"></code></pre>
+            </div>
+          </section>
+
+          <section class="content-section">
+            <h3 class="content-section-title">CSS Design Token Customization Guide</h3>
+            <p>
+              Easily re-theme the entire template by modifying the core CSS custom properties in the <code>:root</code> selector:
+            </p>
+            <div class="code-block-wrapper">
+              <div class="code-header">
+                <span>CSS Variables / Design System Tokens</span>
+                <button class="copy-code-btn" data-target="cssTokensSnippet">Copy CSS</button>
+              </div>
+              <pre class="code-block"><code id="cssTokensSnippet"></code></pre>
+            </div>
+          </section>
+
+          <section class="content-section">
+            <h3 class="content-section-title">Rules Followed &amp; World-Class Standards</h3>
+            <div style="background: var(--bg-glass-card); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 1.5rem;">
+              <ul style="list-style: none; display: flex; flex-direction: column; gap: 12px; color: var(--text-secondary); font-size: 0.95rem;">
+                <li style="display: flex; gap: 10px;">
+                  <span style="color: var(--accent-emerald);">✔</span>
+                  <div><strong>Semantic Landmark Hierarchy:</strong> Strictly uses <code>&lt;header&gt;</code>, <code>&lt;nav&gt;</code>, <code>&lt;main&gt;</code>, <code>&lt;section&gt;</code>, <code>&lt;article&gt;</code>, and <code>&lt;footer&gt;</code> with single <code>&lt;h1&gt;</code>.</div>
+                </li>
+                <li style="display: flex; gap: 10px;">
+                  <span style="color: var(--accent-emerald);">✔</span>
+                  <div><strong>WCAG 2.1 AAA Accessibility:</strong> Validated contrast ratios, focus-visible keyboard outlines, and ARIA labels on all interactive controls.</div>
+                </li>
+                <li style="display: flex; gap: 10px;">
+                  <span style="color: var(--accent-emerald);">✔</span>
+                  <div><strong>Fluid Responsive Typography:</strong> Utilizes CSS <code>clamp()</code> and container queries for pixel-perfect scaling across all devices from 320px to 4K monitors.</div>
+                </li>
+                <li style="display: flex; gap: 10px;">
+                  <span style="color: var(--accent-emerald);">✔</span>
+                  <div><strong>Zero-Dependency Performance:</strong> 100% vanilla HTML5 and CSS3 with 0kb framework JavaScript payload for maximum loading speed.</div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </div>
+
+        <!-- Tab 4: Changelog -->
+        <div class="tab-panel" id="tab-changelog" role="tabpanel" aria-labelledby="tabBtnChangelog">
+          <section class="content-section">
+            <h2 class="content-section-title">Release History &amp; Changelog</h2>
+            <div id="changelogContainer">
+              <!-- Rendered via details.js -->
+            </div>
+          </section>
+        </div>
+      </article>
+
+      <!-- Sidebar Specifications Column -->
+      <aside class="details-sidebar" aria-label="Template Specifications and Metadata">
+        <!-- Specs Card -->
+        <div class="specs-card">
+          <h3 class="specs-title">Technical Specifications</h3>
+          
+          <div class="spec-row">
+            <span class="spec-label">Initial Release</span>
+            <span class="spec-value" id="specRelease">2026</span>
+          </div>
+
+          <div class="spec-row spec-row-chips">
+            <span class="spec-label">Tech Stack</span>
+            <div class="spec-value spec-chips-wrapper" id="specFramework">
+              <span class="tech-chip">HTML5 Semantic</span>
+              <span class="tech-chip">Vanilla CSS3</span>
+            </div>
+          </div>
+
+          <div class="spec-row">
+            <span class="spec-label">Bundle Size</span>
+            <span class="spec-value" id="specSize">14 KB</span>
+          </div>
+
+          <div class="spec-row">
+            <span class="spec-label">Browser Support</span>
+            <span class="spec-value" id="specBrowser">All Modern Browsers (Chrome, Safari, Firefox, Edge)</span>
+          </div>
+
+          <div class="spec-row">
+            <span class="spec-label">Lighthouse Score</span>
+            <span class="spec-value" id="specLighthouse" style="color: #34d399;">100 / 100 / 100 / 100</span>
+          </div>
+
+          <div class="spec-row">
+            <span class="spec-label">License</span>
+            <span class="spec-value" id="specLicense">MIT Perpetual</span>
+          </div>
+
+          <div class="spec-row">
+            <span class="spec-label">Creator</span>
+            <span class="spec-value" id="specAuthor">Pixoptimo Labs</span>
+          </div>
+        </div>
+
+        <!-- Included Assets Card -->
+        <div class="specs-card">
+          <h3 class="specs-title">Included in Package</h3>
+          <ul style="list-style: none; display: flex; flex-direction: column; gap: 10px; font-size: 0.88rem; color: var(--text-secondary);">
+            <li style="display: flex; gap: 8px;"><span style="color: var(--accent-emerald);">✓</span> Complete Semantic HTML5 Source</li>
+            <li style="display: flex; gap: 8px;"><span style="color: var(--accent-emerald);">✓</span> Modular Vanilla CSS3 Stylesheet</li>
+            <li style="display: flex; gap: 8px;"><span style="color: var(--accent-emerald);">✓</span> CSS Variable Tokens for Dark/Light Themes</li>
+            <li style="display: flex; gap: 8px;"><span style="color: var(--accent-emerald);">✓</span> SVG Vector Icons &amp; Illustrations</li>
+            <li style="display: flex; gap: 8px;"><span style="color: var(--accent-emerald);">✓</span> Step-by-Step Customization Documentation</li>
+          </ul>
+        </div>
+
+        <!-- Quality Seal -->
+        <div class="seal-card">
+          <div class="seal-icon">🛡️</div>
+          <h4>Pixoptimo Quality Verified</h4>
+          <p>Every line of code complies with W3C validation rules, zero layout shifts (CLS &lt; 0.01), and WCAG 2.1 AAA color contrast standards.</p>
+        </div>
+      </aside>
+    </div>
+
+    <!-- More Templates Grid Section -->
+    <section style="margin-bottom: 5rem;" aria-label="Recommended Templates">
+      <h2 style="font-size: 1.8rem; font-weight: 800; margin-bottom: 1.5rem; color: #fff;">Explore More UI Templates</h2>
+      <div class="templates-grid" id="relatedGrid">
+        <!-- Rendered via details.js -->
+      </div>
+    </section>

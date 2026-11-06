@@ -15,6 +15,35 @@ program
   .description('Planfo CMS CLI — Database-free static website manager')
   .version('0.1.0');
 
+program.on('--help', () => {
+  console.log(`
+\x1b[1mExamples:\x1b[0m
+  $ planfo init my-site          Initialize a new Planfo website project
+  $ cd my-site
+  $ planfo dev                   Start Planfo CMS dashboard on http://localhost:3000
+  $ planfo dev -p 4000           Start Planfo CMS dashboard on a custom port
+  $ planfo build                 Compile static HTML/CSS into generated/
+  $ planfo preview               Preview the generated static website on :8080
+  $ planfo publish               Build and publish static output to GitHub Pages
+
+\x1b[1m\x1b[33mImportant Note:\x1b[0m
+  Planfo website projects are database-free and intentionally \x1b[1mDO NOT\x1b[0m contain a package.json file.
+  \x1b[31m✖ Do NOT run 'npm run dev' inside your website project folder!\x1b[0m
+    (Doing so causes: npm error enoent Could not read package.json)
+  \x1b[32m✔ Run 'planfo dev' instead.\x1b[0m
+
+\x1b[1mTroubleshooting & Global Setup:\x1b[0m
+  If the 'planfo' command is not recognized globally on your system:
+  1. Link it globally from the CMS Monorepo:
+     $ cd "/Users/bejoynj/Downloads/Static CMS/CMS Project"
+     $ npm link packages/create-planfo
+  2. Or run it directly via Node:
+     $ node "<CMS-Monorepo>/packages/create-planfo/bin/planfo.js" dev
+  3. Or run it from the CMS Monorepo targeting your website folder:
+     $ npm run planfo -- dev "/path/to/your-website"
+`);
+});
+
 function resolvePlanfoProject(targetDir?: string): { projectDir: string; storageDir: string } | null {
   const base = targetDir ? path.resolve(process.cwd(), targetDir) : process.cwd();
 
@@ -194,6 +223,64 @@ program
         console.log(`\n\x1b[32m✔ Successfully published to GitHub Pages!\x1b[0m\n`);
       }
     });
+  });
+
+// planfo reset-password [new-password] [dir]
+program
+  .command('reset-password [new-password] [dir]')
+  .description('Reset or restore admin credentials for a Planfo CMS project')
+  .action(async (newPassword = 'admin123', dir) => {
+    const projectInfo = resolvePlanfoProject(dir);
+    const storageDir = projectInfo ? projectInfo.storageDir : path.resolve(process.cwd(), 'storage');
+    const authDir = path.join(storageDir, 'auth');
+    const usersFile = path.join(authDir, 'users.json');
+
+    console.log(`\n\x1b[36m⚡ Resetting Planfo CMS Admin Password...\x1b[0m`);
+    console.log(`\x1b[90m  Storage: ${storageDir}\x1b[0m\n`);
+
+    try {
+      if (!fs.existsSync(authDir)) fs.mkdirSync(authDir, { recursive: true });
+
+      const monorepoRoot = findMonorepoRoot();
+      const { hashPassword } = await import(path.join(monorepoRoot, 'apps/server/dist/auth/password.js'));
+      const passwordHash = await hashPassword(newPassword);
+      const now = new Date().toISOString();
+
+      let users: any[] = [];
+      if (fs.existsSync(usersFile)) {
+        try {
+          const parsed = JSON.parse(fs.readFileSync(usersFile, 'utf8'));
+          users = parsed.users || [];
+        } catch {}
+      }
+
+      const adminIdx = users.findIndex((u: any) => u.role === 'admin');
+      if (adminIdx >= 0) {
+        users[adminIdx].passwordHash = passwordHash;
+        users[adminIdx].active = true;
+        users[adminIdx].updatedAt = now;
+      } else {
+        users.unshift({
+          id: 'usr_admin_default',
+          email: 'admin@example.com',
+          name: 'admin',
+          passwordHash,
+          role: 'admin',
+          active: true,
+          createdAt: now,
+          updatedAt: now
+        });
+      }
+
+      fs.writeFileSync(usersFile, JSON.stringify({ users }, null, 2), 'utf8');
+
+      console.log(`\x1b[32m✔ Admin credentials successfully updated!\x1b[0m\n`);
+      console.log(`  \x1b[1mUsername:\x1b[0m admin (or admin@example.com)`);
+      console.log(`  \x1b[1mPassword:\x1b[0m ${newPassword}\n`);
+      console.log(`  You can now log in at your CMS dashboard.\n`);
+    } catch (err: any) {
+      console.error(`\x1b[31m❌ Failed to reset password: ${err.message}\x1b[0m\n`);
+    }
   });
 
 function findMonorepoRoot(): string {

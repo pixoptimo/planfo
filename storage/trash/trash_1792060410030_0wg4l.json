@@ -1,0 +1,31 @@
+{
+  "trashId": "trash_1792060410030_0wg4l",
+  "entityType": "blueprint-entry",
+  "blueprintSlug": "templates",
+  "originalId": "ent_1792060410030_2",
+  "originalSlug": "trashed-test-1792060410022",
+  "title": "Trashed Template Showcase",
+  "data": {
+    "id": "ent_1792060410030_2",
+    "blueprintId": "templates",
+    "title": "Trashed Template Showcase",
+    "slug": "trashed-test-1792060410022",
+    "status": "published",
+    "publishedAt": "2026-10-15T10:33:30.030Z",
+    "category": "saas",
+    "tags": [],
+    "excerpt": "Trashed template in blueprints",
+    "featuredImage": "",
+    "data": {
+      "demoUrl": "sample-templates/trashed-test-1792060410022.html",
+      "downloadFile": "sample-templates/trashed-test-1792060410022.html"
+    },
+    "content": {
+      "blocks": []
+    },
+    "createdAt": "2026-10-15T10:33:30.030Z",
+    "updatedAt": "2026-10-15T10:33:30.030Z"
+  },
+  "deletedAt": "2026-10-15T10:33:30.030Z",
+  "deletedBy": "test@example.com"
+}
