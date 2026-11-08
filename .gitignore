@@ -26,6 +26,8 @@ Thumbs.db
 .active-ports.json
 storage/sessions/*.json
 !storage/sessions/.gitkeep
+storage/trash/*.json
+!storage/trash/.gitkeep
 
 # Vitest
 coverage
