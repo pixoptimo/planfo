@@ -209,7 +209,7 @@ export const TrashPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 w-full pb-20">
+    <div className="space-y-6 w-full max-w-7xl mx-auto pb-20">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-container-high/40 pb-5">
         <div>

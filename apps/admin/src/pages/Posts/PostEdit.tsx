@@ -7,6 +7,7 @@ import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
+import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 
 // Default block templates for all supported ContentBlock types
 const createDefaultBlock = (type: string): ContentBlock => {
@@ -582,7 +583,7 @@ export const PostEdit: React.FC = () => {
   const activeBlockIndex = activeBlock ? blocks.findIndex((b) => b.id === selectedBlockId) : -1;
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface font-body-md antialiased flex flex-col">
+    <div className="h-screen bg-surface text-on-surface font-body-md antialiased flex overflow-hidden relative select-text">
       {/* Toast Notification */}
       <div
         className={`fixed bottom-8 right-8 z-50 transform transition-all duration-300 pointer-events-none flex items-center gap-3 px-5 py-3.5 rounded-xl bg-inverse-surface text-inverse-on-surface shadow-xl ${
@@ -593,81 +594,13 @@ export const PostEdit: React.FC = () => {
         <span className="font-label-md text-label-md font-semibold tracking-wide">{toastMessage}</span>
       </div>
 
-      {/* Slim Global Icon Navigation Rail (Left 64px) */}
-      <aside className="fixed left-0 top-0 h-full w-16 bg-surface-container-lowest z-50 flex flex-col items-center justify-between py-4 shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-outline-variant/30">
-        <div className="flex flex-col items-center gap-6 w-full">
-          <Link
-            to="/"
-            className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-surface-container transition-transform hover:scale-105"
-            title="Planfo Editorial Studio"
-          >
-            <PlanfoLogo variant="icon" className="w-7 h-7" />
-          </Link>
-
-          <nav className="flex flex-col items-center gap-2 w-full px-2">
-            <Link
-              to="/"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-              title="Overview"
-            >
-              <span className="material-symbols-outlined text-[20px]">grid_view</span>
-            </Link>
-
-            <Link
-              to="/posts"
-              className="flex items-center justify-center w-10 h-10 transition-colors bg-primary-container text-on-primary-container rounded-lg shadow-xs"
-              title="Articles Library"
-            >
-              <span className="material-symbols-outlined text-[20px]">article</span>
-            </Link>
-
-            <Link
-              to="/pages"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-              title="Pages"
-            >
-              <span className="material-symbols-outlined text-[20px]">menu_book</span>
-            </Link>
-
-            <Link
-              to="/blueprints/templates"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-              title="Templates & Catalog"
-            >
-              <span className="material-symbols-outlined text-[20px]">dashboard_customize</span>
-            </Link>
-
-            <Link
-              to="/media"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-              title="Media Library"
-            >
-              <span className="material-symbols-outlined text-[20px]">image</span>
-            </Link>
-          </nav>
-        </div>
-
-        <div className="flex flex-col items-center gap-2 w-full px-2">
-          <Link
-            to="/settings"
-            className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-            title="Studio Settings"
-          >
-            <span className="material-symbols-outlined text-[20px]">tune</span>
-          </Link>
-          <div
-            className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shadow-sm text-on-primary font-bold text-label-xs"
-            title={user?.email || 'User'}
-          >
-            {user?.name?.[0]?.toUpperCase() || 'A'}
-          </div>
-        </div>
-      </aside>
+      {/* Global 64px Left Icon Rail Navigation */}
+      <SidebarRail />
 
       {/* Main Studio Viewport (Padded by left 64px) */}
-      <div className="pl-16 flex-1 flex flex-col">
+      <div className="pl-16 flex-1 flex flex-col h-screen overflow-hidden">
         {/* Top Header Bar */}
-        <header className="fixed top-0 left-16 right-0 z-40 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-outline-variant/30 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
+        <header className="h-16 shrink-0 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-surface-container-high/60 shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40">
           <div className="h-16 w-full px-6 flex items-center justify-between gap-4">
             {/* Breadcrumb Hierarchy */}
             <div className="flex items-center gap-3 min-w-0">
@@ -806,7 +739,7 @@ export const PostEdit: React.FC = () => {
         </header>
 
         {/* Sub-bar: Document Meta, Presets & Quick Actions */}
-        <div className="mt-16 bg-surface-container-lowest border-b border-outline-variant/20 shadow-[0_1px_3px_rgba(19,27,46,0.03)] px-8 py-2.5 flex items-center justify-between gap-4 z-30">
+        <div className="shrink-0 bg-surface-container-lowest border-b border-surface-container-high/40 shadow-[0_1px_3px_rgba(19,27,46,0.03)] px-6 py-2 flex items-center justify-between gap-4 z-30">
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider font-semibold">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
@@ -890,7 +823,7 @@ export const PostEdit: React.FC = () => {
         </div>
 
         {/* Three-Panel Post Editor Stage */}
-        <div className="flex-1 flex items-start justify-between min-h-[calc(100vh-120px)] relative overflow-hidden bg-surface">
+        <div className="flex-1 flex overflow-hidden min-h-0 relative bg-surface">
           {/* PANEL 1: Left Floating Palette: Content Block Composer */}
           {showBlockPalette && (
             <aside className="hidden xl:block fixed left-20 top-32 z-30 w-72 bg-surface-container-lowest rounded-xl p-4 shadow-[0_10px_30px_-8px_rgba(19,27,46,0.08)] border border-outline-variant/20 animate-fade-in">
@@ -1105,8 +1038,8 @@ export const PostEdit: React.FC = () => {
             </button>
           )}
 
-          {/* PANEL 2: Center Stage: Editorial Manuscript Canvas */}
-          <main className="flex-1 flex flex-col items-center justify-start py-10 px-4 lg:px-8 overflow-y-auto">
+          {/* PANEL 2: Center Stage: Editorial Manuscript Canvas with 24px side padding and inner scroll */}
+          <main className="flex-1 h-full overflow-y-auto px-6 py-8 flex flex-col items-center justify-start">
             <div
               ref={manuscriptRef}
               id="manuscriptPaper"
@@ -1607,8 +1540,8 @@ export const PostEdit: React.FC = () => {
             </div>
           </main>
 
-          {/* PANEL 3: Right Inspector Rail (Design & Settings) */}
-          <aside className="w-80 h-[calc(100vh-108px)] sticky top-0 bg-surface-container-lowest border-l border-outline-variant/30 shadow-[-1px_0_4px_rgba(19,27,46,0.03)] flex flex-col z-20 shrink-0">
+          {/* PANEL 3: Right Inspector Rail (Fixed with inner scroll) */}
+          <aside className="w-80 h-full shrink-0 bg-surface-container-lowest border-l border-surface-container-high/60 shadow-[-1px_0_4px_rgba(19,27,46,0.03)] flex flex-col z-20 overflow-y-auto">
             {/* Inspector Tab Switcher */}
             <div className="p-4 pb-2 bg-surface-container-lowest">
               <div className="flex items-center p-1 bg-surface-container-low rounded-lg w-full">

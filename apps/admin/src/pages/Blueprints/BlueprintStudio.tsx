@@ -6,6 +6,7 @@ import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
+import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 import { FEATURE_PACKS } from '../../data/featurePacks.js';
 
 interface EnrichedBlueprint extends Blueprint {
@@ -359,7 +360,7 @@ export const BlueprintStudio: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased flex flex-col relative select-text">
+    <div className="h-screen bg-surface font-body-md text-on-surface antialiased flex overflow-hidden relative select-text">
       {/* Toast Feedback */}
       {showToast && toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-lg bg-inverse-surface text-inverse-on-surface shadow-2xl flex items-center gap-2 text-sm font-label-md animate-in fade-in slide-in-from-bottom-2">
@@ -368,76 +369,14 @@ export const BlueprintStudio: React.FC = () => {
         </div>
       )}
 
-      {/* 64px Left Icon Rail */}
-      <aside className="fixed left-0 top-0 h-full w-16 bg-surface-container-lowest z-50 flex flex-col items-center justify-between py-space-md shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-r border-surface-container-high/60">
-        <div className="flex flex-col items-center gap-space-lg w-full">
-          <Link
-            to="/"
-            title="Planfo CMS Home"
-            className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-surface-container transition-transform hover:scale-105"
-          >
-            <PlanfoLogo variant="icon" className="w-7 h-7" />
-          </Link>
-          <nav className="flex flex-col items-center gap-space-sm w-full px-space-xs">
-            <Link
-              to="/"
-              title="Dashboard"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">grid_view</span>
-            </Link>
-            <Link
-              to="/posts"
-              title="Posts"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">article</span>
-            </Link>
-            <Link
-              to="/pages"
-              title="Pages"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">description</span>
-            </Link>
-            <Link
-              to="/blueprints/studio"
-              title="Blueprints Studio"
-              className="flex items-center justify-center w-10 h-10 transition-colors bg-primary-container/20 text-primary font-bold rounded-lg shadow-xs"
-            >
-              <span className="material-symbols-outlined text-[20px]">schema</span>
-            </Link>
-            <Link
-              to="/media"
-              title="Media"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">photo_library</span>
-            </Link>
-          </nav>
-        </div>
-        <div className="flex flex-col items-center gap-space-sm w-full px-space-xs">
-          <Link
-            to="/settings"
-            title="Settings"
-            className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-colors"
-          >
-            <span className="material-symbols-outlined text-[20px]">tune</span>
-          </Link>
-          <div
-            title={`Signed in as ${user?.name || user?.email || 'Admin'}`}
-            className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs shadow-xs"
-          >
-            {(user?.name || user?.email || 'A').slice(0, 1).toUpperCase()}
-          </div>
-        </div>
-      </aside>
+      {/* Global 64px Left Icon Rail Navigation */}
+      <SidebarRail />
 
       {/* Main Container */}
-      <div className="pl-16 flex flex-col flex-1">
-        {/* Fixed Top Header */}
-        <header className="fixed top-0 left-16 right-0 z-40 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/60">
-          <div className="h-16 w-full px-space-lg flex items-center justify-between gap-space-md">
+      <div className="pl-16 flex flex-col flex-1 h-screen overflow-hidden">
+        {/* Top Header */}
+        <header className="h-16 shrink-0 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/60 flex items-center justify-between px-6 z-40">
+          <div className="w-full flex items-center justify-between gap-space-md">
             <div className="flex items-center gap-space-md min-w-0">
               <PlanfoLogo variant="full" className="h-5 w-auto" />
               <span className="text-outline-variant font-body-sm text-body-sm select-none">/</span>
@@ -491,11 +430,11 @@ export const BlueprintStudio: React.FC = () => {
           </div>
         </header>
 
-        {/* Content Body */}
-        <main className="w-full pt-16 bg-surface min-h-screen flex flex-col pb-20">
-          <div className="flex flex-col w-full">
+        {/* Content Body with 24px side padding and inner scrolling only */}
+        <main className="flex-1 overflow-y-auto px-6 py-6 bg-surface">
+          <div className="flex flex-col w-full max-w-7xl mx-auto">
             {/* Sub-header Breadcrumb & Live Tokens bar */}
-            <div className="w-full bg-surface-container-lowest px-space-xl py-space-sm flex flex-wrap items-center justify-between gap-space-md shadow-sm border-b border-surface-container-high/40">
+            <div className="w-full bg-surface-container-lowest rounded-xl px-6 py-3 flex flex-wrap items-center justify-between gap-space-md shadow-xs border border-surface-container-high/40 mb-6">
               <div className="flex items-center gap-space-sm text-body-sm font-body-sm min-w-0">
                 <Link
                   to="/"

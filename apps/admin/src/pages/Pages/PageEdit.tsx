@@ -7,6 +7,7 @@ import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
+import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 import { getTemplatePreset, TEMPLATE_PRESETS } from '../../data/templatePresets.js';
 import { getMediaUrl } from '../../utils/media.js';
 
@@ -638,7 +639,7 @@ export const PageEdit: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased flex flex-col relative select-text">
+    <div className="h-screen bg-surface font-body-md text-on-surface antialiased flex overflow-hidden relative select-text">
       {/* Toast Feedback */}
       {showToast && toastMessage && (
         <div className="fixed bottom-6 right-6 z-50 px-4 py-2.5 rounded-lg bg-inverse-surface text-inverse-on-surface shadow-2xl flex items-center gap-2 text-sm font-label-md animate-in fade-in slide-in-from-bottom-2">
@@ -647,81 +648,14 @@ export const PageEdit: React.FC = () => {
         </div>
       )}
 
-      {/* 64px Left Icon Rail */}
-      <aside className="fixed left-0 top-0 h-full w-16 bg-surface-container-lowest z-50 flex flex-col items-center justify-between py-space-md border-r border-surface-container-high shadow-xs">
-        <div className="flex flex-col items-center gap-space-lg w-full">
-          <Link
-            to="/"
-            title="Planfo CMS Home"
-            className="flex items-center justify-center w-10 h-10 rounded-xl hover:bg-surface-container transition-transform hover:scale-105"
-          >
-            <PlanfoLogo variant="icon" className="w-7 h-7" />
-          </Link>
-          <nav className="flex flex-col items-center gap-space-sm w-full px-space-xs">
-            <Link
-              to="/"
-              title="Overview"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">grid_view</span>
-            </Link>
-            <Link
-              to="/components-and-tokens"
-              title="Components & Tokens"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">widgets</span>
-            </Link>
-            <Link
-              to="/posts"
-              title="Articles Library"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">menu_book</span>
-            </Link>
-            <Link
-              to="/pages"
-              title="Pages"
-              className="flex items-center justify-center w-10 h-10 transition-colors bg-primary-container/20 text-primary font-bold rounded-lg shadow-xs"
-            >
-              <span className="material-symbols-outlined text-[20px]">article</span>
-            </Link>
-            <Link
-              to="/media"
-              title="Media Assets"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">photo_library</span>
-            </Link>
-            <Link
-              to="/blueprints"
-              title="Blueprints"
-              className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-            >
-              <span className="material-symbols-outlined text-[20px]">schema</span>
-            </Link>
-          </nav>
-        </div>
-        <div className="flex flex-col items-center gap-space-sm w-full px-space-xs">
-          <Link
-            to="/settings"
-            title="System Settings"
-            className="flex items-center justify-center w-10 h-10 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors"
-          >
-            <span className="material-symbols-outlined text-[20px]">tune</span>
-          </Link>
-          <div
-            title={`Signed in as ${user?.name || user?.email || 'Admin'}`}
-            className="w-9 h-9 rounded-full bg-primary-fixed text-on-primary-fixed flex items-center justify-center font-bold text-xs ring-2 ring-primary/20 shadow-xs cursor-pointer"
-          >
-            {(user?.name || user?.email || 'A').slice(0, 1).toUpperCase()}
-          </div>
-        </div>
-      </aside>
+      {/* Global 64px Left Icon Rail Navigation */}
+      <SidebarRail />
 
-      {/* Fixed Top Navigation Header */}
-      <header className="fixed top-0 left-16 right-0 z-40 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/60">
-        <div className="h-16 w-full px-space-lg flex items-center justify-between gap-space-md">
+      {/* Main Studio Viewport */}
+      <div className="pl-16 flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Top Header Bar */}
+        <header className="h-16 shrink-0 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/60 flex items-center justify-between px-6 z-40">
+          <div className="w-full flex items-center justify-between gap-space-md">
           {/* Left: Branding & Breadcrumbs */}
           <div className="flex items-center gap-space-md min-w-0">
             <PlanfoLogo variant="full" className="h-5 w-auto" />
@@ -891,10 +825,8 @@ export const PageEdit: React.FC = () => {
         </div>
       </header>
 
-      {/* Main Container below fixed header */}
-      <main className="w-full pl-16 pt-16 bg-surface min-h-screen flex flex-col">
-        {/* Sub-bar: Document Meta & View Switcher */}
-        <section className="w-full bg-surface-container-lowest shadow-[0_1px_3px_rgba(19,27,46,0.03)] px-space-lg py-2.5 flex items-center justify-between gap-space-md border-b border-surface-container-high/40">
+      {/* Sub-bar: Document Meta & View Switcher */}
+      <section className="shrink-0 w-full bg-surface-container-lowest shadow-[0_1px_3px_rgba(19,27,46,0.03)] px-6 py-2 flex items-center justify-between gap-space-md border-b border-surface-container-high/40 z-30">
           <div className="flex items-center gap-space-md">
             <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
@@ -1010,7 +942,7 @@ export const PageEdit: React.FC = () => {
         </section>
 
         {/* Studio Stage & Split Layout */}
-        <div className="flex-1 flex min-h-[calc(100vh-108px)] relative overflow-hidden">
+        <div className="flex-1 flex overflow-hidden min-h-0 relative">
           {/* Left Floating Palette: Block Composer */}
           {isPaletteOpen && (
             <aside className="hidden xl:block fixed left-20 top-28 z-30 w-72 bg-surface-container-lowest rounded-xl p-space-md shadow-[0_10px_30px_-8px_rgba(19,27,46,0.08)] border border-surface-container-high/60 animate-in fade-in duration-200">
@@ -1205,8 +1137,8 @@ export const PageEdit: React.FC = () => {
             </button>
           )}
 
-          {/* Center Stage: The Editorial Sheet Canvas */}
-          <section className="flex-1 flex flex-col items-center justify-start py-space-xl px-4 lg:px-8 overflow-y-auto">
+          {/* Center Stage: The Editorial Sheet Canvas with 24px side padding and inner scroll only */}
+          <section className="flex-1 h-full overflow-y-auto px-6 py-8 flex flex-col items-center">
             <div
               id="manuscriptPaper"
               ref={manuscriptRef}
@@ -1722,8 +1654,8 @@ export const PageEdit: React.FC = () => {
             </div>
           </section>
 
-          {/* Right Inspector Rail (Collapsible Design / Settings Panel) */}
-          <aside className="w-80 h-[calc(100vh-108px)] sticky top-0 bg-surface-container-lowest shadow-[-1px_0_4px_rgba(19,27,46,0.03)] flex flex-col z-20 border-l border-surface-container-high/60">
+          {/* Right Inspector Rail (Fixed / pinned with its own inner scroll) */}
+          <aside className="w-80 h-full shrink-0 bg-surface-container-lowest shadow-[-1px_0_4px_rgba(19,27,46,0.03)] flex flex-col z-20 border-l border-surface-container-high/60 overflow-y-auto">
             {/* Inspector Segmented Tabs */}
             <div className="p-space-md pb-2 bg-surface-container-lowest">
               <div className="flex items-center p-1 bg-surface-container-low rounded-lg w-full">
@@ -2154,7 +2086,7 @@ export const PageEdit: React.FC = () => {
             </div>
           </aside>
         </div>
-      </main>
+      </div>
 
       {/* Media Picker Modal */}
       <MediaPickerModal

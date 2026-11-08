@@ -70,7 +70,7 @@ export const SiteSettingsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 w-full pb-20">
+    <div className="space-y-6 w-full max-w-7xl mx-auto pb-20">
       <form onSubmit={handleSave} className="space-y-6">
         <div className="border-b border-surface-container-high/40 pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">

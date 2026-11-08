@@ -119,7 +119,7 @@ export const SeoSettingsPage: React.FC = () => {
   const displayUrl = settings.siteUrl ? settings.siteUrl.replace(/\/+$/, '') : 'https://example.com';
 
   return (
-    <div className="space-y-6 w-full pb-20">
+    <div className="space-y-6 w-full max-w-7xl mx-auto pb-20">
       <form onSubmit={handleSave} className="space-y-6">
         {/* Header with Settings Sub-Navigation Tabs */}
         <div className="border-b border-surface-container-high/40 pb-4">

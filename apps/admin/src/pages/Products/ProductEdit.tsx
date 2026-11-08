@@ -10,6 +10,7 @@ import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
+import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 
 // Default block templates for Product Specifications & Content
 const createDefaultBlock = (type: string): ContentBlock => {
@@ -360,9 +361,14 @@ export const ProductEdit: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased flex flex-col">
-      {/* Top Studio Stage Bar */}
-      <header className="h-14 bg-surface-container-lowest border-b border-surface-container-high/40 px-5 flex items-center justify-between sticky top-0 z-40 shadow-xs">
+    <div className="h-screen bg-surface font-body-md text-on-surface antialiased flex overflow-hidden relative select-text">
+      {/* Global 64px Left Icon Rail Navigation */}
+      <SidebarRail />
+
+      {/* Main Studio Viewport */}
+      <div className="pl-16 flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Top Studio Stage Bar */}
+        <header className="h-16 shrink-0 bg-surface-container-lowest border-b border-surface-container-high/40 px-6 flex items-center justify-between z-40 shadow-xs">
         {/* Left: Brand / breadcrumb / auto-synced */}
         <div className="flex items-center gap-3 min-w-0">
           <Link
@@ -618,8 +624,8 @@ export const ProductEdit: React.FC = () => {
           </div>
         </aside>
 
-        {/* Center Editorial Manuscript Canvas */}
-        <main className="flex-1 overflow-y-auto p-4 sm:p-8 flex justify-center bg-surface">
+        {/* Center Editorial Manuscript Canvas with 24px side padding */}
+        <main className="flex-1 overflow-y-auto px-6 py-8 flex justify-center bg-surface">
           <div
             style={{ width: `${canvasWidth}px` }}
             className="w-full transition-all duration-300 bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl shadow-xl min-h-[850px] p-6 sm:p-12 flex flex-col space-y-8"
@@ -1163,6 +1169,7 @@ export const ProductEdit: React.FC = () => {
           </div>
         </aside>
       </div>
+    </div>
 
       {/* Media Picker Modal */}
       {showMediaPicker && (

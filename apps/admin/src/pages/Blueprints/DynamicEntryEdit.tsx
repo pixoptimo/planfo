@@ -10,6 +10,7 @@ import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
+import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 
 export const DynamicEntryEdit: React.FC = () => {
   const { blueprintSlug, entrySlug } = useParams<{ blueprintSlug: string; entrySlug?: string }>();
@@ -367,9 +368,14 @@ export const DynamicEntryEdit: React.FC = () => {
   const IconComp = getBlueprintIcon(blueprint.icon);
 
   return (
-    <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased flex flex-col">
-      {/* Top Studio Stage Bar */}
-      <header className="h-14 bg-surface-container-lowest border-b border-surface-container-high/40 px-5 flex items-center justify-between sticky top-0 z-40 shadow-xs">
+    <div className="h-screen bg-surface font-body-md text-on-surface antialiased flex overflow-hidden relative select-text">
+      {/* Global 64px Left Icon Rail Navigation */}
+      <SidebarRail />
+
+      {/* Main Studio Viewport */}
+      <div className="pl-16 flex-1 flex flex-col h-screen overflow-hidden">
+        {/* Top Studio Stage Bar */}
+        <header className="h-16 shrink-0 bg-surface-container-lowest border-b border-surface-container-high/40 px-6 flex items-center justify-between z-40 shadow-xs">
         {/* Left: Brand, collection breadcrumb, title & autosave */}
         <div className="flex items-center gap-3 min-w-0">
           <Link
@@ -1222,6 +1228,7 @@ export const DynamicEntryEdit: React.FC = () => {
           </div>
         </aside>
       </div>
+    </div>
 
       {/* Floating Save Toast */}
       {showToast && (

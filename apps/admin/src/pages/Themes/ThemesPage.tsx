@@ -153,7 +153,7 @@ export const ThemesPage: React.FC = () => {
   const activeTheme = themes.find((t) => t.isActive);
 
   return (
-    <div className="space-y-6 w-full pb-20">
+    <div className="space-y-6 w-full max-w-7xl mx-auto pb-20">
       {/* Header bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-surface-container-high/40 pb-4">
         <div>
