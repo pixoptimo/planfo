@@ -32,6 +32,22 @@ async function startServer(): Promise<void> {
     }
   }
 
+  // 1.6 Auto-build admin dashboard assets on startup if dist/index.html doesn't exist
+  const adminIndexPath = path.join(config.ADMIN_DIST_PATH, 'index.html');
+  if (!fs.existsSync(adminIndexPath)) {
+    try {
+      const { execSync } = await import('node:child_process');
+      logger.info('Building Planfo CMS admin dashboard assets...');
+      execSync('npm run build --workspace=@cms/admin', {
+        cwd: config.WORKSPACE_ROOT,
+        stdio: 'inherit'
+      });
+      logger.info('Planfo CMS admin dashboard assets built successfully');
+    } catch (adminBuildErr) {
+      logger.warn('Admin dashboard asset build deferred', { error: String(adminBuildErr) });
+    }
+  }
+
   // 2. Setup periodic session cleanup (every 1 hour)
   setInterval(() => {
     SessionStore.cleanExpired().catch((err) => {

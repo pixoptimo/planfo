@@ -202,11 +202,20 @@ export function createApp(): express.Application {
   // Admin Dashboard (SPA) - Unified WordPress Model
   const adminDistPath = config.ADMIN_DIST_PATH;
   if (fs.existsSync(adminDistPath)) {
-    // Serve static files from built admin panel (express.static automatically redirects /admin to /admin/)
+    // 1. Serve static files from built admin panel (express.static automatically redirects /admin to /admin/)
     app.use('/admin', express.static(adminDistPath, { index: 'index.html', redirect: true }));
 
-    // SPA fallback for HTML5 client-side routing inside /admin/*
-    app.get('/admin/*', (_req, res) => {
+    // 2. Direct /admin or /admin/
+    app.get(['/admin', '/admin/'], (_req, res) => {
+      res.sendFile(path.join(adminDistPath, 'index.html'));
+    });
+
+    // 3. SPA fallback for HTML5 client-side routing inside /admin/*
+    app.get('/admin/*', (req, res, next) => {
+      // If it looks like a missing static asset file (e.g. .js, .css, .map, .png), let it 404
+      if (path.extname(req.path)) {
+        return next();
+      }
       res.sendFile(path.join(adminDistPath, 'index.html'));
     });
   } else {

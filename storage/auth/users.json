@@ -33,7 +33,7 @@
     {
       "id": "usr_admin_default",
       "email": "admin@example.com",
-      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$8tDsm0CLnbt9SZgSbfG3Dw$XUaZ0PXvjZgDih4mAhQAxsNH6ljJzzJYksnrLyTeXx8",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$cmK46s/L//surOmd92xmlg$4mRZnOE/4D4vIi5NRLh/4Lc3PY0VN4X7ewsrGAa78sQ",
       "role": "admin",
       "name": "admin",
       "active": true,
