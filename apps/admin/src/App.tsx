@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useParams } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext.js';
+import { SidebarProvider } from './context/SidebarContext.js';
 import { AdminLayout } from './components/Layout/AdminLayout.js';
 import { Login } from './pages/Login.js';
 import { Dashboard } from './pages/Dashboard.js';
@@ -79,8 +80,9 @@ export const App: React.FC = () => {
 
   return (
     <AuthProvider>
-      <BrowserRouter basename={basename}>
-        <Routes>
+      <SidebarProvider>
+        <BrowserRouter basename={basename}>
+          <Routes>
           <Route path="/setup" element={<SetupWizard />} />
           <Route path="/login" element={<Login />} />
 
@@ -126,6 +128,7 @@ export const App: React.FC = () => {
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
-    </AuthProvider>
+    </SidebarProvider>
+  </AuthProvider>
   );
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Outlet, useNavigate, useLocation, Link } from 'react-router-dom';
 import { Loader2, ExternalLink, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext.js';
+import { useSidebar } from '../../context/SidebarContext.js';
 import { api } from '../../api/client.js';
 import { SidebarRail } from './SidebarRail.js';
 import { ProfileDropdown } from '../UI/ProfileDropdown.js';
@@ -9,6 +10,7 @@ import type { PublishResult } from '@cms/types';
 
 export const AdminLayout: React.FC = () => {
   const { user, logout, can } = useAuth();
+  const { mainPaddingClass } = useSidebar();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -76,7 +78,7 @@ export const AdminLayout: React.FC = () => {
       <SidebarRail />
 
       {/* Main Content Stage */}
-      <div className="pl-16 flex-1 flex flex-col h-screen overflow-hidden">
+      <div className={`${mainPaddingClass} flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out`}>
         {/* Top Header Bar */}
         <header className="h-16 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-surface-container-high/60 flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_1px_8px_rgba(0,0,0,0.04)]">
           {/* Breadcrumbs */}

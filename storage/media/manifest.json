@@ -101,9 +101,29 @@
       "originalName": "test.png",
       "mimeType": "image/png",
       "size": 1024,
+      "alt": "",
       "url": "/media/test-media-1792422153209.png",
-      "createdAt": "2026-10-19T15:02:33.209Z",
-      "updatedAt": "2026-10-19T15:02:33.229Z"
+      "createdAt": "2026-10-19T15:02:33.209Z"
+    },
+    {
+      "id": "media_1794169469823",
+      "filename": "test-media-1794169469823.png",
+      "originalName": "test.png",
+      "mimeType": "image/png",
+      "size": 1024,
+      "alt": "",
+      "url": "/media/test-media-1794169469823.png",
+      "createdAt": "2026-11-08T20:24:29.823Z"
+    },
+    {
+      "id": "media_1794169490850",
+      "filename": "test-media-1794169490850.png",
+      "originalName": "test.png",
+      "mimeType": "image/png",
+      "size": 1024,
+      "url": "/media/test-media-1794169490850.png",
+      "createdAt": "2026-11-08T20:24:50.850Z",
+      "updatedAt": "2026-11-08T20:24:50.855Z"
     }
   ]
 }

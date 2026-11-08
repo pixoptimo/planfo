@@ -5,7 +5,7 @@ import { api } from '../../api/client.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
-import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { useSidebar } from '../../context/SidebarContext.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 import { getTemplatePreset, TEMPLATE_PRESETS } from '../../data/templatePresets.js';
@@ -216,6 +216,7 @@ const getInitialDefaultBlocks = (): ContentBlock[] => [
 ];
 
 export const PageEdit: React.FC = () => {
+  const { mainPaddingClass } = useSidebar();
   const { slug } = useParams<{ slug?: string }>();
   const isNew = !slug || slug === 'new';
   const navigate = useNavigate();
@@ -651,15 +652,13 @@ export const PageEdit: React.FC = () => {
       {/* Global 64px Left Icon Rail Navigation */}
       <SidebarRail />
 
-      {/* Main Studio Viewport */}
-      <div className="pl-16 flex-1 flex flex-col h-screen overflow-hidden">
+      {/* Main Studio Viewport with dynamic sidebar padding */}
+      <div className={`${mainPaddingClass} flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out`}>
         {/* Top Header Bar */}
         <header className="h-16 shrink-0 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/60 flex items-center justify-between px-6 z-40">
           <div className="w-full flex items-center justify-between gap-space-md">
-          {/* Left: Branding & Breadcrumbs */}
+          {/* Left: Breadcrumbs */}
           <div className="flex items-center gap-space-md min-w-0">
-            <PlanfoLogo variant="full" className="h-5 w-auto" />
-            <span className="text-outline-variant font-body-sm text-body-sm select-none">/</span>
             <div className="flex items-center gap-space-xs min-w-0 text-on-surface-variant">
               <Link
                 to="/pages"

@@ -1229,6 +1229,26 @@
       "active": true,
       "createdAt": "2026-10-19T15:02:34.375Z",
       "updatedAt": "2026-10-19T15:02:34.375Z"
+    },
+    {
+      "id": "usr_1794169471152",
+      "email": "testuser_1794169470966@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$1cF4BNotjAMcUq32cstkwA$LoFZycabErP83WSiQDxc3gHRZIcMVOmsvwa4FU5wpfc",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-11-08T20:24:31.152Z",
+      "updatedAt": "2026-11-08T20:24:31.152Z"
+    },
+    {
+      "id": "usr_1794169492065",
+      "email": "testuser_1794169491787@example.com",
+      "passwordHash": "$argon2id$v=19$m=65536,t=3,p=1$lz63UntU9LR0UebGMun1Qg$tz1thOpFYgEJKvx4XxY1b4/WH4J+1SEChBYubR1hW+M",
+      "role": "editor",
+      "name": "Test Editor",
+      "active": true,
+      "createdAt": "2026-11-08T20:24:52.065Z",
+      "updatedAt": "2026-11-08T20:24:52.065Z"
     }
   ]
 }

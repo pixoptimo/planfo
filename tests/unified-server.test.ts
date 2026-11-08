@@ -81,14 +81,14 @@ describe('Unified Server & URL Mapping (WordPress Single-Port Architecture)', ()
     const adminRes = await fetch(`${baseUrl}/admin/`);
     expect(adminRes.status).toBe(200);
     const text = await adminRes.text();
-    expect(text).toContain('Static CMS - Admin Dashboard');
+    expect(text).toMatch(/Planfo CMS|Static CMS/);
   });
 
   it('should support SPA client-side routes under /admin/*', async () => {
     const res = await fetch(`${baseUrl}/admin/blueprints/templates`);
     expect(res.status).toBe(200);
     const text = await res.text();
-    expect(text).toContain('Static CMS - Admin Dashboard');
+    expect(text).toMatch(/Planfo CMS|Static CMS/);
   });
 
   it('should serve public homepage at /', async () => {

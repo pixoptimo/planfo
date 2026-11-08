@@ -4,7 +4,7 @@ import type { Blueprint, BlueprintField, BlueprintFieldType } from '@cms/schemas
 import { api } from '../../api/client.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
-import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { useSidebar } from '../../context/SidebarContext.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 import { FEATURE_PACKS } from '../../data/featurePacks.js';
@@ -61,6 +61,7 @@ function getFieldIcon(type: string): string {
 }
 
 export const BlueprintCreate: React.FC = () => {
+  const { mainPaddingClass } = useSidebar();
   const { blueprintSlug } = useParams<{ blueprintSlug?: string }>();
   const isEditing = Boolean(blueprintSlug);
   const navigate = useNavigate();
@@ -405,14 +406,12 @@ export const BlueprintCreate: React.FC = () => {
       {/* Global 64px Left Icon Rail Navigation */}
       <SidebarRail />
 
-      {/* Main Pl-16 Wrapper */}
-      <div className="pl-16 flex flex-col flex-1 h-screen overflow-hidden">
+      {/* Main Content Stage with dynamic sidebar padding */}
+      <div className={`${mainPaddingClass} flex flex-col flex-1 h-screen overflow-hidden transition-all duration-300 ease-in-out`}>
         {/* Top Header */}
         <header className="h-16 shrink-0 bg-surface-container-lowest/90 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] border-b border-surface-container-high/60 flex items-center justify-between px-6 z-40">
           <div className="w-full flex items-center justify-between gap-space-md">
             <div className="flex items-center gap-space-md min-w-0">
-              <PlanfoLogo variant="full" className="h-5 w-auto" />
-              <span className="text-outline-variant font-body-sm text-body-sm select-none">/</span>
               <div className="flex items-center gap-space-xs min-w-0 text-on-surface-variant">
                 <Link
                   to="/blueprints/studio"

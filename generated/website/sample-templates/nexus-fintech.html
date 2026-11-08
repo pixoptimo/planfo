@@ -1,0 +1,240 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Nexus — Next-Gen Decentralized Finance & Wealth OS</title><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet"><style>
+    :root {
+      --bg: #090d16;
+      --card-bg: #111726;
+      --border: rgba(16, 185, 129, 0.2);
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --accent-green: #10b981;
+      --accent-green-glow: rgba(16, 185, 129, 0.35);
+      --accent-cyan: #06b6d4;
+      --accent-purple: #8b5cf6;
+      --text: #f1f5f9;
+      --text-muted: #94a3b8;
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'Inter', sans-serif;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      line-height: 1.5;
+    }
+    header {
+      background: rgba(17, 23, 38, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: var(--font-heading);
+      font-size: 1.35rem;
+      font-weight: 700;
+      color: #fff;
+      text-decoration: none;
+    }
+    .brand span { color: var(--accent-green); }
+    .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: #fff; }
+    .wallet-btn {
+      background: rgba(16, 185, 129, 0.15);
+      border: 1px solid var(--accent-green);
+      color: var(--accent-green);
+      padding: 0.5rem 1.25rem;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .wallet-btn:hover {
+      background: var(--accent-green);
+      color: #000;
+      box-shadow: 0 0 20px var(--accent-green-glow);
+    }
+
+    /* Live Ticker Bar */
+    .ticker-bar {
+      background: #0d121f;
+      border-bottom: 1px solid var(--border-subtle);
+      padding: 0.6rem 2rem;
+      display: flex;
+      gap: 2.5rem;
+      overflow-x: auto;
+      font-size: 0.82rem;
+      font-family: var(--font-heading);
+    }
+    .ticker-item { display: flex; gap: 8px; align-items: center; white-space: nowrap; }
+    .ticker-up { color: var(--accent-green); }
+    .ticker-down { color: #f43f5e; }
+
+    /* Main Grid Layout */
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1.5rem;
+      display: grid;
+      grid-template-columns: 280px 1fr 340px;
+      gap: 1.5rem;
+    }
+    @media (max-width: 1024px) {
+      .container { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 16px;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    .card:hover { border-color: rgba(16, 185, 129, 0.4); }
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    /* Left Sidebar: Assets & Pairs */
+    .asset-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.8rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.9rem;
+    }
+    .asset-row:last-child { border-bottom: none; }
+    .asset-info { display: flex; align-items: center; gap: 10px; }
+    .asset-badge {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.05);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+    }
+
+    /* Center: Main Portfolio & Trading Chart */
+    .portfolio-hero {
+      background: linear-gradient(135deg, #111b2b 0%, #131722 100%);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+    .balance-label { font-size: 0.85rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .balance-val {
+      font-size: 2.5rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: #fff;
+      margin: 0.2rem 0;
+    }
+    .balance-change {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      color: var(--accent-green);
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+
+    .chart-container {
+      margin-top: 1.5rem;
+      height: 220px;
+      width: 100%;
+      position: relative;
+    }
+    .chart-grid-lines {
+      stroke: rgba(255, 255, 255, 0.05);
+      stroke-dasharray: 4;
+    }
+
+    /* Swap / Trade Widget */
+    .swap-box {
+      background: rgba(0, 0, 0, 0.2);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
+    .swap-header { display: flex; justify-content: space-between; font-size: 0.8rem; color: var(--text-muted); margin-bottom: 6px; }
+    .swap-input-row { display: flex; justify-content: space-between; align-items: center; }
+    .swap-input {
+      background: transparent;
+      border: none;
+      font-family: var(--font-heading);
+      font-size: 1.4rem;
+      color: #fff;
+      outline: none;
+      width: 60%;
+    }
+    .pill-select {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      padding: 4px 12px;
+      font-weight: 600;
+      font-size: 0.85rem;
+    }
+    .swap-action-btn {
+      width: 100%;
+      background: linear-gradient(90deg, var(--accent-green), var(--accent-cyan));
+      border: none;
+      color: #000;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.9rem;
+      border-radius: 10px;
+      cursor: pointer;
+      margin-top: 0.5rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .swap-action-btn:hover {
+      box-shadow: 0 0 25px var(--accent-green-glow);
+      transform: translateY(-1px);
+    }
+
+    /* Transactions */
+    .tx-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.75rem 0;
+      border-bottom: 1px solid var(--border-subtle);
+      font-size: 0.85rem;
+    }
+    .tx-item:last-child { border-bottom: none; }
+  </style></head><body><header><a href="#" class="brand">NEXUS<span>.FIN</span></a><ul class="nav-links"><li><a href="#" class="active">Terminal</a></li><li><a href="#">Vaults</a></li><li><a href="#">Staking</a></li><li><a href="#">Analytics</a></li></ul><button class="wallet-btn" onclick="alert('Demo Wallet Connected: 0x9F4a...72B1')"><span>●</span> 0x9F4a...72B1
+    </button></header><div class="ticker-bar"><div class="ticker-item">BTC/USD <span class="ticker-up">$68,490.20 (+4.12%)</span></div><div class="ticker-item">ETH/USD <span class="ticker-up">$3,745.10 (+2.85%)</span></div><div class="ticker-item">SOL/USD <span class="ticker-up">$184.45 (+6.19%)</span></div><div class="ticker-item">AVAX/USD <span class="ticker-down">$32.10 (-1.05%)</span></div><div class="ticker-item">USDC APY <span class="ticker-up">8.42%</span></div></div><div class="container"><aside><div class="card"><div class="card-title"><span>Top Assets</span><span style="font-size: 0.8rem; color: var(--accent-green); cursor: pointer;">View All &rarr;</span></div><div class="asset-row"><div class="asset-info"><div class="asset-badge" style="color: #f59e0b;">₿</div><div><div style="font-weight: 600;">Bitcoin</div><div style="font-size: 0.75rem; color: var(--text-muted);">BTC</div></div></div><div style="text-align: right;"><div>$68,490</div><div class="ticker-up" style="font-size: 0.75rem;">+4.12%</div></div></div><div class="asset-row"><div class="asset-info"><div class="asset-badge" style="color: #818cf8;">Ξ</div><div><div style="font-weight: 600;">Ethereum</div><div style="font-size: 0.75rem; color: var(--text-muted);">ETH</div></div></div><div style="text-align: right;"><div>$3,745</div><div class="ticker-up" style="font-size: 0.75rem;">+2.85%</div></div></div><div class="asset-row"><div class="asset-info"><div class="asset-badge" style="color: #2dd4bf;">◎</div><div><div style="font-weight: 600;">Solana</div><div style="font-size: 0.75rem; color: var(--text-muted);">SOL</div></div></div><div style="text-align: right;"><div>$184.45</div><div class="ticker-up" style="font-size: 0.75rem;">+6.19%</div></div></div></div></aside><main><div class="portfolio-hero"><div class="balance-label">Total Portfolio Net Worth</div><div class="balance-val">$148,250.30</div><div class="balance-change"><span>▲ +$12,410.50 (9.14%)</span><span style="color: var(--text-muted); font-size: 0.8rem; margin-left: 6px;">past 30 days</span></div><div class="chart-container"><svg width="100%" height="100%" viewBox="0 0 700 200" preserveAspectRatio="none"><line x1="0" y1="50" x2="700" y2="50" class="chart-grid-lines"/><line x1="0" y1="100" x2="700" y2="100" class="chart-grid-lines"/><line x1="0" y1="150" x2="700" y2="150" class="chart-grid-lines"/><path d="M0,170 C100,160 180,120 280,130 C380,140 460,70 540,60 C620,50 670,30 700,20 L700,200 L0,200 Z" fill="url(#greenGrad)" opacity="0.3"/><path d="M0,170 C100,160 180,120 280,130 C380,140 460,70 540,60 C620,50 670,30 700,20" fill="none" stroke="#10b981" stroke-width="3"/><defs><linearGradient id="greenGrad" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#10b981"/><stop offset="100%" stop-color="transparent"/></linearGradient></defs></svg></div></div><div class="card"><div class="card-title">Recent Settlement History</div><div class="tx-item"><div><strong>Swap ETH &rarr; USDC</strong><div style="color: var(--text-muted); font-size: 0.75rem;">12 mins ago &bull; Hash: 0x4e8a...31f</div></div><div style="text-align: right;"><div class="ticker-up">+4,500 USDC</div><div style="color: var(--text-muted); font-size: 0.75rem;">-1.201 ETH</div></div></div><div class="tx-item"><div><strong>Yield Harvest (Vault #04)</strong><div style="color: var(--text-muted); font-size: 0.75rem;">2 hours ago &bull; Compound Staking</div></div><div style="text-align: right;"><div class="ticker-up">+$340.22</div><div style="color: var(--accent-green); font-size: 0.75rem;">Completed</div></div></div></div></main><aside><div class="card"><div class="card-title">Instant DEX Liquidity</div><div class="swap-box"><div class="swap-header"><span>You Pay</span><span>Balance: 4.85 ETH</span></div><div class="swap-input-row"><input type="number" class="swap-input" value="1.50" id="payAmount" oninput="calculateSwap()"><div class="pill-select">Ξ ETH</div></div></div><div class="swap-box"><div class="swap-header"><span>You Receive (Estimated)</span><span>Fee: 0.05%</span></div><div class="swap-input-row"><input type="text" class="swap-input" id="receiveAmount" value="5,617.65" readonly><div class="pill-select">$ USDC</div></div></div><button class="swap-action-btn" onclick="alert('Executing Swap Transaction for ' + document.getElementById('payAmount').value + ' ETH')">Execute Swap &rarr;</button></div></aside></div>
+
+  <script>
+    function calculateSwap() {
+      const val = parseFloat(document.getElementById('payAmount').value) || 0;
+      document.getElementById('receiveAmount').value = (val * 3745.10).toLocaleString('en-US', {maximumFractionDigits: 2});
+    }
+  </script>
+</body></html>

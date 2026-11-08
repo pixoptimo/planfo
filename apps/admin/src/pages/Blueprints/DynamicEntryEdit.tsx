@@ -8,11 +8,12 @@ import { getBlueprintIcon } from '../../utils/blueprintIcons.js';
 import { getMediaUrl } from '../../utils/media.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
-import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { useSidebar } from '../../context/SidebarContext.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 
 export const DynamicEntryEdit: React.FC = () => {
+  const { mainPaddingClass } = useSidebar();
   const { blueprintSlug, entrySlug } = useParams<{ blueprintSlug: string; entrySlug?: string }>();
   const isNew = !entrySlug || entrySlug === 'new';
   const navigate = useNavigate();
@@ -372,20 +373,12 @@ export const DynamicEntryEdit: React.FC = () => {
       {/* Global 64px Left Icon Rail Navigation */}
       <SidebarRail />
 
-      {/* Main Studio Viewport */}
-      <div className="pl-16 flex-1 flex flex-col h-screen overflow-hidden">
+      {/* Main Studio Viewport with dynamic sidebar padding */}
+      <div className={`${mainPaddingClass} flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out`}>
         {/* Top Studio Stage Bar */}
         <header className="h-16 shrink-0 bg-surface-container-lowest border-b border-surface-container-high/40 px-6 flex items-center justify-between z-40 shadow-xs">
-        {/* Left: Brand, collection breadcrumb, title & autosave */}
+        {/* Left: Collection breadcrumb, title & autosave */}
         <div className="flex items-center gap-3 min-w-0">
-          <Link
-            to="/"
-            title="Planfo CMS Home"
-            className="hidden sm:flex items-center justify-center p-1 rounded-lg hover:bg-surface-container transition-transform hover:scale-105 shrink-0"
-          >
-            <PlanfoLogo variant="icon" className="h-6 w-auto" />
-          </Link>
-
           <Link
             to={`/blueprints/${blueprint.slug}`}
             className="w-8 h-8 rounded-lg bg-primary-container text-on-primary-container flex items-center justify-center shrink-0 hover:scale-105 transition-transform"

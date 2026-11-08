@@ -5,7 +5,7 @@ import { api } from '../../api/client.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
-import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { useSidebar } from '../../context/SidebarContext.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { SidebarRail } from '../../components/Layout/SidebarRail.js';
 
@@ -128,6 +128,7 @@ const createDefaultBlock = (type: string): ContentBlock => {
 };
 
 export const PostEdit: React.FC = () => {
+  const { mainPaddingClass } = useSidebar();
   const { slug } = useParams<{ slug?: string }>();
   const isNew = !slug || slug === 'new';
   const navigate = useNavigate();
@@ -597,8 +598,8 @@ export const PostEdit: React.FC = () => {
       {/* Global 64px Left Icon Rail Navigation */}
       <SidebarRail />
 
-      {/* Main Studio Viewport (Padded by left 64px) */}
-      <div className="pl-16 flex-1 flex flex-col h-screen overflow-hidden">
+      {/* Main Studio Viewport with dynamic sidebar padding */}
+      <div className={`${mainPaddingClass} flex-1 flex flex-col h-screen overflow-hidden transition-all duration-300 ease-in-out`}>
         {/* Top Header Bar */}
         <header className="h-16 shrink-0 bg-surface-container-lowest/90 backdrop-blur-xl border-b border-surface-container-high/60 shadow-[0_1px_8px_rgba(0,0,0,0.04)] z-40">
           <div className="h-16 w-full px-6 flex items-center justify-between gap-4">

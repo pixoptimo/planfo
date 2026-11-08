@@ -94,6 +94,26 @@
       "alt": "",
       "url": "/media/test-media-1792421646025.png",
       "createdAt": "2026-10-19T14:54:06.025Z"
+    },
+    {
+      "id": "media_1792422153209",
+      "filename": "test-media-1792422153209.png",
+      "originalName": "test.png",
+      "mimeType": "image/png",
+      "size": 1024,
+      "alt": "",
+      "url": "/media/test-media-1792422153209.png",
+      "createdAt": "2026-10-19T15:02:33.209Z"
+    },
+    {
+      "id": "media_1794169469823",
+      "filename": "test-media-1794169469823.png",
+      "originalName": "test.png",
+      "mimeType": "image/png",
+      "size": 1024,
+      "alt": "",
+      "url": "/media/test-media-1794169469823.png",
+      "createdAt": "2026-11-08T20:24:29.823Z"
     }
   ]
 }

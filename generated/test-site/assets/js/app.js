@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded",()=>{initTheme(),initCatalog()}),window.showToast=function(s,r="\u2728"){let i=document.querySelector(".toast-container");i||(i=document.createElement("div"),i.className="toast-container",document.body.appendChild(i));const a=document.createElement("div");a.className="toast",a.innerHTML=`<span>${r}</span> <span>${s}</span>`,i.appendChild(a),setTimeout(()=>{a.style.opacity="0",a.style.transform="translateY(10px)",a.style.transition="all 0.3s ease",setTimeout(()=>a.remove(),300)},3200)};function initTheme(){document.documentElement.setAttribute("data-theme","light");try{localStorage.removeItem("pixoptimo_theme")}catch{}}function updateThemeIcon(){}function initCatalog(){const s=document.getElementById("templatesGrid");if(!s||!window.TEMPLATES_DATA)return;let r="all",i="",a="featured";function o(){let t=window.TEMPLATES_DATA.filter(e=>{const n=r==="all"||e.categorySlug===r,h=!i||e.title.toLowerCase().includes(i)||e.tagline.toLowerCase().includes(i)||e.techStack.some(u=>u.toLowerCase().includes(i));return n&&h});if(a==="rating"?t.sort((e,n)=>n.rating-e.rating):a==="downloads"?t.sort((e,n)=>parseInt(n.downloads.replace(/,/g,""))-parseInt(e.downloads.replace(/,/g,""))):a==="free"&&t.sort((e,n)=>(n.isFree?1:0)-(e.isFree?1:0)),t.length===0){s.innerHTML=`
+document.addEventListener("DOMContentLoaded",()=>{initTheme(),initCatalog()}),window.showToast=function(s,r="\u2728"){let i=document.querySelector(".toast-container");i||(i=document.createElement("div"),i.className="toast-container",document.body.appendChild(i));const a=document.createElement("div");a.className="toast",a.innerHTML=`<span>${r}</span> <span>${s}</span>`,i.appendChild(a),setTimeout(()=>{a.style.opacity="0",a.style.transform="translateY(10px)",a.style.transition="all 0.3s ease",setTimeout(()=>a.remove(),300)},3200)};function initTheme(){document.documentElement.setAttribute("data-theme","light");try{localStorage.removeItem("pixoptimo_theme")}catch{}}function updateThemeIcon(){}function initCatalog(){const s=document.getElementById("templatesGrid");if(!s||!window.TEMPLATES_DATA)return;let r="all",i="",a="featured";function o(){let t=window.TEMPLATES_DATA.filter(e=>{const n=r==="all"||e.categorySlug===r,h=!i||e.title.toLowerCase().includes(i)||e.tagline.toLowerCase().includes(i)||e.techStack.some(m=>m.toLowerCase().includes(i));return n&&h});if(a==="rating"?t.sort((e,n)=>n.rating-e.rating):a==="downloads"?t.sort((e,n)=>parseInt(n.downloads.replace(/,/g,""))-parseInt(e.downloads.replace(/,/g,""))):a==="free"&&t.sort((e,n)=>(n.isFree?1:0)-(e.isFree?1:0)),t.length===0){s.innerHTML=`
         <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1rem;">
           <div style="font-size: 3rem; margin-bottom: 1rem;">\u{1F50D}</div>
           <h3 style="font-size: 1.4rem; font-weight: 700; margin-bottom: 0.5rem;">No templates found</h3>
@@ -15,11 +15,11 @@ document.addEventListener("DOMContentLoaded",()=>{initTheme(),initCatalog()}),wi
             ${e.price}
           </div>
           <div class="card-overlay-actions">
-            <a href="/demos/${e.id}/index.html" class="btn btn-sm btn-demo">
+            <a href="demo.html?id=${e.id}" class="btn btn-sm btn-demo">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               Live Demo
             </a>
-            <a href="/${e.id}/details" class="btn btn-sm btn-secondary">
+            <a href="templates/${e.id}/" class="btn btn-sm btn-secondary">
               View Details
             </a>
           </div>
@@ -35,7 +35,7 @@ document.addEventListener("DOMContentLoaded",()=>{initTheme(),initCatalog()}),wi
           </div>
 
           <h2 class="card-title">
-            <a href="/${e.id}/details">${e.title}</a>
+            <a href="templates/${e.id}/">${e.title}</a>
           </h2>
 
           <p class="card-description">${e.tagline}</p>
@@ -46,11 +46,11 @@ document.addEventListener("DOMContentLoaded",()=>{initTheme(),initCatalog()}),wi
           </div>
 
           <div class="card-actions">
-            <a href="/${e.id}/details" class="btn btn-details" id="btn-details-${e.id}">
+            <a href="templates/${e.id}/" class="btn btn-details" id="btn-details-${e.id}">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
               Details
             </a>
-            <a href="/demos/${e.id}/index.html" class="btn btn-demo" id="btn-demo-${e.id}">
+            <a href="demo.html?id=${e.id}" class="btn btn-demo" id="btn-demo-${e.id}">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
               Demo
             </a>

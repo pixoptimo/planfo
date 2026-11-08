@@ -33,7 +33,7 @@
     "events": true,
     "faqs": true
   },
-  "activeTheme": "aero-modern",
+  "activeTheme": "planfo-default",
   "deployment": {
     "target": "local",
     "gitRepo": "",
@@ -44,5 +44,5 @@
     "customDomain": "",
     "autoPublishOnSave": false
   },
-  "updatedAt": "2026-11-06T11:44:12.266Z"
+  "updatedAt": "2026-11-08T20:24:53.216Z"
 }
