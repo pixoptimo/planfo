@@ -626,13 +626,13 @@ export const NavigationManager: React.FC = () => {
 
       {/* Feedback Messages */}
       {error && (
-        <div className="p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+        <div className="p-3.5 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-700 font-medium flex items-center space-x-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
       {success && (
-        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
+        <div className="p-3.5 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-800 font-medium flex items-center space-x-2">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           <span>{success}</span>
         </div>
@@ -645,14 +645,14 @@ export const NavigationManager: React.FC = () => {
           className="p-5 bg-surface-container-lowest border border-primary/40 rounded-xl space-y-4 shadow-sm"
         >
           <div className="flex items-center justify-between border-b border-surface-container-high/40 pb-3">
-            <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+            <h3 className="text-sm font-bold text-on-surface flex items-center space-x-2">
               <Plus className="w-4 h-4 text-primary" />
               <span>Create New Navigation Menu</span>
             </h3>
             <button
               type="button"
               onClick={() => setIsCreatingMenu(false)}
-              className="text-on-surface-variant hover:text-white"
+              className="text-on-surface-variant hover:text-on-surface"
             >
               <X className="w-4 h-4" />
             </button>
@@ -669,7 +669,7 @@ export const NavigationManager: React.FC = () => {
                 value={newMenuName}
                 onChange={(e) => setNewMenuName(e.target.value)}
                 placeholder="e.g. Header Nav, Footer Nav, Socials"
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
 
@@ -741,7 +741,7 @@ export const NavigationManager: React.FC = () => {
                 <select
                   value={selectedSlug}
                   onChange={(e) => handleSelectMenu(e.target.value)}
-                  className="bg-surface-container-low border border-surface-container-high/50 rounded-lg px-3 py-1.5 text-xs text-white font-semibold pr-8 focus:outline-none focus:border-primary"
+                  className="bg-surface-container-low border border-surface-container-high/50 rounded-lg px-3 py-1.5 text-xs text-on-surface font-semibold pr-8 focus:outline-none focus:border-primary"
                 >
                   {menus.map((m) => {
                     const locs = m.locations && m.locations.length > 0 ? ` (${m.locations.join(', ')})` : '';
@@ -776,7 +776,7 @@ export const NavigationManager: React.FC = () => {
               <button
                 type="button"
                 onClick={handleDeleteMenu}
-                className="text-xs text-red-400 hover:text-red-300 hover:underline flex items-center space-x-1 self-start md:self-auto"
+                className="text-xs text-red-600 hover:text-red-700 hover:underline flex items-center space-x-1 self-start md:self-auto font-medium"
               >
                 <Trash2 className="w-3.5 h-3.5" />
                 <span>Delete this menu</span>
@@ -802,8 +802,8 @@ export const NavigationManager: React.FC = () => {
                   className="w-full p-3 flex items-center justify-between text-left hover:bg-surface-container-high/50 transition"
                 >
                   <div className="flex items-center space-x-2">
-                    <FileText className="w-4 h-4 text-emerald-400" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Pages</span>
+                    <FileText className="w-4 h-4 text-emerald-600" />
+                    <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Pages</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono">
                       {pages.length}
                     </span>
@@ -821,7 +821,7 @@ export const NavigationManager: React.FC = () => {
                           value={pageSearch}
                           onChange={(e) => setPageSearch(e.target.value)}
                           placeholder="Search pages..."
-                          className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-primary"
+                          className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg pl-7 pr-2.5 py-1 text-xs text-on-surface focus:outline-none focus:border-primary"
                         />
                       </div>
                     )}
@@ -835,7 +835,7 @@ export const NavigationManager: React.FC = () => {
                           return (
                             <label
                               key={p.id}
-                              className="flex items-center space-x-2 text-xs text-on-surface hover:text-white cursor-pointer py-1 px-1.5 rounded hover:bg-surface-container-high/60"
+                              className="flex items-center space-x-2 text-xs text-on-surface hover:text-primary cursor-pointer py-1 px-1.5 rounded hover:bg-surface-container-high/60"
                             >
                               <input
                                 type="checkbox"
@@ -889,8 +889,8 @@ export const NavigationManager: React.FC = () => {
                   className="w-full p-3 flex items-center justify-between text-left hover:bg-surface-container-high/50 transition"
                 >
                   <div className="flex items-center space-x-2">
-                    <BookOpen className="w-4 h-4 text-blue-400" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Posts</span>
+                    <BookOpen className="w-4 h-4 text-blue-600" />
+                    <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Posts</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono">
                       {posts.length}
                     </span>
@@ -908,7 +908,7 @@ export const NavigationManager: React.FC = () => {
                           value={postSearch}
                           onChange={(e) => setPostSearch(e.target.value)}
                           placeholder="Search posts..."
-                          className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-primary"
+                          className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg pl-7 pr-2.5 py-1 text-xs text-on-surface focus:outline-none focus:border-primary"
                         />
                       </div>
                     )}
@@ -922,7 +922,7 @@ export const NavigationManager: React.FC = () => {
                           return (
                             <label
                               key={p.id}
-                              className="flex items-center space-x-2 text-xs text-on-surface hover:text-white cursor-pointer py-1 px-1.5 rounded hover:bg-surface-container-high/60"
+                              className="flex items-center space-x-2 text-xs text-on-surface hover:text-primary cursor-pointer py-1 px-1.5 rounded hover:bg-surface-container-high/60"
                             >
                               <input
                                 type="checkbox"
@@ -976,8 +976,8 @@ export const NavigationManager: React.FC = () => {
                   className="w-full p-3 flex items-center justify-between text-left hover:bg-surface-container-high/50 transition"
                 >
                   <div className="flex items-center space-x-2">
-                    <Tag className="w-4 h-4 text-amber-400" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Categories</span>
+                    <Tag className="w-4 h-4 text-amber-600" />
+                    <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Categories</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono">
                       {categories.length}
                     </span>
@@ -995,7 +995,7 @@ export const NavigationManager: React.FC = () => {
                           value={categorySearch}
                           onChange={(e) => setCategorySearch(e.target.value)}
                           placeholder="Search categories..."
-                          className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-primary"
+                          className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg pl-7 pr-2.5 py-1 text-xs text-on-surface focus:outline-none focus:border-primary"
                         />
                       </div>
                     )}
@@ -1009,7 +1009,7 @@ export const NavigationManager: React.FC = () => {
                           return (
                             <label
                               key={c.id}
-                              className="flex items-center space-x-2 text-xs text-on-surface hover:text-white cursor-pointer py-1 px-1.5 rounded hover:bg-surface-container-high/60"
+                              className="flex items-center space-x-2 text-xs text-on-surface hover:text-primary cursor-pointer py-1 px-1.5 rounded hover:bg-surface-container-high/60"
                             >
                               <input
                                 type="checkbox"
@@ -1063,8 +1063,8 @@ export const NavigationManager: React.FC = () => {
                   className="w-full p-3 flex items-center justify-between text-left hover:bg-surface-container-high/50 transition"
                 >
                   <div className="flex items-center space-x-2">
-                    <Package className="w-4 h-4 text-purple-400" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Blueprints</span>
+                    <Package className="w-4 h-4 text-purple-600" />
+                    <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Blueprints</span>
                     <span className="text-[10px] px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-mono">
                       {blueprints.length}
                     </span>
@@ -1086,7 +1086,7 @@ export const NavigationManager: React.FC = () => {
                               setActiveBlueprintSlug(e.target.value);
                               setSelectedBlueprintEntryIds([]);
                             }}
-                            className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-2.5 py-1 text-xs text-white font-semibold focus:outline-none focus:border-primary"
+                            className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-2.5 py-1 text-xs text-on-surface font-semibold focus:outline-none focus:border-primary"
                           >
                             {blueprints.map((bp) => {
                               const count = (blueprintEntriesMap[bp.slug] || []).length;
@@ -1107,7 +1107,7 @@ export const NavigationManager: React.FC = () => {
                               value={blueprintSearch}
                               onChange={(e) => setBlueprintSearch(e.target.value)}
                               placeholder={`Search ${activeBlueprintSlug}...`}
-                              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg pl-7 pr-2.5 py-1 text-xs text-white focus:outline-none focus:border-primary"
+                              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg pl-7 pr-2.5 py-1 text-xs text-on-surface focus:outline-none focus:border-primary"
                             />
                           </div>
                         )}
@@ -1122,7 +1122,7 @@ export const NavigationManager: React.FC = () => {
                               return (
                                 <label
                                   key={id}
-                                  className="flex items-center space-x-2 text-xs text-on-surface hover:text-white cursor-pointer py-1 px-1.5 rounded hover:bg-surface-container-high/60"
+                                  className="flex items-center space-x-2 text-xs text-on-surface hover:text-primary cursor-pointer py-1 px-1.5 rounded hover:bg-surface-container-high/60"
                                 >
                                   <input
                                     type="checkbox"
@@ -1178,8 +1178,8 @@ export const NavigationManager: React.FC = () => {
                   className="w-full p-3 flex items-center justify-between text-left hover:bg-surface-container-high/50 transition"
                 >
                   <div className="flex items-center space-x-2">
-                    <LinkIcon className="w-4 h-4 text-cyan-400" />
-                    <span className="text-xs font-bold text-white uppercase tracking-wider">Custom Link</span>
+                    <LinkIcon className="w-4 h-4 text-cyan-600" />
+                    <span className="text-xs font-bold text-on-surface uppercase tracking-wider">Custom Link</span>
                   </div>
                   {accordionsOpen.custom ? <ChevronUp className="w-4 h-4 text-on-surface-variant" /> : <ChevronDown className="w-4 h-4 text-on-surface-variant" />}
                 </button>
@@ -1196,7 +1196,7 @@ export const NavigationManager: React.FC = () => {
                         value={customLinkLabel}
                         onChange={(e) => setCustomLinkLabel(e.target.value)}
                         placeholder="e.g. Products, About Us"
-                        className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-primary"
+                        className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-2.5 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary"
                       />
                     </div>
 
@@ -1244,7 +1244,7 @@ export const NavigationManager: React.FC = () => {
               <button
                 type="button"
                 onClick={addItem}
-                className="w-full py-2 bg-surface-container-low border border-dashed border-surface-container-high/40 hover:border-primary/50 hover:bg-surface-container-high/50 text-on-surface-variant hover:text-white text-xs font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition"
+                className="w-full py-2 bg-surface-container-low border border-dashed border-surface-container-high/40 hover:border-primary/50 hover:bg-surface-container-high/50 text-on-surface-variant hover:text-on-surface text-xs font-semibold rounded-xl flex items-center justify-center space-x-1.5 transition"
               >
                 <Plus className="w-3.5 h-3.5 text-primary" />
                 <span>Add Blank Item</span>
@@ -1266,7 +1266,7 @@ export const NavigationManager: React.FC = () => {
                       type="text"
                       value={menu.name}
                       onChange={(e) => setMenu({ ...menu, name: e.target.value })}
-                      className="bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-sm font-bold text-white focus:outline-none focus:border-primary w-full max-w-sm"
+                      className="bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-sm font-bold text-on-surface focus:outline-none focus:border-primary w-full max-w-sm"
                     />
                   </div>
 
@@ -1324,10 +1324,10 @@ export const NavigationManager: React.FC = () => {
                               className="flex items-center space-x-2.5 flex-1 cursor-pointer truncate"
                             >
                               <GripVertical className="w-4 h-4 text-outline-variant hover:text-on-surface-variant flex-shrink-0" />
-                              <span className="text-xs font-bold text-white tracking-tight truncate">{item.label}</span>
+                              <span className="text-xs font-bold text-on-surface tracking-tight truncate">{item.label}</span>
 
                               {item.noLink ? (
-                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-400 font-semibold border border-amber-500/20">
+                                <span className="text-[10px] px-1.5 py-0.2 rounded bg-amber-500/10 text-amber-700 font-semibold border border-amber-500/20">
                                   Dropdown Trigger
                                 </span>
                               ) : (
@@ -1361,7 +1361,7 @@ export const NavigationManager: React.FC = () => {
                                 onClick={() => moveItem(idx, 'up')}
                                 disabled={idx === 0}
                                 title="Move Up"
-                                className="p-1 text-on-surface-variant hover:text-white disabled:opacity-20"
+                                className="p-1 text-on-surface-variant hover:text-on-surface disabled:opacity-20"
                               >
                                 <ArrowUp className="w-3.5 h-3.5" />
                               </button>
@@ -1370,7 +1370,7 @@ export const NavigationManager: React.FC = () => {
                                 onClick={() => moveItem(idx, 'down')}
                                 disabled={idx === menu.items.length - 1}
                                 title="Move Down"
-                                className="p-1 text-on-surface-variant hover:text-white disabled:opacity-20"
+                                className="p-1 text-on-surface-variant hover:text-on-surface disabled:opacity-20"
                               >
                                 <ArrowDown className="w-3.5 h-3.5" />
                               </button>
@@ -1378,7 +1378,7 @@ export const NavigationManager: React.FC = () => {
                                 type="button"
                                 onClick={() => toggleExpand(item.id)}
                                 title="Edit Item"
-                                className="p-1 text-on-surface-variant hover:text-white"
+                                className="p-1 text-on-surface-variant hover:text-on-surface"
                               >
                                 {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
                               </button>
@@ -1386,7 +1386,7 @@ export const NavigationManager: React.FC = () => {
                                 type="button"
                                 onClick={() => removeItem(idx)}
                                 title="Remove Item"
-                                className="p-1 text-on-surface-variant hover:text-red-400"
+                                className="p-1 text-on-surface-variant hover:text-red-600"
                               >
                                 <Trash2 className="w-3.5 h-3.5" />
                               </button>
@@ -1405,7 +1405,7 @@ export const NavigationManager: React.FC = () => {
                                     type="text"
                                     value={item.label}
                                     onChange={(e) => updateItem(idx, { label: e.target.value })}
-                                    className="w-full bg-surface-container-lowest border border-surface-container-high/40 rounded-lg px-2.5 py-1.5 text-xs text-white focus:outline-none focus:border-primary font-semibold"
+                                    className="w-full bg-surface-container-lowest border border-surface-container-high/40 rounded-lg px-2.5 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary font-semibold"
                                   />
                                 </div>
 
@@ -1465,14 +1465,14 @@ export const NavigationManager: React.FC = () => {
                                 <button
                                   type="button"
                                   onClick={() => removeItem(idx)}
-                                  className="text-[11px] text-red-400 hover:text-red-300 hover:underline"
+                                  className="text-[11px] text-red-600 hover:text-red-700 hover:underline font-medium"
                                 >
                                   Remove Item
                                 </button>
                                 <button
                                   type="button"
                                   onClick={() => toggleExpand(item.id)}
-                                  className="text-[11px] text-on-surface-variant hover:text-white"
+                                  className="text-[11px] text-on-surface-variant hover:text-on-surface font-medium"
                                 >
                                   Close
                                 </button>
@@ -1493,7 +1493,7 @@ export const NavigationManager: React.FC = () => {
                                   value={child.label}
                                   onChange={(e) => updateChildItem(idx, childIdx, { label: e.target.value })}
                                   placeholder="Sub-link Label"
-                                  className="w-full sm:w-44 bg-surface-container-low border border-surface-container-high/40 rounded px-2 py-1 text-xs text-white font-semibold"
+                                  className="w-full sm:w-44 bg-surface-container-low border border-surface-container-high/40 rounded px-2 py-1 text-xs text-on-surface font-semibold"
                                 />
                                 <input
                                   type="text"
@@ -1523,7 +1523,7 @@ export const NavigationManager: React.FC = () => {
                                   type="button"
                                   onClick={() => removeChildItem(idx, childIdx)}
                                   title="Remove Sub-link"
-                                  className="p-1 text-on-surface-variant hover:text-red-400 ml-auto"
+                                  className="p-1 text-on-surface-variant hover:text-red-600 ml-auto"
                                 >
                                   <Trash2 className="w-3 h-3" />
                                 </button>
@@ -1549,14 +1549,14 @@ export const NavigationManager: React.FC = () => {
                 <div className="p-4 bg-surface-container-low/60 border-t border-surface-container-high/40 space-y-3">
                   <div className="flex items-center space-x-2">
                     <Settings className="w-4 h-4 text-primary" />
-                    <h3 className="text-xs font-bold text-white uppercase tracking-wider">Display Location</h3>
+                    <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider">Display Location</h3>
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label
                       className={`p-3 rounded-xl border cursor-pointer flex items-center space-x-3 transition ${
                         (menu.locations || []).includes('header')
-                          ? 'bg-primary/10 border-primary/50 text-white'
+                          ? 'bg-primary/10 border-primary/50 text-primary font-semibold'
                           : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
                       }`}
                     >
@@ -1566,13 +1566,13 @@ export const NavigationManager: React.FC = () => {
                         onChange={() => toggleLocation('header')}
                         className="rounded border-surface-container-high/50 bg-surface-container-lowest text-primary focus:ring-0"
                       />
-                      <span className="text-xs font-bold text-white">Header Navigation</span>
+                      <span className="text-xs font-bold text-on-surface">Header Navigation</span>
                     </label>
 
                     <label
                       className={`p-3 rounded-xl border cursor-pointer flex items-center space-x-3 transition ${
                         (menu.locations || []).includes('footer')
-                          ? 'bg-primary/10 border-primary/50 text-white'
+                          ? 'bg-primary/10 border-primary/50 text-primary font-semibold'
                           : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
                       }`}
                     >
@@ -1582,7 +1582,7 @@ export const NavigationManager: React.FC = () => {
                         onChange={() => toggleLocation('footer')}
                         className="rounded border-surface-container-high/50 bg-surface-container-lowest text-primary focus:ring-0"
                       />
-                      <span className="text-xs font-bold text-white">Footer Navigation</span>
+                      <span className="text-xs font-bold text-on-surface">Footer Navigation</span>
                     </label>
                   </div>
 
@@ -1592,7 +1592,7 @@ export const NavigationManager: React.FC = () => {
                       <button
                         type="button"
                         onClick={handleDeleteMenu}
-                        className="text-xs text-red-400 hover:text-red-300 hover:underline flex items-center space-x-1"
+                        className="text-xs text-red-600 hover:text-red-700 hover:underline flex items-center space-x-1 font-medium"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
                         <span>Delete Menu</span>
@@ -1624,7 +1624,7 @@ export const NavigationManager: React.FC = () => {
       {activeTab === 'locations' && (
         <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl overflow-hidden shadow-sm space-y-4">
           <div className="p-4 border-b border-surface-container-high/40">
-            <h2 className="text-base font-bold text-white flex items-center space-x-2">
+            <h2 className="text-base font-bold text-on-surface flex items-center space-x-2">
               <Layers className="w-5 h-5 text-primary" />
               <span>Theme Display Locations</span>
             </h2>
@@ -1641,14 +1641,14 @@ export const NavigationManager: React.FC = () => {
               </thead>
               <tbody className="divide-y divide-surface-container-high/40 text-xs text-on-surface">
                 <tr className="hover:bg-surface-container-high/30 transition">
-                  <td className="py-3 px-3 font-semibold text-white">Header Navigation</td>
+                  <td className="py-3 px-3 font-semibold text-on-surface">Header Navigation</td>
                   <td className="py-3 px-3">
                     <select
                       value={locationAssignments.header}
                       onChange={(e) =>
                         setLocationAssignments({ ...locationAssignments, header: e.target.value })
                       }
-                      className="bg-surface-container-low border border-surface-container-high/50 rounded-lg px-3 py-1.5 text-xs text-white font-semibold focus:outline-none focus:border-primary w-full max-w-xs"
+                      className="bg-surface-container-low border border-surface-container-high/50 rounded-lg px-3 py-1.5 text-xs text-on-surface font-semibold focus:outline-none focus:border-primary w-full max-w-xs"
                     >
                       <option value="">— Select a Menu —</option>
                       {menus.map((m) => (
@@ -1675,14 +1675,14 @@ export const NavigationManager: React.FC = () => {
                 </tr>
 
                 <tr className="hover:bg-surface-container-high/30 transition">
-                  <td className="py-3 px-3 font-semibold text-white">Footer Navigation</td>
+                  <td className="py-3 px-3 font-semibold text-on-surface">Footer Navigation</td>
                   <td className="py-3 px-3">
                     <select
                       value={locationAssignments.footer}
                       onChange={(e) =>
                         setLocationAssignments({ ...locationAssignments, footer: e.target.value })
                       }
-                      className="bg-surface-container-low border border-surface-container-high/50 rounded-lg px-3 py-1.5 text-xs text-white font-semibold focus:outline-none focus:border-primary w-full max-w-xs"
+                      className="bg-surface-container-low border border-surface-container-high/50 rounded-lg px-3 py-1.5 text-xs text-on-surface font-semibold focus:outline-none focus:border-primary w-full max-w-xs"
                     >
                       <option value="">— Select a Menu —</option>
                       {menus.map((m) => (

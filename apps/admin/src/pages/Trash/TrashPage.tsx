@@ -260,24 +260,24 @@ export const TrashPage: React.FC = () => {
 
       {/* Alerts */}
       {success && (
-        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-400 text-xs flex items-center justify-between">
+        <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-emerald-800 font-medium text-xs flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{success}</span>
           </div>
-          <button onClick={() => setSuccess(null)} className="text-emerald-400 hover:text-emerald-300 font-bold ml-2">
+          <button onClick={() => setSuccess(null)} className="text-emerald-800 hover:text-emerald-900 font-bold ml-2">
             &times;
           </button>
         </div>
       )}
 
       {error && (
-        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-400 text-xs flex items-center justify-between">
+        <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-xl text-rose-700 font-medium text-xs flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <AlertTriangle className="w-4 h-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
-          <button onClick={() => setError(null)} className="text-rose-400 hover:text-rose-300 font-bold ml-2">
+          <button onClick={() => setError(null)} className="text-rose-700 hover:text-rose-800 font-bold ml-2">
             &times;
           </button>
         </div>
@@ -288,7 +288,7 @@ export const TrashPage: React.FC = () => {
         <ShieldAlert className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" />
         <div className="leading-relaxed">
           <span className="font-semibold text-on-surface">Safe Restore Guarantee: </span>
-          Restoring any item automatically resets its publishing status to <span className="text-amber-400 font-semibold font-mono">draft</span>. This guarantees that accidentally restored items will not immediately overwrite your public website until you review and publish them.
+          Restoring any item automatically resets its publishing status to <span className="text-amber-800 font-bold font-mono">draft</span>. This guarantees that accidentally restored items will not immediately overwrite your public website until you review and publish them.
         </div>
       </div>
 
@@ -305,17 +305,17 @@ export const TrashPage: React.FC = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveFilter(tab.id)}
-                className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition border ${
+                className={`flex items-center space-x-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition border ${
                   isActive
-                    ? 'bg-surface-container text-white border-surface-container-high/50 shadow-sm'
+                    ? 'bg-primary text-on-primary border-primary shadow-sm'
                     : 'bg-surface-container-high/40 text-on-surface-variant border-transparent hover:bg-surface-container-high/60 hover:text-on-surface'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-primary' : 'text-on-surface-variant'}`} />
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-on-primary' : 'text-on-surface-variant'}`} />
                 <span>{tab.label}</span>
                 <span
                   className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                    isActive ? 'bg-primary-container text-on-primary-container' : 'bg-surface-container text-on-surface-variant'
+                    isActive ? 'bg-white/20 text-on-primary' : 'bg-surface-container text-on-surface-variant'
                   }`}
                 >
                   {count}
@@ -349,7 +349,7 @@ export const TrashPage: React.FC = () => {
           <div className="w-16 h-16 rounded-2xl bg-surface-container-high/60 border border-surface-container-high/50/50 flex items-center justify-center text-on-surface-variant mx-auto mb-4 shadow-inner">
             <Trash2 className="w-8 h-8 opacity-40 text-on-surface-variant" />
           </div>
-          <h3 className="text-base font-semibold text-white mb-1">
+          <h3 className="text-base font-semibold text-on-surface mb-1">
             {items.length === 0 ? 'Trash is empty' : 'No matching items in trash'}
           </h3>
           <p className="text-xs text-on-surface-variant max-w-md mx-auto leading-relaxed">
@@ -378,7 +378,7 @@ export const TrashPage: React.FC = () => {
 
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                        <span className="font-semibold text-white text-sm tracking-tight truncate max-w-md">
+                        <span className="font-semibold text-on-surface text-sm tracking-tight truncate max-w-md">
                           {item.title}
                         </span>
                         <span
@@ -422,7 +422,7 @@ export const TrashPage: React.FC = () => {
                     <button
                       onClick={() => handleRestore(item)}
                       disabled={isItemBusy}
-                      className="px-3 py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-500/20 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition disabled:opacity-50"
+                      className="px-3 py-1.5 bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-700 hover:text-emerald-800 border border-emerald-500/20 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition disabled:opacity-50"
                       title="Restore as draft"
                     >
                       {isItemBusy ? (
@@ -437,7 +437,7 @@ export const TrashPage: React.FC = () => {
                       <button
                         onClick={() => setItemToDeletePermanently(item)}
                         disabled={isItemBusy}
-                        className="px-3 py-1.5 bg-rose-600/10 hover:bg-rose-600/20 text-rose-400 border border-rose-500/20 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition disabled:opacity-50"
+                        className="px-3 py-1.5 bg-rose-600/10 hover:bg-rose-600/20 text-rose-700 hover:text-rose-800 border border-rose-500/20 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition disabled:opacity-50"
                         title="Delete permanently from filesystem"
                       >
                         <Trash2 className="w-3.5 h-3.5" />
@@ -456,24 +456,24 @@ export const TrashPage: React.FC = () => {
       {itemToDeletePermanently && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-container-low/80 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="bg-surface-container-lowest border border-rose-500/30 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center space-x-3 text-rose-400">
+            <div className="flex items-center space-x-3 text-rose-600">
               <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center flex-shrink-0">
-                <AlertTriangle className="w-5 h-5 text-rose-400" />
+                <AlertTriangle className="w-5 h-5 text-rose-600" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">Permanently Delete Item?</h3>
-                <p className="text-[11px] text-rose-300/80 font-mono">This action cannot be undone</p>
+                <h3 className="font-bold text-on-surface text-base">Permanently Delete Item?</h3>
+                <p className="text-[11px] text-rose-700 font-mono font-medium">This action cannot be undone</p>
               </div>
             </div>
 
             <p className="text-xs text-on-surface leading-relaxed">
-              Are you sure you want to permanently delete <span className="font-bold text-white font-mono">"{itemToDeletePermanently.title}"</span>?
+              Are you sure you want to permanently delete <span className="font-bold text-on-surface font-mono">"{itemToDeletePermanently.title}"</span>?
               The item file will be purged from the filesystem permanently and cannot be recovered.
             </p>
 
             <div className="bg-surface-container-low/60 p-3 rounded-lg border border-surface-container-high/40 text-[11px] font-mono text-on-surface-variant space-y-1">
-              <div>Type: <span className="text-on-surface">{itemToDeletePermanently.entityType}</span></div>
-              <div>Slug: <span className="text-on-surface">{itemToDeletePermanently.originalSlug}</span></div>
+              <div>Type: <span className="text-on-surface font-semibold">{itemToDeletePermanently.entityType}</span></div>
+              <div>Slug: <span className="text-on-surface font-semibold">{itemToDeletePermanently.originalSlug}</span></div>
             </div>
 
             <div className="flex items-center justify-end space-x-2 pt-2">
@@ -489,7 +489,7 @@ export const TrashPage: React.FC = () => {
                 disabled={isDeleting}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-rose-600/20 transition disabled:opacity-50"
               >
-                {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Trash2 className="w-3.5 h-3.5 text-white" />}
                 <span>Permanently Delete</span>
               </button>
             </div>
@@ -501,18 +501,18 @@ export const TrashPage: React.FC = () => {
       {showEmptyModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-surface-container-low/80 backdrop-blur-sm animate-in fade-in duration-150">
           <div className="bg-surface-container-lowest border border-rose-500/30 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <div className="flex items-center space-x-3 text-rose-400">
+            <div className="flex items-center space-x-3 text-rose-600">
               <div className="w-10 h-10 rounded-xl bg-rose-500/10 border border-rose-500/20 flex items-center justify-center flex-shrink-0">
-                <Trash2 className="w-5 h-5 text-rose-400" />
+                <Trash2 className="w-5 h-5 text-rose-600" />
               </div>
               <div>
-                <h3 className="font-bold text-white text-base">Empty All Trash?</h3>
-                <p className="text-[11px] text-rose-300/80 font-mono">Permanent wipe of {items.length} items</p>
+                <h3 className="font-bold text-on-surface text-base">Empty All Trash?</h3>
+                <p className="text-[11px] text-rose-700 font-mono font-medium">Permanent wipe of {items.length} items</p>
               </div>
             </div>
 
             <p className="text-xs text-on-surface leading-relaxed">
-              Are you sure you want to completely empty the Trash? All <span className="font-bold text-white">{items.length}</span> items currently in the trash directory will be wiped from disk permanently.
+              Are you sure you want to completely empty the Trash? All <span className="font-bold text-on-surface">{items.length}</span> items currently in the trash directory will be wiped from disk permanently.
             </p>
 
             <div className="flex items-center justify-end space-x-2 pt-2">
@@ -528,7 +528,7 @@ export const TrashPage: React.FC = () => {
                 disabled={isDeleting}
                 className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs rounded-lg flex items-center space-x-2 shadow-lg shadow-rose-600/20 transition disabled:opacity-50"
               >
-                {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                {isDeleting ? <Loader2 className="w-3.5 h-3.5 animate-spin text-white" /> : <Trash2 className="w-3.5 h-3.5 text-white" />}
                 <span>Yes, Empty Trash</span>
               </button>
             </div>

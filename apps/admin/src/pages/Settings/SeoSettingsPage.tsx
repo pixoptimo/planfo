@@ -150,7 +150,7 @@ export const SeoSettingsPage: React.FC = () => {
           <div className="flex items-center space-x-1.5 overflow-x-auto pb-1">
             <Link
               to="/settings"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-white hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
             >
               <Sliders className="w-3.5 h-3.5" />
               <span>General Settings</span>
@@ -163,7 +163,7 @@ export const SeoSettingsPage: React.FC = () => {
 
             <Link
               to="/settings?tab=deployment"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-white hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
             >
               <Cloud className="w-3.5 h-3.5" />
               <span>Hosting & Deployment</span>
@@ -171,7 +171,7 @@ export const SeoSettingsPage: React.FC = () => {
 
             <Link
               to="/settings?tab=features"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-white hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
             >
               <Package className="w-3.5 h-3.5" />
               <span>Feature Packs</span>
@@ -179,7 +179,7 @@ export const SeoSettingsPage: React.FC = () => {
 
             <Link
               to="/settings?tab=tools"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-white hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
               <span>URL Tools</span>
@@ -188,13 +188,13 @@ export const SeoSettingsPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-700 font-medium flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
         {success && (
-          <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
+          <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-800 font-medium flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{success}</span>
           </div>
@@ -205,15 +205,15 @@ export const SeoSettingsPage: React.FC = () => {
           <div className="flex items-center justify-between border-b border-surface-container-high/40 pb-3">
             <div className="flex items-center space-x-2">
               <ShieldCheck className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+              <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">
                 Site-Wide Search Engine Visibility
               </h2>
             </div>
             <span
               className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded ${
                 isSiteWideNoIndex
-                  ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                  : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
+                  ? 'bg-amber-500/15 text-amber-800 border border-amber-500/30'
+                  : 'bg-emerald-500/15 text-emerald-800 border border-emerald-500/30'
               }`}
             >
               {isSiteWideNoIndex ? 'Site is No-Indexed' : 'Site is Search Indexed'}
@@ -234,11 +234,11 @@ export const SeoSettingsPage: React.FC = () => {
               className="mt-1 rounded border-surface-container-high/50 text-primary focus:ring-0 focus:ring-offset-0 bg-surface-container-lowest"
             />
             <div className="text-xs space-y-1">
-              <span className="font-semibold text-white block text-sm">
+              <span className="font-semibold text-on-surface block text-sm">
                 Discourage search engines from indexing this entire website
               </span>
               <p className="text-on-surface-variant leading-relaxed">
-                Applies <code className="text-amber-400 font-mono text-[11px]">noindex,nofollow</code> as the default across the entire site. Use this for development stages, staging portals, or internal private sites. (Individual pages can also override or be individually set to No-Index).
+                Applies <code className="text-amber-800 font-mono text-[11px] font-semibold">noindex,nofollow</code> as the default across the entire site. Use this for development stages, staging portals, or internal private sites. (Individual pages can also override or be individually set to No-Index).
               </p>
             </div>
           </label>
@@ -248,7 +248,7 @@ export const SeoSettingsPage: React.FC = () => {
         <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
           <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
             <Search className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+            <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">
               Global Default Meta Tags
             </h2>
           </div>
@@ -266,7 +266,7 @@ export const SeoSettingsPage: React.FC = () => {
                 value={seo.title}
                 onChange={(e) => updateSEO('title', e.target.value)}
                 placeholder={settings.siteName || 'Global Title Fallback'}
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary"
               />
               <span className="text-[11px] text-on-surface-variant mt-1 block">
                 Used whenever an individual page does not have a customized meta title.
@@ -286,7 +286,7 @@ export const SeoSettingsPage: React.FC = () => {
                     noIndex: val.includes('noindex')
                   });
                 }}
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary"
               >
                 <option value="index,follow">index, follow (Standard - Recommended for live sites)</option>
                 <option value="noindex,follow">noindex, follow (Hide site, but follow internal links)</option>
@@ -308,7 +308,7 @@ export const SeoSettingsPage: React.FC = () => {
               value={seo.description}
               onChange={(e) => updateSEO('description', e.target.value)}
               placeholder={settings.tagline || 'Concise description of the site for search snippets...'}
-              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg p-3 text-xs text-white focus:outline-none focus:border-primary"
+              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg p-3 text-xs text-on-surface focus:outline-none focus:border-primary"
             />
             <span className="text-[11px] text-on-surface-variant mt-1 block">
               Optimal length: 140-160 characters. Displayed beneath your title in Google search results.
@@ -336,7 +336,7 @@ export const SeoSettingsPage: React.FC = () => {
         <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
           <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
             <Share2 className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+            <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">
               Open Graph & Social Graph Defaults
             </h2>
           </div>
@@ -351,7 +351,7 @@ export const SeoSettingsPage: React.FC = () => {
                 value={seo.ogTitle}
                 onChange={(e) => updateSEO('ogTitle', e.target.value)}
                 placeholder={displayTitle}
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
 
@@ -365,12 +365,12 @@ export const SeoSettingsPage: React.FC = () => {
                   value={seo.ogImage}
                   onChange={(e) => updateSEO('ogImage', e.target.value)}
                   placeholder="/media/og-banner.jpg"
-                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-primary"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary"
                 />
                 <button
                   type="button"
                   onClick={() => setIsMediaPickerOpen(true)}
-                  className="p-2 bg-surface-container hover:bg-surface-container-highest text-white rounded-lg text-xs flex-shrink-0"
+                  className="p-2 bg-surface-container hover:bg-surface-container-highest text-primary rounded-lg text-xs flex-shrink-0"
                   title="Choose from Media Library"
                 >
                   <ImageIcon className="w-4 h-4" />
@@ -388,7 +388,7 @@ export const SeoSettingsPage: React.FC = () => {
               value={seo.ogDescription}
               onChange={(e) => updateSEO('ogDescription', e.target.value)}
               placeholder={displayDesc}
-              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg p-2.5 text-xs text-white focus:outline-none focus:border-primary"
+              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg p-2.5 text-xs text-on-surface focus:outline-none focus:border-primary"
             />
           </div>
         </div>
@@ -398,7 +398,7 @@ export const SeoSettingsPage: React.FC = () => {
           <div className="flex items-center justify-between border-b border-surface-container-high/40 pb-3">
             <div className="flex items-center space-x-2">
               <Eye className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+              <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">
                 Live Search Engine & Social Previews
               </h2>
             </div>
@@ -407,7 +407,7 @@ export const SeoSettingsPage: React.FC = () => {
                 type="button"
                 onClick={() => setPreviewDevice('desktop')}
                 className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${
-                  previewDevice === 'desktop' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-white'
+                  previewDevice === 'desktop' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
                 Desktop
@@ -416,7 +416,7 @@ export const SeoSettingsPage: React.FC = () => {
                 type="button"
                 onClick={() => setPreviewDevice('mobile')}
                 className={`px-2.5 py-1 rounded text-[11px] font-semibold transition ${
-                  previewDevice === 'mobile' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-white'
+                  previewDevice === 'mobile' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
                 Mobile
@@ -443,12 +443,12 @@ export const SeoSettingsPage: React.FC = () => {
                     <span className="text-on-surface">{displayUrl}</span>
                   </div>
                 </div>
-                <div className="text-blue-400 hover:underline font-medium text-base cursor-pointer truncate">
+                <div className="text-blue-700 hover:underline font-semibold text-base cursor-pointer truncate">
                   {displayTitle} | {settings.siteName}
                 </div>
                 <p className="text-xs text-on-surface line-clamp-2 leading-relaxed">{displayDesc}</p>
                 {isSiteWideNoIndex && (
-                  <div className="mt-2 text-[10px] text-amber-400 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 inline-block font-mono">
+                  <div className="mt-2 text-[10px] text-amber-800 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/20 inline-block font-mono font-semibold">
                     ⚠️ Page will have noindex header
                   </div>
                 )}
@@ -479,7 +479,7 @@ export const SeoSettingsPage: React.FC = () => {
                 )}
                 <div className="p-3.5 space-y-1">
                   <div className="text-[11px] text-on-surface-variant uppercase font-mono truncate">{displayUrl}</div>
-                  <div className="text-sm font-bold text-white truncate">{seo.ogTitle || displayTitle}</div>
+                  <div className="text-sm font-bold text-on-surface truncate">{seo.ogTitle || displayTitle}</div>
                   <p className="text-xs text-on-surface line-clamp-2 leading-relaxed">
                     {seo.ogDescription || displayDesc}
                   </p>
@@ -493,7 +493,7 @@ export const SeoSettingsPage: React.FC = () => {
         <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
           <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
             <FileCode2 className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+            <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">
               Crawlers & Sitemap Files
             </h2>
           </div>
@@ -501,14 +501,14 @@ export const SeoSettingsPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div className="p-4 bg-surface-container-low border border-surface-container-high/40 rounded-lg flex items-center justify-between">
               <div>
-                <span className="text-xs font-semibold text-white block">XML Sitemap</span>
+                <span className="text-xs font-semibold text-on-surface block">XML Sitemap</span>
                 <span className="text-[11px] text-on-surface-variant block font-mono">/sitemap.xml</span>
               </div>
               <a
                 href={`${displayUrl}/sitemap.xml`}
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 text-on-surface-variant hover:text-white bg-surface-container-lowest hover:bg-surface-container rounded-lg transition"
+                className="p-2 text-on-surface-variant hover:text-primary bg-surface-container-lowest hover:bg-surface-container rounded-lg transition"
                 title="View Sitemap"
               >
                 <ExternalLink className="w-4 h-4" />
@@ -517,14 +517,14 @@ export const SeoSettingsPage: React.FC = () => {
 
             <div className="p-4 bg-surface-container-low border border-surface-container-high/40 rounded-lg flex items-center justify-between">
               <div>
-                <span className="text-xs font-semibold text-white block">Robots Directives</span>
+                <span className="text-xs font-semibold text-on-surface block">Robots Directives</span>
                 <span className="text-[11px] text-on-surface-variant block font-mono">/robots.txt</span>
               </div>
               <a
                 href={`${displayUrl}/robots.txt`}
                 target="_blank"
                 rel="noreferrer"
-                className="p-2 text-on-surface-variant hover:text-white bg-surface-container-lowest hover:bg-surface-container rounded-lg transition"
+                className="p-2 text-on-surface-variant hover:text-primary bg-surface-container-lowest hover:bg-surface-container rounded-lg transition"
                 title="View Robots.txt"
               >
                 <ExternalLink className="w-4 h-4" />

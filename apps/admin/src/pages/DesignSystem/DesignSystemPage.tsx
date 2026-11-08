@@ -451,7 +451,7 @@ export const DesignSystemPage: React.FC = () => {
             <div className="flex flex-wrap items-center gap-3">
               <button
                 type="button"
-                className="h-10 px-5 rounded-lg bg-secondary-container text-white font-label-lg text-label-lg shadow-sm hover:opacity-90 transition-all flex items-center gap-2"
+                className="h-10 px-5 rounded-lg bg-secondary text-on-secondary font-label-lg text-label-lg shadow-sm hover:opacity-90 transition-all flex items-center gap-2"
               >
                 <span className="material-symbols-outlined text-[18px]">campaign</span>
                 <span>Go Live Stream</span>
@@ -806,7 +806,7 @@ export const DesignSystemPage: React.FC = () => {
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-on-surface-variant font-label-xs text-label-xs font-medium">
                 Draft Saved
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-white font-label-xs text-label-xs font-bold shadow-sm">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary text-on-secondary font-label-xs text-label-xs font-bold shadow-sm">
                 <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping" />
                 Live Breaking
               </span>

@@ -19,7 +19,7 @@ export const Badge: React.FC<BadgeProps> = ({
     published: 'bg-surface-container-highest text-primary font-semibold',
     draft: 'bg-surface-container text-on-surface-variant font-medium',
     review: 'bg-tertiary-fixed text-on-tertiary-fixed font-semibold',
-    live: 'bg-secondary-container text-white font-bold shadow-sm',
+    live: 'bg-secondary text-on-secondary font-bold shadow-sm',
     archived: 'bg-surface-container-high text-on-surface-variant',
     neutral: 'bg-surface-container text-on-surface-variant font-medium',
     violet: 'bg-primary-container text-on-primary-container font-semibold'

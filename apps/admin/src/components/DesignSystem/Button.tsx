@@ -30,7 +30,7 @@ export const Button: React.FC<ButtonProps> = ({
   const variantClasses = {
     primary: 'bg-primary-container text-on-primary-container shadow-sm hover:bg-primary active:scale-[0.98]',
     secondary: 'bg-surface-container text-primary hover:bg-surface-container-high active:scale-[0.98]',
-    coral: 'bg-secondary-container text-white shadow-sm hover:opacity-90 active:scale-[0.98]',
+    coral: 'bg-secondary text-on-secondary shadow-sm hover:opacity-90 active:scale-[0.98]',
     pill: 'rounded-full bg-primary-container text-on-primary-container shadow-sm hover:shadow active:scale-[0.98]',
     icon: 'w-10 h-10 p-0 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface active:scale-[0.96]',
     ghost: 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low active:scale-[0.98]',

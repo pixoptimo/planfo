@@ -152,7 +152,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
             type="button"
             onClick={() => setActiveTab('editor')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-              activeTab === 'editor' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-white'
+              activeTab === 'editor' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             <Edit3 className="w-3.5 h-3.5" />
@@ -162,7 +162,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
             type="button"
             onClick={() => setActiveTab('preview')}
             className={`px-3 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
-              activeTab === 'preview' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-white'
+              activeTab === 'preview' ? 'bg-primary text-on-primary' : 'text-on-surface-variant hover:text-on-surface'
             }`}
           >
             <Eye className="w-3.5 h-3.5" />
@@ -299,7 +299,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                 <button
                   type="button"
                   onClick={() => addBlock('heading')}
-                  className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-white font-semibold rounded-lg text-xs"
+                  className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-primary border border-primary/20 font-semibold rounded-lg text-xs"
                 >
                   + Add Heading
                 </button>
@@ -344,7 +344,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                       type="button"
                       onClick={() => moveBlock(index, 'up')}
                       disabled={index === 0}
-                      className="p-1 text-on-surface-variant hover:text-white disabled:opacity-30"
+                      className="p-1 text-on-surface-variant hover:text-on-surface disabled:opacity-30"
                       title="Move Up"
                     >
                       <ArrowUp className="w-3.5 h-3.5" />
@@ -353,7 +353,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                       type="button"
                       onClick={() => moveBlock(index, 'down')}
                       disabled={index === blocks.length - 1}
-                      className="p-1 text-on-surface-variant hover:text-white disabled:opacity-30"
+                      className="p-1 text-on-surface-variant hover:text-on-surface disabled:opacity-30"
                       title="Move Down"
                     >
                       <ArrowDown className="w-3.5 h-3.5" />
@@ -376,7 +376,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                     value={block.text}
                     onChange={(e) => updateBlock(block.id, { text: e.target.value })}
                     placeholder="Enter heading text..."
-                    className="w-full bg-surface-container-lowest border border-surface-container-high/40 rounded-lg px-3 py-2 text-base font-bold text-white focus:outline-none focus:border-primary"
+                    className="w-full bg-surface-container-lowest border border-surface-container-high/40 rounded-lg px-3 py-2 text-base font-bold text-on-surface focus:outline-none focus:border-primary"
                   />
                 )}
 
@@ -422,7 +422,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                       <button
                         type="button"
                         onClick={() => setMediaPickerBlockId(block.id)}
-                        className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-white rounded-lg text-xs font-semibold whitespace-nowrap"
+                        className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-primary border border-primary/20 rounded-lg text-xs font-semibold whitespace-nowrap"
                       >
                         Choose File
                       </button>
@@ -657,7 +657,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                               className={`px-2.5 py-1 rounded text-xs font-semibold transition ${
                                 (block.columns || 3) === colCount
                                   ? 'bg-primary text-on-primary shadow-sm'
-                                  : 'text-on-surface-variant hover:text-white'
+                                  : 'text-on-surface-variant hover:text-on-surface'
                               }`}
                             >
                               {colCount} Cols
@@ -734,7 +734,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                                   updateBlock(block.id, { items: newItems });
                                 }}
                                 placeholder="✨ or 💡"
-                                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded px-2.5 py-1.5 text-xs text-white"
+                                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded px-2.5 py-1.5 text-xs text-on-surface"
                               />
                             </div>
                             <div className="sm:col-span-3">
@@ -762,7 +762,7 @@ export const StructuredEditor: React.FC<StructuredEditorProps> = ({ content, onC
                                   updateBlock(block.id, { items: newItems });
                                 }}
                                 placeholder="Card headline or title"
-                                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded px-2.5 py-1.5 text-xs font-semibold text-white"
+                                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded px-2.5 py-1.5 text-xs font-semibold text-on-surface"
                               />
                             </div>
                           </div>

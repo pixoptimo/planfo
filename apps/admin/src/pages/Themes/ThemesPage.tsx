@@ -210,14 +210,14 @@ export const ThemesPage: React.FC = () => {
 
       {/* Notifications */}
       {error && (
-        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+        <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-700 font-medium flex items-center space-x-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
       )}
 
       {success && (
-        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center justify-between">
+        <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-800 font-medium flex items-center justify-between">
           <div className="flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{success}</span>
@@ -227,7 +227,7 @@ export const ThemesPage: React.FC = () => {
               href={liveSiteUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-300 font-semibold rounded-lg transition"
+              className="inline-flex items-center space-x-1.5 px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-800 font-semibold rounded-lg transition"
             >
               <span>View Live Site</span>
               <ExternalLink className="w-3.5 h-3.5" />
@@ -245,12 +245,12 @@ export const ThemesPage: React.FC = () => {
             </div>
             <div>
               <div className="flex items-center space-x-2">
-                <span className="text-xs uppercase font-mono font-bold text-emerald-400 tracking-wider">
+                <span className="text-xs uppercase font-mono font-bold text-emerald-700 tracking-wider">
                   Active Design Theme
                 </span>
                 <span className="text-[11px] font-mono text-on-surface-variant">v{activeTheme.version}</span>
               </div>
-              <h2 className="text-lg font-bold text-white">{activeTheme.name}</h2>
+              <h2 className="text-lg font-bold text-on-surface">{activeTheme.name}</h2>
               <p className="text-xs text-on-surface-variant mt-0.5">{activeTheme.description}</p>
             </div>
           </div>
@@ -318,7 +318,7 @@ export const ThemesPage: React.FC = () => {
               <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                 <div>
                   <div className="flex items-center justify-between">
-                    <h3 className="text-base font-bold text-white">{theme.name}</h3>
+                    <h3 className="text-base font-bold text-on-surface">{theme.name}</h3>
                     <span className="text-xs font-mono text-on-surface-variant">v{theme.version}</span>
                   </div>
 
@@ -349,8 +349,8 @@ export const ThemesPage: React.FC = () => {
                 <div className="pt-3 border-t border-surface-container-high/40 flex items-center justify-between gap-2">
                   {isActive ? (
                     <>
-                      <div className="text-xs font-semibold text-emerald-400 flex items-center space-x-1.5">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                      <div className="text-xs font-semibold text-emerald-700 flex items-center space-x-1.5">
+                        <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
                         <span>Currently Deployed</span>
                       </div>
                       {can('settings.update') && theme.id !== 'aero-modern' && (
@@ -359,7 +359,7 @@ export const ThemesPage: React.FC = () => {
                           title="Remove Theme"
                           disabled={deletingId === theme.id}
                           onClick={() => setConfirmDeleteTheme(theme)}
-                          className="px-2.5 py-1.5 bg-surface-container-low hover:bg-red-500/20 text-on-surface-variant hover:text-red-400 border border-surface-container-high/40 hover:border-red-500/30 text-xs rounded-lg transition flex items-center space-x-1"
+                          className="px-2.5 py-1.5 bg-surface-container-low hover:bg-red-500/20 text-on-surface-variant hover:text-red-600 border border-surface-container-high/40 hover:border-red-500/30 text-xs rounded-lg transition flex items-center space-x-1"
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                           <span className="text-[11px]">Remove</span>
@@ -373,7 +373,7 @@ export const ThemesPage: React.FC = () => {
                           type="button"
                           disabled={activatingId === theme.id || deletingId === theme.id}
                           onClick={() => handleActivate(theme.id)}
-                          className="flex-1 py-2 bg-surface-container hover:bg-surface-container-highest text-white font-medium text-xs rounded-lg flex items-center justify-center space-x-1.5 transition border border-surface-container-high/50 disabled:opacity-50"
+                          className="flex-1 py-2 bg-surface-container hover:bg-surface-container-highest text-primary font-semibold text-xs rounded-lg flex items-center justify-center space-x-1.5 transition border border-surface-container-high/50 disabled:opacity-50"
                         >
                           {activatingId === theme.id ? (
                             <>
@@ -394,7 +394,7 @@ export const ThemesPage: React.FC = () => {
                             title="Delete Theme"
                             disabled={deletingId === theme.id}
                             onClick={() => setConfirmDeleteTheme(theme)}
-                            className="p-2 bg-surface-container-low hover:bg-red-500/20 text-on-surface-variant hover:text-red-400 border border-surface-container-high/40 hover:border-red-500/40 rounded-lg text-xs transition"
+                            className="p-2 bg-surface-container-low hover:bg-red-500/20 text-on-surface-variant hover:text-red-600 border border-surface-container-high/40 hover:border-red-500/40 rounded-lg text-xs transition"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
                           </button>
@@ -413,17 +413,17 @@ export const ThemesPage: React.FC = () => {
       {confirmDeleteTheme && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
           <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mx-auto">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-600 mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="text-center space-y-1.5">
-              <h3 className="text-lg font-bold text-white">Delete Theme</h3>
+              <h3 className="text-lg font-bold text-on-surface">Delete Theme</h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 Are you sure you want to permanently delete{' '}
-                <span className="font-semibold text-white">"{confirmDeleteTheme.name}"</span>?
+                <span className="font-semibold text-on-surface">"{confirmDeleteTheme.name}"</span>?
                 {confirmDeleteTheme.isActive && (
-                  <span className="block mt-2.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-300 font-medium text-[11px] text-left">
-                    ⚠️ Note: This theme is currently active. Deleting it will automatically revert the site to the core default theme (<strong className="text-white">Planfo Default</strong>) and rebuild your site.
+                  <span className="block mt-2.5 p-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-800 font-medium text-[11px] text-left">
+                    ⚠️ Note: This theme is currently active. Deleting it will automatically revert the site to the core default theme (<strong className="text-on-surface font-bold">Planfo Default</strong>) and rebuild your site.
                   </span>
                 )}
               </p>
@@ -445,12 +445,12 @@ export const ThemesPage: React.FC = () => {
               >
                 {deletingId === confirmDeleteTheme.id ? (
                   <>
-                    <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                    <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
                     <span>Deleting...</span>
                   </>
                 ) : (
                   <>
-                    <Trash2 className="w-3.5 h-3.5" />
+                    <Trash2 className="w-3.5 h-3.5 text-white" />
                     <span>Delete Theme</span>
                   </>
                 )}
@@ -464,14 +464,14 @@ export const ThemesPage: React.FC = () => {
       {confirmCleanAll && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/75 backdrop-blur-sm p-4">
           <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl max-w-md w-full p-6 shadow-2xl space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-400 mx-auto">
+            <div className="w-12 h-12 rounded-full bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-600 mx-auto">
               <AlertTriangle className="w-6 h-6" />
             </div>
             <div className="text-center space-y-1.5">
-              <h3 className="text-lg font-bold text-white">Remove All Uploaded Themes</h3>
+              <h3 className="text-lg font-bold text-on-surface">Remove All Uploaded Themes</h3>
               <p className="text-xs text-on-surface-variant leading-relaxed">
                 This will permanently delete all custom and uploaded theme folders from the filesystem.
-                The active theme will immediately revert to the default <span className="text-white font-semibold">Planfo Default</span> theme and the static website will be regenerated.
+                The active theme will immediately revert to the default <span className="text-on-surface font-semibold">Planfo Default</span> theme and the static website will be regenerated.
               </p>
             </div>
             <div className="flex items-center space-x-3 pt-2">

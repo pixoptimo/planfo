@@ -102,7 +102,7 @@ export const SiteSettingsPage: React.FC = () => {
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
                 activeTab === 'general'
                   ? 'bg-primary text-on-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high/60'
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
               }`}
             >
               <Sliders className="w-3.5 h-3.5" />
@@ -111,7 +111,7 @@ export const SiteSettingsPage: React.FC = () => {
 
             <Link
               to="/settings/seo"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-white hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
             >
               <Globe className="w-3.5 h-3.5" />
               <span>SEO & Indexing</span>
@@ -123,7 +123,7 @@ export const SiteSettingsPage: React.FC = () => {
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
                 activeTab === 'deployment'
                   ? 'bg-primary text-on-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high/60'
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
               }`}
             >
               <Cloud className="w-3.5 h-3.5" />
@@ -136,7 +136,7 @@ export const SiteSettingsPage: React.FC = () => {
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
                 activeTab === 'features'
                   ? 'bg-primary text-on-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high/60'
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
               }`}
             >
               <Package className="w-3.5 h-3.5" />
@@ -149,7 +149,7 @@ export const SiteSettingsPage: React.FC = () => {
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${
                 activeTab === 'tools'
                   ? 'bg-primary text-on-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-white hover:bg-surface-container-high/60'
+                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
               }`}
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
@@ -159,13 +159,13 @@ export const SiteSettingsPage: React.FC = () => {
         </div>
 
         {error && (
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-400 flex items-center space-x-2">
+          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl text-xs text-red-700 font-medium flex items-center space-x-2">
             <AlertCircle className="w-4 h-4 flex-shrink-0" />
             <span>{error}</span>
           </div>
         )}
         {success && (
-          <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-400 flex items-center space-x-2">
+          <div className="p-4 bg-emerald-500/10 border border-emerald-500/20 rounded-xl text-xs text-emerald-800 font-medium flex items-center space-x-2">
             <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
             <span>{success}</span>
           </div>
@@ -176,7 +176,7 @@ export const SiteSettingsPage: React.FC = () => {
           <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
             <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
               <Package className="w-4 h-4 text-primary" />
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+              <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">
                 Planfo Feature Packs
               </h2>
             </div>
@@ -189,8 +189,8 @@ export const SiteSettingsPage: React.FC = () => {
               <div className="p-4 rounded-xl bg-surface-container-low border border-surface-container-high/40 flex items-start justify-between">
                 <div>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs font-bold text-white">Pages & Articles Blueprint</span>
-                    <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-400 font-mono border border-emerald-500/20 font-semibold">
+                    <span className="text-xs font-bold text-on-surface">Pages & Articles Blueprint</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/10 text-emerald-700 font-mono border border-emerald-500/20 font-semibold">
                       Core Active
                     </span>
                   </div>
@@ -204,7 +204,7 @@ export const SiteSettingsPage: React.FC = () => {
               <div className="p-4 rounded-xl bg-surface-container-low border border-surface-container-high/40 flex items-start justify-between">
                 <div className="pr-4">
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs font-bold text-white">Storefront Catalog Pack</span>
+                    <span className="text-xs font-bold text-on-surface">Storefront Catalog Pack</span>
                     {settings.featurePacks?.catalog ? (
                       <span className="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-mono border border-primary/20 font-semibold">
                         Enabled
@@ -247,7 +247,7 @@ export const SiteSettingsPage: React.FC = () => {
           <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
           <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
             <GitBranch className="w-4 h-4 text-primary" />
-            <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+            <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">
               Deployment & Hosting Architecture
             </h2>
           </div>
@@ -259,7 +259,7 @@ export const SiteSettingsPage: React.FC = () => {
             <label
               className={`p-3 rounded-xl border cursor-pointer flex flex-col justify-between transition ${
                 (settings.deployment?.target ?? 'local') === 'github-pages'
-                  ? 'bg-primary/10 border-primary text-white'
+                  ? 'bg-primary/10 border-primary text-primary font-semibold'
                   : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
               }`}
             >
@@ -280,7 +280,7 @@ export const SiteSettingsPage: React.FC = () => {
                   }
                   className="accent-brand-500"
                 />
-                <span className="text-xs font-bold text-white">Git & Cloud Hosting (GitHub Pages, Cloudflare, Netlify, Vercel)</span>
+                <span className="text-xs font-bold text-on-surface">Git & Cloud Hosting (GitHub Pages, Cloudflare, Netlify, Vercel)</span>
               </div>
               <p className="text-[11px] text-on-surface-variant">
                 1-click push to Git repositories, Cloudflare Pages, Netlify, Vercel, or GitHub Pages. Zero database costs.
@@ -290,7 +290,7 @@ export const SiteSettingsPage: React.FC = () => {
             <label
               className={`p-3 rounded-xl border cursor-pointer flex flex-col justify-between transition ${
                 (settings.deployment?.target ?? 'local') === 'server'
-                  ? 'bg-primary/10 border-primary text-white'
+                  ? 'bg-primary/10 border-primary text-primary font-semibold'
                   : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
               }`}
             >
@@ -311,7 +311,7 @@ export const SiteSettingsPage: React.FC = () => {
                   }
                   className="accent-brand-500"
                 />
-                <span className="text-xs font-bold text-white">Own Server (Self-Hosted)</span>
+                <span className="text-xs font-bold text-on-surface">Own Server (Self-Hosted)</span>
               </div>
               <p className="text-[11px] text-on-surface-variant">
                 Atomic zero-downtime directory swap to web root on VPS, Hostinger, or cPanel.
@@ -339,7 +339,7 @@ export const SiteSettingsPage: React.FC = () => {
                       }
                     })
                   }
-                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary"
                 />
               </div>
 
@@ -362,7 +362,7 @@ export const SiteSettingsPage: React.FC = () => {
                       }
                     })
                   }
-                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary"
                 />
               </div>
             </div>
@@ -374,7 +374,7 @@ export const SiteSettingsPage: React.FC = () => {
         {activeTab === 'general' && (
           <div className="space-y-6">
             <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
-              <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">General Website Information</h2>
+              <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">General Website Information</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -386,7 +386,7 @@ export const SiteSettingsPage: React.FC = () => {
                 required
                 value={settings.siteName}
                 onChange={(e) => setSettings({ ...settings, siteName: e.target.value })}
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
 
@@ -400,7 +400,7 @@ export const SiteSettingsPage: React.FC = () => {
                 value={settings.siteUrl}
                 onChange={(e) => setSettings({ ...settings, siteUrl: e.target.value })}
                 placeholder="https://example.com"
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -414,7 +414,7 @@ export const SiteSettingsPage: React.FC = () => {
               value={settings.tagline}
               onChange={(e) => setSettings({ ...settings, tagline: e.target.value })}
               placeholder="e.g. Blazing fast static websites"
-              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-primary"
+              className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-sm text-on-surface focus:outline-none focus:border-primary"
             />
           </div>
 
@@ -429,12 +429,12 @@ export const SiteSettingsPage: React.FC = () => {
                   value={settings.logo || ''}
                   onChange={(e) => setSettings({ ...settings, logo: e.target.value })}
                   placeholder="/media/logo.png"
-                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-primary"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary"
                 />
                 <button
                   type="button"
                   onClick={() => setActiveMediaTarget('logo')}
-                  className="p-2 bg-surface-container hover:bg-surface-container-highest text-white rounded-lg text-xs"
+                  className="p-2 bg-surface-container hover:bg-surface-container-highest text-primary rounded-lg text-xs"
                 >
                   <ImageIcon className="w-4 h-4" />
                 </button>
@@ -451,12 +451,12 @@ export const SiteSettingsPage: React.FC = () => {
                   value={settings.favicon || ''}
                   onChange={(e) => setSettings({ ...settings, favicon: e.target.value })}
                   placeholder="/media/favicon.ico"
-                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-primary"
+                  className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary"
                 />
                 <button
                   type="button"
                   onClick={() => setActiveMediaTarget('favicon')}
-                  className="p-2 bg-surface-container hover:bg-surface-container-highest text-white rounded-lg text-xs"
+                  className="p-2 bg-surface-container hover:bg-surface-container-highest text-primary rounded-lg text-xs"
                 >
                   <ImageIcon className="w-4 h-4" />
                 </button>
@@ -467,7 +467,7 @@ export const SiteSettingsPage: React.FC = () => {
 
         {/* Social Links & Analytics */}
         <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-4">
-          <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">Social Links & Integrations</h2>
+          <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">Social Links & Integrations</h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
@@ -484,7 +484,7 @@ export const SiteSettingsPage: React.FC = () => {
                   })
                 }
                 placeholder="https://twitter.com/..."
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
 
@@ -502,7 +502,7 @@ export const SiteSettingsPage: React.FC = () => {
                   })
                 }
                 placeholder="https://github.com/..."
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -517,7 +517,7 @@ export const SiteSettingsPage: React.FC = () => {
                 value={settings.analyticsId || ''}
                 onChange={(e) => setSettings({ ...settings, analyticsId: e.target.value })}
                 placeholder="G-XXXXXXXXXX"
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs font-mono text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs font-mono text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
 
@@ -529,7 +529,7 @@ export const SiteSettingsPage: React.FC = () => {
                 type="text"
                 value={settings.footerText}
                 onChange={(e) => setSettings({ ...settings, footerText: e.target.value })}
-                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary"
+                className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary"
               />
             </div>
           </div>
@@ -542,7 +542,7 @@ export const SiteSettingsPage: React.FC = () => {
               <Globe className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-white flex items-center space-x-2">
+              <h3 className="text-sm font-bold text-on-surface flex items-center space-x-2">
                 <span>SEO & Search Engine Indexing Settings</span>
                 <span className="text-[10px] px-2 py-0.5 rounded bg-primary/10 text-primary font-mono border border-primary/20 font-semibold">
                   Dedicated Tab
@@ -555,7 +555,7 @@ export const SiteSettingsPage: React.FC = () => {
           </div>
           <Link
             to="/settings/seo"
-            className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition flex-shrink-0 self-start sm:self-auto border border-surface-container-high/50 hover:border-primary/40 shadow-sm"
+            className="px-4 py-2 bg-surface-container hover:bg-surface-container-highest text-primary font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition flex-shrink-0 self-start sm:self-auto border border-surface-container-high/50 hover:border-primary/40 shadow-sm"
           >
             <span>Open SEO Settings</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -632,17 +632,17 @@ const UrlRewriterCard: React.FC = () => {
     <div className="bg-surface-container-lowest border border-surface-container-high/40 rounded-xl p-6 space-y-5">
       <div className="flex items-center space-x-2 border-b border-surface-container-high/40 pb-3">
         <RefreshCw className="w-4 h-4 text-primary" />
-        <h2 className="text-sm font-bold text-white uppercase tracking-wider font-mono">
+        <h2 className="text-sm font-bold text-on-surface uppercase tracking-wider font-mono">
           Global URL & Permalink Search-and-Replace
         </h2>
       </div>
 
       <p className="text-xs text-on-surface-variant">
-        Safely migrate domain names, ports (e.g. <code className="text-brand-300">http://localhost:3000</code> to <code className="text-brand-300">http://localhost:4000</code>), or URL prefixes across all JSON storage files (pages, blog posts, blueprints, products, and navigation menus) with atomic file writes and automatic site regeneration.
+        Safely migrate domain names, ports (e.g. <code className="text-primary font-semibold">http://localhost:3000</code> to <code className="text-primary font-semibold">http://localhost:4000</code>), or URL prefixes across all JSON storage files (pages, blog posts, blueprints, products, and navigation menus) with atomic file writes and automatic site regeneration.
       </p>
 
       {error && (
-        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-xs text-red-400 flex items-center space-x-2">
+        <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-lg text-xs text-red-700 font-medium flex items-center space-x-2">
           <AlertCircle className="w-4 h-4 flex-shrink-0" />
           <span>{error}</span>
         </div>
@@ -658,7 +658,7 @@ const UrlRewriterCard: React.FC = () => {
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="e.g. http://localhost:3000 or /blog/hoodie"
-            className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary font-mono"
+            className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary font-mono"
           />
         </div>
 
@@ -671,7 +671,7 @@ const UrlRewriterCard: React.FC = () => {
             value={replace}
             onChange={(e) => setReplace(e.target.value)}
             placeholder="e.g. http://localhost:4000 or /products/hoodie"
-            className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-primary font-mono"
+            className="w-full bg-surface-container-low border border-surface-container-high/40 rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary font-mono"
           />
         </div>
       </div>
@@ -681,7 +681,7 @@ const UrlRewriterCard: React.FC = () => {
           type="button"
           disabled={loading || !search.trim()}
           onClick={() => handleRewrite(true)}
-          className="px-3.5 py-2 bg-surface-container hover:bg-surface-container-highest text-white font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
+          className="px-3.5 py-2 bg-surface-container hover:bg-surface-container-highest text-primary font-semibold text-xs rounded-lg flex items-center space-x-1.5 transition disabled:opacity-50"
         >
           {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Search className="w-3.5 h-3.5" />}
           <span>Dry Run Preview</span>
@@ -701,8 +701,8 @@ const UrlRewriterCard: React.FC = () => {
       {report && (
         <div className={`p-4 rounded-xl border text-xs space-y-2 ${
           report.dryRun
-            ? 'bg-blue-500/10 border-blue-500/20 text-blue-300'
-            : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-300'
+            ? 'bg-blue-500/10 border-blue-500/20 text-blue-800'
+            : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800'
         }`}>
           <div className="flex items-center space-x-2 font-bold">
             <CheckCircle2 className="w-4 h-4" />
@@ -718,7 +718,7 @@ const UrlRewriterCard: React.FC = () => {
               {report.files.map((item, idx) => (
                 <div key={idx} className="flex justify-between items-center text-on-surface">
                   <span className="truncate pr-2">{item.file}</span>
-                  <span className="px-1.5 py-0.5 rounded bg-surface-container text-white text-[10px]">
+                  <span className="px-1.5 py-0.5 rounded bg-surface-container text-on-surface font-semibold text-[10px]">
                     {item.matches} {item.matches === 1 ? 'match' : 'matches'}
                   </span>
                 </div>
