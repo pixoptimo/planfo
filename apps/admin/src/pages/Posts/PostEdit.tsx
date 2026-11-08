@@ -6,6 +6,7 @@ import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 
 // Default block templates for all supported ContentBlock types
 const createDefaultBlock = (type: string): ContentBlock => {
@@ -798,10 +799,8 @@ export const PostEdit: React.FC = () => {
                 )}
               </div>
 
-              {/* User Avatar */}
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center font-bold text-label-xs text-on-primary">
-                {user?.name?.[0]?.toUpperCase() || 'A'}
-              </div>
+              {/* Profile Dropdown */}
+              <ProfileDropdown />
             </div>
           </div>
         </header>

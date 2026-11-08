@@ -9,6 +9,7 @@ import { getMediaUrl } from '../../utils/media.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 
 export const DynamicEntryEdit: React.FC = () => {
   const { blueprintSlug, entrySlug } = useParams<{ blueprintSlug: string; entrySlug?: string }>();
@@ -519,9 +520,8 @@ export const DynamicEntryEdit: React.FC = () => {
             )}
           </div>
 
-          <div className="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs uppercase shadow-xs shrink-0">
-            {user?.name?.[0] || 'A'}
-          </div>
+          {/* Profile Dropdown */}
+          <ProfileDropdown />
         </div>
       </header>
 

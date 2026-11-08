@@ -27,6 +27,7 @@ import { useAuth } from '../../context/AuthContext.js';
 import { api } from '../../api/client.js';
 import { getBlueprintIcon } from '../../utils/blueprintIcons.js';
 import { PlanfoLogo } from '../UI/PlanfoLogo.js';
+import { ProfileDropdown } from '../UI/ProfileDropdown.js';
 import type { PublishResult } from '@cms/types';
 
 export const AdminLayout: React.FC = () => {
@@ -402,15 +403,6 @@ export const AdminLayout: React.FC = () => {
 
           {/* Action Toolbar */}
           <div className="flex items-center gap-4">
-            {/* Quick Post Creator Trigger */}
-            <Link
-              to="/posts/new"
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-md text-label-md font-semibold transition-all shadow-xs"
-            >
-              <span className="material-symbols-outlined text-[16px]">add</span>
-              <span>New Post</span>
-            </Link>
-
             {/* Visit Live Website */}
             <a
               href={liveSiteUrl}
@@ -439,10 +431,8 @@ export const AdminLayout: React.FC = () => {
               </button>
             )}
 
-            {/* User Profile Avatar */}
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 shadow-sm text-on-primary font-semibold text-label-xs">
-              {user?.name?.[0]?.toUpperCase() || 'A'}
-            </div>
+            {/* User Profile Dropdown */}
+            <ProfileDropdown />
           </div>
         </header>
 

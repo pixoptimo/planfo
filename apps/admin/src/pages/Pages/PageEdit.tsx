@@ -6,6 +6,7 @@ import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { getTemplatePreset, TEMPLATE_PRESETS } from '../../data/templatePresets.js';
 import { getMediaUrl } from '../../utils/media.js';
 
@@ -884,10 +885,8 @@ export const PageEdit: React.FC = () => {
               )}
             </div>
 
-            {/* Profile Avatar */}
-            <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs shadow-xs">
-              {(user?.name || user?.email || 'A').slice(0, 1).toUpperCase()}
-            </div>
+            {/* Profile Dropdown */}
+            <ProfileDropdown />
           </div>
         </div>
       </header>

@@ -9,6 +9,7 @@ import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 
 // Default block templates for Product Specifications & Content
 const createDefaultBlock = (type: string): ContentBlock => {
@@ -513,9 +514,8 @@ export const ProductEdit: React.FC = () => {
             )}
           </div>
 
-          <div className="w-8 h-8 rounded-full bg-surface-container-high border border-surface-container-highest flex items-center justify-center font-label-xs font-bold text-primary shrink-0 select-none">
-            {user?.name?.[0] || 'A'}
-          </div>
+          {/* Profile Dropdown */}
+          <ProfileDropdown />
         </div>
       </header>
 

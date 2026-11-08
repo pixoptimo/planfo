@@ -5,6 +5,7 @@ import { api } from '../../api/client.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { FEATURE_PACKS } from '../../data/featurePacks.js';
 
 interface EnrichedBlueprint extends Blueprint {
@@ -85,6 +86,19 @@ export const BlueprintStudio: React.FC = () => {
     setToastMessage(msg);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
+  };
+
+  const [isPublishing, setIsPublishing] = useState(false);
+  const handlePublish = async () => {
+    setIsPublishing(true);
+    try {
+      await api.post('/api/publish');
+      triggerToast('Site published successfully!');
+    } catch (err) {
+      triggerToast(err instanceof Error ? err.message : 'Publish failed');
+    } finally {
+      setIsPublishing(false);
+    }
   };
 
   // Modals
@@ -446,39 +460,33 @@ export const BlueprintStudio: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-space-md">
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowDocsModal(true)}
-                  className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md"
-                >
-                  <span className="material-symbols-outlined text-[18px]">menu_book</span>
-                  Schema Docs
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setShowImportModal(true)}
-                  className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md"
-                >
-                  <span className="material-symbols-outlined text-[18px]">file_upload</span>
-                  Import Schema
-                </button>
-              </div>
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md"
+              >
+                <span className="material-symbols-outlined text-[18px]">visibility</span>
+                <span>Preview</span>
+              </a>
 
-              {can('blueprints.create') && (
+              {can('publish.all') && (
                 <button
                   type="button"
-                  onClick={() => navigate('/blueprints/new')}
-                  className="inline-flex items-center gap-2 px-space-md py-1.5 rounded-lg bg-primary hover:bg-primary-container text-on-primary font-label-md text-label-md shadow-sm transition-all hover:scale-[1.01]"
+                  onClick={handlePublish}
+                  disabled={isPublishing}
+                  className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md transition-all shadow-sm disabled:opacity-50"
                 >
-                  <span className="material-symbols-outlined text-[18px]">add</span>
-                  Create Custom Blueprint
+                  {isPublishing ? (
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                  ) : (
+                    <span className="material-symbols-outlined text-[18px]">publish</span>
+                  )}
+                  <span>{isPublishing ? 'Publishing...' : 'Publish'}</span>
                 </button>
               )}
 
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs shadow-xs">
-                {(user?.name || user?.email || 'A').slice(0, 1).toUpperCase()}
-              </div>
+              <ProfileDropdown />
             </div>
           </div>
         </header>

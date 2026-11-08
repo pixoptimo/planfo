@@ -5,6 +5,7 @@ import { api } from '../../api/client.js';
 import { slugify } from '../../utils/slugify.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { PlanfoLogo } from '../../components/UI/PlanfoLogo.js';
+import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { FEATURE_PACKS } from '../../data/featurePacks.js';
 
 const AVAILABLE_ICONS = [
@@ -492,28 +493,31 @@ export const BlueprintCreate: React.FC = () => {
             </div>
 
             <div className="flex items-center gap-space-md">
-              <button
-                type="button"
-                onClick={() => navigate('/blueprints/studio')}
-                className="px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container font-label-md text-label-md transition-colors flex items-center gap-1.5"
+              <a
+                href="/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-surface-container-low text-on-surface hover:bg-surface-container transition-colors font-label-md text-label-md"
               >
-                <span className="material-symbols-outlined text-[18px]">close</span>
-                Discard Draft
-              </button>
+                <span className="material-symbols-outlined text-[18px]">visibility</span>
+                <span>Preview</span>
+              </a>
 
               <button
                 type="button"
                 onClick={() => handleSubmit()}
                 disabled={saving}
-                className="px-space-lg py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md transition-all shadow-md hover:shadow-lg flex items-center gap-2 disabled:opacity-50"
+                className="flex items-center gap-space-xs px-space-md py-1.5 rounded-lg bg-primary text-on-primary hover:bg-primary-container font-label-md text-label-md transition-all shadow-sm disabled:opacity-50"
               >
-                <span className="material-symbols-outlined text-[18px]">auto_fix_high</span>
-                {saving ? 'Registering...' : isEditing ? 'Update & Sync Blueprint' : 'Create & Register Blueprint'}
+                {saving ? (
+                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <span className="material-symbols-outlined text-[18px]">publish</span>
+                )}
+                <span>{saving ? 'Publishing...' : 'Publish'}</span>
               </button>
 
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary font-bold text-xs shadow-xs">
-                {(user?.name || user?.email || 'A').slice(0, 1).toUpperCase()}
-              </div>
+              <ProfileDropdown />
             </div>
           </div>
         </header>
