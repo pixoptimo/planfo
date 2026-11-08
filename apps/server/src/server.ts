@@ -44,8 +44,12 @@ async function startServer(): Promise<void> {
   const actualCmsPort = await findAvailablePort(preferredCmsPort, config.CMS_HOST, []);
 
   if (actualCmsPort !== preferredCmsPort) {
+    console.log('\n\x1b[43m\x1b[30m ⚠️  PORT CONFLICT NOTICE \x1b[0m');
+    console.log(`\x1b[33mPreferred port ${preferredCmsPort} is already in use by another application.\x1b[0m`);
+    console.log(`\x1b[32mPlanfo CMS has automatically bound to: http://${config.CMS_HOST}:${actualCmsPort}\x1b[0m`);
+    console.log(`\x1b[33m👉 Make sure to visit: http://${config.CMS_HOST}:${actualCmsPort}/admin (do not use :${preferredCmsPort})\x1b[0m\n`);
     logger.warn(
-      `⚠️ CMS API port ${preferredCmsPort} is in use. Automatically switched to available port ${actualCmsPort}`
+      `⚠️ CMS port ${preferredCmsPort} in use. Switched to ${actualCmsPort}`
     );
   }
 
@@ -59,6 +63,7 @@ async function startServer(): Promise<void> {
     logger.info(`🌐 Website Named Alias:  http://${config.CMS_HOST}:${actualCmsPort}/${primaryAlias}/`);
     logger.info(`🛠️  Admin Dashboard:      http://${config.CMS_HOST}:${actualCmsPort}/admin`);
     logger.info(`🔌 REST API:             http://${config.CMS_HOST}:${actualCmsPort}/api`);
+    logger.info(`🔑 Admin Login:          admin / admin123`);
     logger.info(`📂 Storage Root:         ${config.STORAGE_PATH}`);
     logger.info(`🌐 Static Output:        ${config.OUTPUT_PATH}`);
   });

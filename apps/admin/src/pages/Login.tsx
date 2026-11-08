@@ -30,7 +30,7 @@ export const Login: React.FC = () => {
     setError(null);
 
     try {
-      await login(email, password);
+      await login(email.trim(), password);
       navigate('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Invalid login credentials');
@@ -90,6 +90,20 @@ export const Login: React.FC = () => {
                 className="w-full bg-surface-container-low border border-outline-variant/30 rounded-xl pl-10 pr-4 py-2.5 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition"
               />
             </div>
+          </div>
+
+          <div className="pt-1 flex items-center justify-between text-xs text-on-surface-variant/80">
+            <span>Dev Admin: <strong className="text-on-surface font-mono">admin</strong> / <strong className="text-on-surface font-mono">admin123</strong></span>
+            <button
+              type="button"
+              onClick={() => {
+                setEmail('admin');
+                setPassword('admin123');
+              }}
+              className="text-primary hover:text-primary/80 font-medium hover:underline transition"
+            >
+              Fill Default
+            </button>
           </div>
 
           <button

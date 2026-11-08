@@ -21,6 +21,7 @@
     "planfo:build": "node packages/create-planfo/bin/planfo.js build",
     "seed": "npx tsx scripts/seed-sample-content.ts",
     "create-admin": "npx tsx scripts/create-admin.ts",
+    "reset-admin": "npx tsx scripts/reset-admin.ts",
     "test": "vitest run"
   },
   "devDependencies": {

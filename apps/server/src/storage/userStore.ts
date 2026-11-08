@@ -25,7 +25,9 @@ export class UserStore {
 
   static async findByEmail(identifier: string): Promise<User | null> {
     const users = await this.getAllUsers();
-    const query = identifier.trim().toLowerCase();
+    const query = (identifier || '').trim().toLowerCase();
+
+    if (!query) return null;
 
     // 1. Direct match on email, username prefix, or display name
     const match = users.find(
@@ -36,8 +38,8 @@ export class UserStore {
     );
     if (match) return match;
 
-    // 2. If identifier is 'admin', match any active admin
-    if (query === 'admin') {
+    // 2. If identifier is 'admin' or variants, match any active admin
+    if (query === 'admin' || query === 'administrator' || query.startsWith('admin@') || query === 'root') {
       const admin = users.find((u) => u.role === 'admin' && u.active);
       if (admin) return admin;
     }

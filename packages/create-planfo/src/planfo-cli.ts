@@ -24,6 +24,7 @@ program.on('--help', () => {
   $ planfo dev -p 4000           Start Planfo CMS on a custom port
   $ planfo build                 Compile static HTML/CSS into generated/
   $ planfo preview               Preview website and admin on http://localhost:3000
+  $ planfo reset-admin           Reset/restore admin login to admin/admin123
   $ planfo publish               Build and publish static output to GitHub Pages
 
 \x1b[1m\x1b[33mImportant Note:\x1b[0m
@@ -246,10 +247,11 @@ program
     });
   });
 
-// planfo reset-password [new-password] [dir]
+// planfo reset-password [new-password] [dir] (also: planfo reset-admin)
 program
   .command('reset-password [new-password] [dir]')
-  .description('Reset or restore admin credentials for a Planfo CMS project')
+  .alias('reset-admin')
+  .description('Reset or restore admin credentials for a Planfo CMS project (default: admin / admin123)')
   .action(async (newPassword = 'admin123', dir) => {
     const projectInfo = resolvePlanfoProject(dir);
     const storageDir = projectInfo ? projectInfo.storageDir : path.resolve(process.cwd(), 'storage');
