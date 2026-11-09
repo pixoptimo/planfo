@@ -825,34 +825,35 @@ export const PostEdit: React.FC = () => {
 
         {/* Three-Panel Post Editor Stage */}
         <div className="flex-1 flex overflow-hidden min-h-0 relative bg-surface">
-          {/* PANEL 1: Left Floating Palette: Content Block Composer */}
-          {showBlockPalette && (
-            <aside className="hidden xl:block fixed left-20 top-32 z-30 w-72 bg-surface-container-lowest rounded-xl p-4 shadow-[0_10px_30px_-8px_rgba(19,27,46,0.08)] border border-outline-variant/20 animate-fade-in">
-              <div className="flex items-center justify-between pb-3 mb-3 bg-surface-container-low px-3 py-2 rounded-lg">
-                <div className="flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary text-[18px]">add_circle</span>
-                  <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
-                    Insert Blocks
-                  </span>
+          {/* PANEL 1: Left Attached Palette: Content Block Composer */}
+          {showBlockPalette ? (
+            <aside className="w-64 border-r border-surface-container-high/60 bg-surface-container-lowest p-4 flex flex-col justify-between shrink-0 overflow-y-auto transition-all duration-200">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-3 border-b border-surface-container-high/40">
+                  <div className="flex items-center gap-2">
+                    <span className="material-symbols-outlined text-primary text-[18px]">add_circle</span>
+                    <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
+                      Insert Blocks
+                    </span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant font-code text-[11px]">
+                      ⌘K
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowBlockPalette(false)}
+                      className="text-on-surface-variant hover:text-on-surface p-0.5 rounded hover:bg-surface-container transition-colors"
+                      title="Collapse palette"
+                    >
+                      <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+                    </button>
+                  </div>
                 </div>
-                <div className="flex items-center gap-1.5">
-                  <span className="px-1.5 py-0.5 rounded bg-surface-container-lowest text-on-surface-variant font-code text-[11px]">
-                    ⌘K
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => setShowBlockPalette(false)}
-                    className="text-on-surface-variant hover:text-on-surface p-0.5"
-                    title="Minimize"
-                  >
-                    <span className="material-symbols-outlined text-[14px]">close</span>
-                  </button>
-                </div>
-              </div>
 
-              <p className="font-body-sm text-body-sm text-on-surface-variant mb-3 px-1">
-                Click elements to insert directly onto the manuscript surface.
-              </p>
+                <p className="font-body-sm text-[11px] text-on-surface-variant px-0.5">
+                  Click elements to insert directly onto the manuscript surface.
+                </p>
 
               {/* Block Composer Grid */}
               <div className="grid grid-cols-2 gap-2 mb-4">
@@ -1011,33 +1012,36 @@ export const PostEdit: React.FC = () => {
                   </span>
                 </button>
               </div>
+            </div>
 
-              {/* Live Cursor Pill Indicator */}
-              <div className="relative bg-surface-container p-2.5 rounded-lg flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-secondary-container animate-pulse" />
-                  <span className="font-label-sm text-label-sm text-on-surface font-medium">
-                    {activeBlock ? `Cursor: ${activeBlock.type}` : 'Cursor: Manuscript Root'}
-                  </span>
-                </div>
-                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest text-primary font-code text-code shadow-xs">
-                  {activeBlockIndex >= 0 ? `Ln ${activeBlockIndex + 1}` : 'Ln 1'}
+            {/* Live Cursor Pill Indicator */}
+            <div className="relative bg-surface-container p-2.5 rounded-lg flex items-center justify-between mt-4">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-secondary-container animate-pulse" />
+                <span className="font-label-sm text-label-sm text-on-surface font-medium">
+                  {activeBlock ? `Cursor: ${activeBlock.type}` : 'Cursor: Manuscript Root'}
                 </span>
               </div>
-            </aside>
-          )}
-
-          {/* Toggle pill when floating palette is collapsed */}
-          {!showBlockPalette && (
+              <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest text-primary font-code text-code shadow-xs">
+                {activeBlockIndex >= 0 ? `Ln ${activeBlockIndex + 1}` : 'Ln 1'}
+              </span>
+            </div>
+          </aside>
+        ) : (
+          <div className="w-12 border-r border-surface-container-high/60 bg-surface-container-lowest flex flex-col items-center py-4 shrink-0 gap-3">
             <button
               type="button"
               onClick={() => setShowBlockPalette(true)}
-              className="hidden xl:flex fixed left-20 top-32 z-30 items-center gap-2 px-3 py-2 rounded-xl bg-surface-container-lowest shadow-md border border-outline-variant/30 text-primary font-label-sm font-semibold hover:bg-surface-container transition-all"
+              className="w-8 h-8 rounded-lg bg-surface-container hover:bg-primary hover:text-on-primary text-primary flex items-center justify-center transition-colors shadow-xs"
+              title="Expand Insert Blocks (⌘K)"
             >
-              <span className="material-symbols-outlined text-[18px]">add_circle</span>
-              <span>Insert Blocks (⌘K)</span>
+              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
             </button>
-          )}
+            <span className="[writing-mode:vertical-lr] rotate-180 font-label-xs text-label-xs uppercase tracking-widest text-outline font-semibold select-none">
+              Blocks
+            </span>
+          </div>
+        )}
 
           {/* PANEL 2: Center Stage: Editorial Manuscript Canvas with 24px side padding and inner scroll */}
           <main className="flex-1 h-full overflow-y-auto px-6 py-8 flex flex-col items-center justify-start">

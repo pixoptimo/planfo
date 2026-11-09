@@ -520,8 +520,8 @@ export const ProductEdit: React.FC = () => {
 
       {/* Main Studio Body: Left Block Composer, Center Canvas, Right Inspector */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* Left Floating Block Composer Palette */}
-        <aside className="hidden xl:flex w-64 bg-surface-container-lowest/80 backdrop-blur-md border-r border-surface-container-high/40 p-4 flex-col gap-4 overflow-y-auto shrink-0 z-10">
+        {/* Left Attached Block Composer Palette */}
+        <aside className="w-64 bg-surface-container-lowest/80 backdrop-blur-md border-r border-surface-container-high/40 p-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-10">
           <div className="flex items-center justify-between">
             <span className="font-label-xs text-label-xs uppercase font-bold tracking-wider text-on-surface-variant flex items-center gap-1.5">
               <span className="material-symbols-outlined text-primary text-[16px]">dashboard_customize</span>
