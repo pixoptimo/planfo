@@ -53,14 +53,34 @@ interface CustomBlueprintNav {
   entryCount?: number;
 }
 
+interface NavEntry {
+  to: string;
+  label: string;
+  icon: string;
+  exact?: boolean;
+  show?: boolean;
+  badge?: number | string;
+  badgeColor?: 'primary' | 'rose';
+  isActiveCheck?: (pathname: string) => boolean;
+}
+
+interface NavSection {
+  title: string;
+  items: NavEntry[];
+}
+
 export const SidebarRail: React.FC = () => {
   const { can } = useAuth();
   const location = useLocation();
   const { isCollapsed, toggleSidebar, sidebarWidthClass } = useSidebar();
   const [customBlueprints, setCustomBlueprints] = useState<CustomBlueprintNav[]>([]);
   const [trashCount, setTrashCount] = useState<number>(0);
+  const [siteName, setSiteName] = useState<string>('My Website');
+  const [liveSiteUrl, setLiveSiteUrl] = useState<string>('http://localhost:3000');
+  const [sitePort, setSitePort] = useState<number | null>(null);
 
   const loadData = () => {
+    // 1. Load Custom Blueprints
     api.get<Array<{ id: string; name: string; slug: string; icon: string; isBuiltIn?: boolean; entryCount?: number }>>('/api/blueprints')
       .then((data) => {
         if (Array.isArray(data)) {
@@ -69,6 +89,7 @@ export const SidebarRail: React.FC = () => {
       })
       .catch(() => {});
 
+    // 2. Load Trash Count
     api.get<{ count: number }>('/api/trash/count')
       .then((res) => {
         if (typeof res?.count === 'number') {
@@ -76,15 +97,38 @@ export const SidebarRail: React.FC = () => {
         }
       })
       .catch(() => {});
+
+    // 3. Load Site Settings / Name
+    api.get<{ siteName?: string }>('/api/settings')
+      .then((res) => {
+        if (res?.siteName) {
+          setSiteName(res.siteName);
+        }
+      })
+      .catch(() => {});
+
+    // 4. Load System Info / Live Site URL
+    api.get<{ siteUrl: string; sitePort: number }>('/api/system/info')
+      .then((data) => {
+        if (data?.siteUrl) setLiveSiteUrl(data.siteUrl);
+        if (data?.sitePort) setSitePort(data.sitePort);
+      })
+      .catch(() => {});
   };
 
   useEffect(() => {
     loadData();
     window.addEventListener('blueprint-updated', loadData);
+    window.addEventListener('blueprints-updated', loadData);
     window.addEventListener('settings-updated', loadData);
+    window.addEventListener('trash-updated', loadData);
+    window.addEventListener('content-updated', loadData);
     return () => {
       window.removeEventListener('blueprint-updated', loadData);
+      window.removeEventListener('blueprints-updated', loadData);
       window.removeEventListener('settings-updated', loadData);
+      window.removeEventListener('trash-updated', loadData);
+      window.removeEventListener('content-updated', loadData);
     };
   }, []);
 
@@ -97,18 +141,157 @@ export const SidebarRail: React.FC = () => {
       location.pathname === '/blueprints/studio' ||
       location.pathname === '/blueprints' ||
       location.pathname === '/blueprints/new' ||
-      location.pathname.startsWith('/blueprints/edit') ||
-      location.pathname === '/blueprints/feature-packs'
+      location.pathname.startsWith('/blueprints/edit')
     );
   };
 
+  // Build the complete categorized navigation matching the full dashboard architecture
+  const sections: NavSection[] = [
+    {
+      title: 'CONTENT',
+      items: [
+        {
+          to: '/pages',
+          label: 'Pages',
+          icon: 'article',
+          show: can('pages.read'),
+          isActiveCheck: (p) => p.startsWith('/pages')
+        },
+        {
+          to: '/posts',
+          label: 'Posts',
+          icon: 'menu_book',
+          show: can('posts.read'),
+          isActiveCheck: (p) => p.startsWith('/posts')
+        },
+        {
+          to: '/products',
+          label: 'Products',
+          icon: 'shopping_bag',
+          show: can('products.read'),
+          isActiveCheck: (p) => p.startsWith('/products') || p.startsWith('/templates')
+        }
+      ]
+    },
+    {
+      title: 'BLUEPRINTS & TAXONOMY',
+      items: [
+        {
+          to: '/blueprints/studio',
+          label: 'Blueprints',
+          icon: 'schema',
+          show: can('blueprints.read'),
+          isActiveCheck: () => isStudioActive()
+        },
+        {
+          to: '/categories',
+          label: 'Categories & Tags',
+          icon: 'folder_open',
+          show: can('categories.read'),
+          isActiveCheck: (p) => p.startsWith('/categories')
+        },
+        {
+          to: '/blueprints/feature-packs',
+          label: 'Feature Packs',
+          icon: 'extension',
+          show: can('blueprints.read'),
+          isActiveCheck: (p) => p.startsWith('/blueprints/feature-packs')
+        }
+      ]
+    },
+    ...(customBlueprints.length > 0
+      ? [
+          {
+            title: 'COLLECTIONS',
+            items: customBlueprints.map((bp) => ({
+              to: `/blueprints/${bp.slug}`,
+              label: bp.name,
+              icon: getBlueprintMaterialIcon(bp.icon),
+              show: true,
+              badge: bp.entryCount && bp.entryCount > 0 ? bp.entryCount : undefined,
+              badgeColor: 'primary' as const,
+              isActiveCheck: () => isBlueprintActive(bp.slug)
+            }))
+          }
+        ]
+      : []),
+    {
+      title: 'ASSETS & NAV',
+      items: [
+        {
+          to: '/media',
+          label: 'Media Library',
+          icon: 'photo_library',
+          show: can('media.read'),
+          isActiveCheck: (p) => p.startsWith('/media')
+        },
+        {
+          to: '/navigation',
+          label: 'Navigation',
+          icon: 'menu',
+          show: can('menus.read'),
+          isActiveCheck: (p) => p.startsWith('/navigation')
+        },
+        {
+          to: '/themes',
+          label: 'Themes',
+          icon: 'palette',
+          show: can('settings.read'),
+          isActiveCheck: (p) => p.startsWith('/themes')
+        }
+      ]
+    },
+    {
+      title: 'SYSTEM & CONFIG',
+      items: [
+        {
+          to: '/users',
+          label: 'Users & Roles',
+          icon: 'manage_accounts',
+          show: can('users.read'),
+          isActiveCheck: (p) => p.startsWith('/users')
+        },
+        {
+          to: '/settings',
+          label: 'Site Settings & SEO',
+          icon: 'tune',
+          show: can('settings.read'),
+          isActiveCheck: (p) => p.startsWith('/settings')
+        },
+        {
+          to: '/revisions',
+          label: 'Revisions',
+          icon: 'history',
+          show: can('revisions.read'),
+          isActiveCheck: (p) => p.startsWith('/revisions')
+        },
+        {
+          to: '/backups',
+          label: 'Backups',
+          icon: 'archive',
+          show: can('backups.read'),
+          isActiveCheck: (p) => p.startsWith('/backups')
+        },
+        {
+          to: '/trash',
+          label: 'Trash',
+          icon: 'delete',
+          show: true,
+          badge: trashCount > 0 ? trashCount : undefined,
+          badgeColor: 'rose' as const,
+          isActiveCheck: (p) => p.startsWith('/trash')
+        }
+      ]
+    }
+  ];
+
   return (
     <aside
-      className={`fixed left-0 top-0 bottom-0 ${sidebarWidthClass} bg-surface-container-lowest z-50 flex flex-col justify-between py-3.5 border-r border-surface-container-high/60 shadow-[0_1px_8px_rgba(0,0,0,0.04)] select-none transition-all duration-300 ease-in-out`}
+      className={`fixed left-0 top-0 bottom-0 ${sidebarWidthClass} bg-surface-container-lowest z-50 flex flex-col justify-between py-3 border-r border-surface-container-high/60 shadow-[0_1px_8px_rgba(0,0,0,0.04)] select-none transition-all duration-300 ease-in-out`}
       aria-label="Admin Sidebar Navigation"
     >
       {/* Top Section: Brand Logo & Toggle Header */}
-      <div className="flex flex-col w-full">
+      <div className="flex flex-col w-full min-h-0">
         {isCollapsed ? (
           <div className="flex flex-col items-center gap-2 w-full px-2 pb-2">
             <Link
@@ -131,32 +314,39 @@ export const SidebarRail: React.FC = () => {
             </button>
           </div>
         ) : (
-          <div className="flex items-center justify-between w-full px-4 pb-3 border-b border-surface-container-high/40 mb-2">
+          <div className="flex items-center justify-between w-full px-4 pb-3 border-b border-surface-container-high/40 mb-1">
             <Link
               to="/"
               title="Planfo CMS Home"
-              className="flex items-center gap-2 transition-transform hover:scale-102"
+              className="flex flex-col min-w-0 transition-transform hover:scale-101"
             >
               <PlanfoLogo variant="full" className="h-6 w-auto" />
+              <div className="flex items-center gap-1.5 text-[11px] text-on-surface-variant font-label-xs mt-1 truncate">
+                <span className="font-semibold text-primary truncate max-w-[130px]" title={siteName}>
+                  {siteName}
+                </span>
+                <span className="text-outline">•</span>
+                <span className="text-outline">Static</span>
+              </div>
             </Link>
             <button
               type="button"
               onClick={toggleSidebar}
               title="Collapse sidebar"
-              className="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors"
+              className="p-1.5 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors shrink-0"
             >
               <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
             </button>
           </div>
         )}
 
-        {/* Scrollable Navigation Items */}
+        {/* Scrollable Categorized Navigation Area */}
         <nav
-          className={`flex flex-col gap-1 w-full max-h-[calc(100vh-210px)] overflow-y-auto no-scrollbar py-1 ${
+          className={`flex flex-col gap-0.5 w-full flex-1 overflow-y-auto no-scrollbar py-1 ${
             isCollapsed ? 'items-center px-2' : 'px-3'
           }`}
         >
-          {/* Overview */}
+          {/* Dashboard / Overview Link */}
           {isCollapsed ? (
             <NavLink
               to="/"
@@ -171,7 +361,7 @@ export const SidebarRail: React.FC = () => {
             >
               <span className="material-symbols-outlined text-[20px]">grid_view</span>
               <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-                Overview
+                Dashboard
               </div>
             </NavLink>
           ) : (
@@ -187,368 +377,150 @@ export const SidebarRail: React.FC = () => {
               }
             >
               <span className="material-symbols-outlined text-[20px] shrink-0">grid_view</span>
-              <span className="truncate">Overview</span>
+              <span className="truncate">Dashboard</span>
             </NavLink>
           )}
 
-          {/* Articles Library */}
-          {can('posts.read') && (
-            isCollapsed ? (
-              <NavLink
-                to="/posts"
-                className={() =>
-                  `relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                    location.pathname.startsWith('/posts')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px]">menu_book</span>
-                <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-                  Articles Library
-                </div>
-              </NavLink>
-            ) : (
-              <NavLink
-                to="/posts"
-                className={() =>
-                  `flex items-center gap-3 w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                    location.pathname.startsWith('/posts')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px] shrink-0">menu_book</span>
-                <span className="truncate">Articles Library</span>
-              </NavLink>
-            )
-          )}
-
-          {/* Pages */}
-          {can('pages.read') && (
-            isCollapsed ? (
-              <NavLink
-                to="/pages"
-                className={() =>
-                  `relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                    location.pathname.startsWith('/pages')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px]">article</span>
-                <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-                  Pages
-                </div>
-              </NavLink>
-            ) : (
-              <NavLink
-                to="/pages"
-                className={() =>
-                  `flex items-center gap-3 w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                    location.pathname.startsWith('/pages')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px] shrink-0">article</span>
-                <span className="truncate">Pages</span>
-              </NavLink>
-            )
-          )}
-
-          {/* Divider Before Blueprints */}
-          {customBlueprints.length > 0 && (
-            <div className={`my-1.5 shrink-0 ${isCollapsed ? 'w-8 h-px bg-surface-container-high/60 mx-auto' : 'w-full h-px bg-surface-container-high/40'}`} />
-          )}
-
-          {/* Dynamic Blueprints */}
-          {customBlueprints.map((bp) => {
-            const active = isBlueprintActive(bp.slug);
-            const iconName = getBlueprintMaterialIcon(bp.icon);
-
-            if (isCollapsed) {
-              return (
-                <Link
-                  key={bp.id || bp.slug}
-                  to={`/blueprints/${bp.slug}`}
-                  className={`relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                    active
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`}
-                >
-                  <span className="material-symbols-outlined text-[20px]">{iconName}</span>
-                  {bp.entryCount !== undefined && bp.entryCount > 0 && (
-                    <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-primary" />
-                  )}
-                  <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60 flex items-center gap-2">
-                    <span>{bp.name}</span>
-                    {bp.entryCount !== undefined && (
-                      <span className="font-code text-[10px] text-primary font-bold bg-surface-container px-1.5 py-0.5 rounded">
-                        {bp.entryCount}
-                      </span>
-                    )}
-                  </div>
-                </Link>
-              );
-            }
+          {/* Categorized Sections */}
+          {sections.map((section, sIdx) => {
+            const visibleItems = section.items.filter((item) => item.show !== false);
+            if (visibleItems.length === 0) return null;
 
             return (
-              <Link
-                key={bp.id || bp.slug}
-                to={`/blueprints/${bp.slug}`}
-                className={`flex items-center justify-between w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                  active
-                    ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                <div className="flex items-center gap-3 truncate min-w-0">
-                  <span className="material-symbols-outlined text-[20px] shrink-0">{iconName}</span>
-                  <span className="truncate">{bp.name}</span>
-                </div>
-                {bp.entryCount !== undefined && bp.entryCount > 0 && (
-                  <span className="font-code text-[11px] font-bold px-2 py-0.5 rounded-full bg-surface-container text-primary shrink-0">
-                    {bp.entryCount}
-                  </span>
+              <div key={section.title || sIdx} className="w-full flex flex-col gap-0.5">
+                {/* Section Header or Divider */}
+                {isCollapsed ? (
+                  <div className="my-1.5 w-8 h-px bg-surface-container-high/60 mx-auto shrink-0" />
+                ) : (
+                  <div className="px-3 pt-3.5 pb-1 text-[10px] font-bold uppercase tracking-wider text-outline font-mono select-none">
+                    {section.title}
+                  </div>
                 )}
-              </Link>
+
+                {/* Section Items */}
+                {visibleItems.map((item) => {
+                  const isActive = item.isActiveCheck
+                    ? item.isActiveCheck(location.pathname)
+                    : location.pathname === item.to || location.pathname.startsWith(`${item.to}/`);
+
+                  if (isCollapsed) {
+                    return (
+                      <NavLink
+                        key={item.to}
+                        to={item.to}
+                        end={item.exact}
+                        className={`relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
+                          isActive
+                            ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
+                            : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                        }`}
+                      >
+                        <span className="material-symbols-outlined text-[20px]">{item.icon}</span>
+
+                        {/* Dot indicator for badges in collapsed mode */}
+                        {item.badge !== undefined && (
+                          <span
+                            className={`absolute top-1.5 right-1.5 w-2 h-2 rounded-full ${
+                              item.badgeColor === 'rose' ? 'bg-rose-500 animate-pulse' : 'bg-primary'
+                            }`}
+                          />
+                        )}
+
+                        {/* Hover Tooltip */}
+                        <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60 flex items-center gap-2">
+                          <span>{item.label}</span>
+                          {item.badge !== undefined && (
+                            <span
+                              className={`font-code text-[10px] font-bold px-1.5 py-0.2 rounded ${
+                                item.badgeColor === 'rose'
+                                  ? 'bg-rose-100 text-rose-700'
+                                  : 'bg-surface-container text-primary'
+                              }`}
+                            >
+                              {item.badge}
+                            </span>
+                          )}
+                        </div>
+                      </NavLink>
+                    );
+                  }
+
+                  return (
+                    <NavLink
+                      key={item.to}
+                      to={item.to}
+                      end={item.exact}
+                      className={`flex items-center justify-between w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
+                        isActive
+                          ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
+                          : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 truncate min-w-0">
+                        <span className="material-symbols-outlined text-[20px] shrink-0">{item.icon}</span>
+                        <span className="truncate">{item.label}</span>
+                      </div>
+
+                      {item.badge !== undefined && (
+                        <span
+                          className={`font-code text-[11px] font-bold px-2 py-0.5 rounded-full shrink-0 ${
+                            item.badgeColor === 'rose'
+                              ? 'bg-rose-100 text-rose-700'
+                              : 'bg-surface-container text-primary'
+                          }`}
+                        >
+                          {item.badge}
+                        </span>
+                      )}
+                    </NavLink>
+                  );
+                })}
+              </div>
             );
           })}
-
-          {/* Divider Before Tools */}
-          <div className={`my-1.5 shrink-0 ${isCollapsed ? 'w-8 h-px bg-surface-container-high/60 mx-auto' : 'w-full h-px bg-surface-container-high/40'}`} />
-
-          {/* Blueprints Studio */}
-          {can('blueprints.read') && (
-            isCollapsed ? (
-              <Link
-                to="/blueprints/studio"
-                className={`relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                  isStudioActive()
-                    ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[20px]">schema</span>
-                <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-                  Blueprints Studio
-                </div>
-              </Link>
-            ) : (
-              <Link
-                to="/blueprints/studio"
-                className={`flex items-center gap-3 w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                  isStudioActive()
-                    ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[20px] shrink-0">schema</span>
-                <span className="truncate">Blueprints Studio</span>
-              </Link>
-            )
-          )}
-
-          {/* Media Library */}
-          {can('media.read') && (
-            isCollapsed ? (
-              <NavLink
-                to="/media"
-                className={() =>
-                  `relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                    location.pathname.startsWith('/media')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px]">photo_library</span>
-                <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-                  Media Library
-                </div>
-              </NavLink>
-            ) : (
-              <NavLink
-                to="/media"
-                className={() =>
-                  `flex items-center gap-3 w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                    location.pathname.startsWith('/media')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px] shrink-0">photo_library</span>
-                <span className="truncate">Media Library</span>
-              </NavLink>
-            )
-          )}
-
-          {/* Navigation Manager */}
-          {can('menus.read') && (
-            isCollapsed ? (
-              <NavLink
-                to="/navigation"
-                className={() =>
-                  `relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                    location.pathname.startsWith('/navigation')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px]">menu</span>
-                <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-                  Navigation Menus
-                </div>
-              </NavLink>
-            ) : (
-              <NavLink
-                to="/navigation"
-                className={() =>
-                  `flex items-center gap-3 w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                    location.pathname.startsWith('/navigation')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px] shrink-0">menu</span>
-                <span className="truncate">Navigation</span>
-              </NavLink>
-            )
-          )}
-
-          {/* Themes */}
-          {can('settings.read') && (
-            isCollapsed ? (
-              <NavLink
-                to="/themes"
-                className={() =>
-                  `relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                    location.pathname.startsWith('/themes')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px]">palette</span>
-                <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-                  Themes
-                </div>
-              </NavLink>
-            ) : (
-              <NavLink
-                to="/themes"
-                className={() =>
-                  `flex items-center gap-3 w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                    location.pathname.startsWith('/themes')
-                      ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`
-                }
-              >
-                <span className="material-symbols-outlined text-[20px] shrink-0">palette</span>
-                <span className="truncate">Themes</span>
-              </NavLink>
-            )
-          )}
         </nav>
       </div>
 
-      {/* Bottom Section: Trash, Settings & User Profile */}
-      <div className={`flex flex-col gap-1 w-full pt-2 border-t border-surface-container-high/60 shrink-0 ${isCollapsed ? 'items-center px-2' : 'px-3'}`}>
-        {/* Trash */}
+      {/* Bottom Section: Live Site Link & User Profile Dropdown */}
+      <div
+        className={`flex flex-col gap-1.5 w-full pt-2.5 border-t border-surface-container-high/60 shrink-0 ${
+          isCollapsed ? 'items-center px-2' : 'px-3'
+        }`}
+      >
+        {/* Visit Live Site Link */}
         {isCollapsed ? (
-          <NavLink
-            to="/trash"
-            className={() =>
-              `relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                location.pathname.startsWith('/trash')
-                  ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-              }`
-            }
+          <a
+            href={liveSiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Visit Live Static Website"
+            className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
           >
-            <span className="material-symbols-outlined text-[20px]">delete</span>
-            {trashCount > 0 && (
-              <span className="absolute top-1 right-1 w-2 h-2 rounded-full bg-rose-500 animate-pulse" />
-            )}
-            <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60 flex items-center gap-1.5">
-              <span>Trash</span>
-              {trashCount > 0 && (
-                <span className="font-code text-[10px] text-rose-500 font-bold bg-rose-50 px-1.5 py-0.2 rounded">
-                  {trashCount}
-                </span>
-              )}
+            <span className="material-symbols-outlined text-[20px]">open_in_new</span>
+            <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+              Visit Live Site ({sitePort ? `:${sitePort}` : '3001'})
             </div>
-          </NavLink>
+          </a>
         ) : (
-          <NavLink
-            to="/trash"
-            className={() =>
-              `flex items-center justify-between w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                location.pathname.startsWith('/trash')
-                  ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-              }`
-            }
+          <a
+            href={liveSiteUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center justify-between w-full px-3 py-1.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-label-sm text-label-sm group"
+            title="Visit Live Static Website"
           >
-            <div className="flex items-center gap-3 truncate min-w-0">
-              <span className="material-symbols-outlined text-[20px] shrink-0">delete</span>
-              <span className="truncate">Trash</span>
+            <div className="flex items-center gap-2">
+              <span className="material-symbols-outlined text-[16px] text-primary">open_in_new</span>
+              <span>Visit Live Site</span>
             </div>
-            {trashCount > 0 && (
-              <span className="font-code text-[11px] font-bold px-2 py-0.5 rounded-full bg-rose-100 text-rose-700 shrink-0">
-                {trashCount}
-              </span>
-            )}
-          </NavLink>
-        )}
-
-        {/* Settings */}
-        {can('settings.read') && (
-          isCollapsed ? (
-            <NavLink
-              to="/settings"
-              className={() =>
-                `relative group flex items-center justify-center w-10 h-10 rounded-xl transition-all ${
-                  location.pathname.startsWith('/settings')
-                    ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`
-              }
-            >
-              <span className="material-symbols-outlined text-[20px]">tune</span>
-              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-                Settings
-              </div>
-            </NavLink>
-          ) : (
-            <NavLink
-              to="/settings"
-              className={() =>
-                `flex items-center gap-3 w-full px-3 py-2 rounded-xl transition-all font-label-md text-label-md ${
-                  location.pathname.startsWith('/settings')
-                    ? 'bg-primary-container/30 text-primary font-bold shadow-xs ring-1 ring-primary/20'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`
-              }
-            >
-              <span className="material-symbols-outlined text-[20px] shrink-0">tune</span>
-              <span className="truncate">Settings</span>
-            </NavLink>
-          )
+            <span className="font-code text-[11px] text-outline group-hover:text-primary">
+              :{sitePort || 3001}
+            </span>
+          </a>
         )}
 
         {/* Profile Dropdown */}
-        <div className={`relative group pt-1 ${isCollapsed ? 'flex justify-center' : 'w-full'}`}>
+        <div className={`relative group ${isCollapsed ? 'flex justify-center' : 'w-full'}`}>
           <ProfileDropdown />
         </div>
       </div>
