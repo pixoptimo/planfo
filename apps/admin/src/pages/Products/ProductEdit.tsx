@@ -123,6 +123,7 @@ export const ProductEdit: React.FC = () => {
   const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
   const [canvasWidth, setCanvasWidth] = useState(720);
   const [activeTab, setActiveTab] = useState<'specs' | 'seo'>('specs');
+  const [showBlockPalette, setShowBlockPalette] = useState(true);
 
   // Revisions Modal
   const [revisions, setRevisions] = useState<RevisionMeta[]>([]);
@@ -521,14 +522,23 @@ export const ProductEdit: React.FC = () => {
       {/* Main Studio Body: Left Block Composer, Center Canvas, Right Inspector */}
       <div className="flex-1 flex overflow-hidden relative">
         {/* Left Attached Block Composer Palette */}
-        <aside className="w-64 bg-surface-container-lowest/80 backdrop-blur-md border-r border-surface-container-high/40 p-4 flex flex-col gap-4 overflow-y-auto shrink-0 z-10">
-          <div className="flex items-center justify-between">
-            <span className="font-label-xs text-label-xs uppercase font-bold tracking-wider text-on-surface-variant flex items-center gap-1.5">
-              <span className="material-symbols-outlined text-primary text-[16px]">dashboard_customize</span>
-              <span>Insert Specs</span>
-            </span>
-            <span className="font-code text-[11px] text-on-surface-variant/70">Click to add</span>
-          </div>
+        {showBlockPalette ? (
+          <aside className="w-64 bg-surface-container-lowest/80 backdrop-blur-md border-r border-surface-container-high/40 p-4 flex flex-col justify-between shrink-0 overflow-y-auto z-10 transition-all duration-200">
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center justify-between pb-2 border-b border-surface-container-high/40">
+                <span className="font-label-xs text-label-xs uppercase font-bold tracking-wider text-on-surface flex items-center gap-1.5">
+                  <span className="material-symbols-outlined text-primary text-[18px]">dashboard_customize</span>
+                  <span>Insert Specs</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={() => setShowBlockPalette(false)}
+                  className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors shrink-0"
+                  title="Collapse specs palette"
+                >
+                  <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
+                </button>
+              </div>
 
           <div className="grid grid-cols-2 gap-2">
             <button
@@ -603,6 +613,7 @@ export const ProductEdit: React.FC = () => {
               <span className="font-label-xs text-label-xs font-semibold text-on-surface">Action Button</span>
             </button>
           </div>
+          </div>
 
           <div className="mt-2 pt-3 border-t border-surface-container-high/40">
             <div className="p-3 bg-surface-container-low rounded-xl border border-surface-container-high/30 space-y-2">
@@ -616,6 +627,63 @@ export const ProductEdit: React.FC = () => {
             </div>
           </div>
         </aside>
+      ) : (
+        <div className="w-16 border-r border-surface-container-high/60 bg-surface-container-lowest flex flex-col items-center py-3.5 shrink-0 gap-2 z-20 select-none transition-all duration-300 ease-in-out">
+          <button
+            type="button"
+            onClick={() => setShowBlockPalette(true)}
+            className="w-10 h-10 rounded-xl bg-primary-container text-primary hover:bg-primary hover:text-on-primary flex items-center justify-center transition-all shadow-xs group relative"
+            title="Expand Insert Specs"
+          >
+            <span className="material-symbols-outlined text-[20px]">dashboard_customize</span>
+            <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60 flex items-center gap-2">
+              <span>Expand Insert Specs</span>
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => setShowBlockPalette(true)}
+            className="w-10 h-7 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors"
+            title="Expand specs palette"
+          >
+            <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_right</span>
+          </button>
+          <div className="w-8 h-px bg-surface-container-high/60 my-1" />
+          <button
+            type="button"
+            onClick={() => addBlock('heading')}
+            className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+            title="Specs Heading"
+          >
+            <span className="material-symbols-outlined text-[20px]">title</span>
+            <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+              Specs Heading
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => addBlock('table')}
+            className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+            title="Specification Matrix"
+          >
+            <span className="material-symbols-outlined text-[20px]">table_chart</span>
+            <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+              Specification Matrix
+            </div>
+          </button>
+          <button
+            type="button"
+            onClick={() => addBlock('features')}
+            className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+            title="Highlights List"
+          >
+            <span className="material-symbols-outlined text-[20px]">checklist</span>
+            <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+              Highlights List
+            </div>
+          </button>
+        </div>
+      )}
 
         {/* Center Editorial Manuscript Canvas with 24px side padding */}
         <main className="flex-1 overflow-y-auto px-6 py-8 flex justify-center bg-surface">

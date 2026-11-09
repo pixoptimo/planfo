@@ -63,6 +63,7 @@ export const DynamicEntryEdit: React.FC = () => {
 
   // Demo ZIP handling
   const [demoModes, setDemoModes] = useState<Record<string, 'url' | 'zip'>>({});
+  const [showBlockPalette, setShowBlockPalette] = useState(true);
   const [uploadingZip, setUploadingZip] = useState(false);
   const [zipUploadMessage, setZipUploadMessage] = useState<{ text: string; error?: boolean } | null>(null);
 
@@ -526,22 +527,33 @@ export const DynamicEntryEdit: React.FC = () => {
 
       {/* Main Studio 3-Panel Workspace */}
       <div className="flex-1 flex overflow-hidden relative">
-        {/* PANEL 1: Left Floating Block Composer Palette */}
+        {/* PANEL 1: Left Attached Block Composer Palette */}
         {blueprint.hasContentEditor && (
-          <aside className="w-64 border-r border-surface-container-high/40 bg-surface-container-lowest/80 backdrop-blur-xs p-4 flex flex-col justify-between shrink-0 overflow-y-auto">
-            <div className="space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 font-label-xs text-label-xs font-bold uppercase tracking-wider text-on-surface">
-                  <span className="material-symbols-outlined text-primary text-[18px]">widgets</span>
-                  <span>Insert Blocks</span>
+          showBlockPalette ? (
+            <aside className="w-64 border-r border-surface-container-high/40 bg-surface-container-lowest/80 backdrop-blur-xs p-4 flex flex-col justify-between shrink-0 overflow-y-auto transition-all duration-200">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between pb-2 border-b border-surface-container-high/40">
+                  <div className="flex items-center gap-1.5 font-label-xs text-label-xs font-bold uppercase tracking-wider text-on-surface">
+                    <span className="material-symbols-outlined text-primary text-[18px]">widgets</span>
+                    <span>Insert Blocks</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="font-code text-[11px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">
+                      8 Available
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => setShowBlockPalette(false)}
+                      className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors shrink-0"
+                      title="Collapse palette"
+                    >
+                      <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
+                    </button>
+                  </div>
                 </div>
-                <span className="font-code text-[11px] text-on-surface-variant bg-surface-container px-2 py-0.5 rounded-full">
-                  8 Available
-                </span>
-              </div>
-              <p className="font-body-sm text-[11px] text-on-surface-variant">
-                Click or drag blocks onto the manuscript paper canvas.
-              </p>
+                <p className="font-body-sm text-[11px] text-on-surface-variant">
+                  Click or drag blocks onto the manuscript paper canvas.
+                </p>
 
               <div className="grid grid-cols-2 gap-2">
                 <button
@@ -649,7 +661,64 @@ export const DynamicEntryEdit: React.FC = () => {
               <span className="text-primary font-semibold">/{blueprint.slug}</span>
             </div>
           </aside>
-        )}
+        ) : (
+          <div className="w-16 border-r border-surface-container-high/60 bg-surface-container-lowest flex flex-col items-center py-3.5 shrink-0 gap-2 z-20 select-none transition-all duration-300 ease-in-out">
+            <button
+              type="button"
+              onClick={() => setShowBlockPalette(true)}
+              className="w-10 h-10 rounded-xl bg-primary-container text-primary hover:bg-primary hover:text-on-primary flex items-center justify-center transition-all shadow-xs group relative"
+              title="Expand Insert Blocks"
+            >
+              <span className="material-symbols-outlined text-[20px]">widgets</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60 flex items-center gap-2">
+                <span>Expand Insert Blocks</span>
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => setShowBlockPalette(true)}
+              className="w-10 h-7 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors"
+              title="Expand block palette"
+            >
+              <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_right</span>
+            </button>
+            <div className="w-8 h-px bg-surface-container-high/60 my-1" />
+            <button
+              type="button"
+              onClick={() => addBlock('heading')}
+              className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+              title="Insert Heading"
+            >
+              <span className="material-symbols-outlined text-[20px]">title</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+                Headings
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => addBlock('paragraph')}
+              className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+              title="Insert Paragraph"
+            >
+              <span className="material-symbols-outlined text-[20px]">text_fields</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+                Prose Paragraph
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => addBlock('image')}
+              className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+              title="Insert Media"
+            >
+              <span className="material-symbols-outlined text-[20px]">image</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+                Media Image
+              </div>
+            </button>
+          </div>
+        )
+      )}
 
         {/* PANEL 2: Center Manuscript Paper Canvas */}
         <main className="flex-1 overflow-y-auto bg-surface-container-low/40 p-6 md:p-10 flex flex-col items-center">

@@ -26,7 +26,7 @@ program.on('--help', () => {
 
 program
   .action((projectName: string = 'my-website') => {
-    console.log(`\n\x1b[36m⚡ Planfo CMS (Beta v0.1)\x1b[0m`);
+    console.log(`\n\x1b[36m⚡ Planfo CMS (v1.0.0)\x1b[0m`);
     console.log(`\x1b[90mScaffolding new database-free static CMS project in \x1b[1m${projectName}\x1b[0m...\n`);
 
     const result = createPlanfoProject({

@@ -562,7 +562,7 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
     // 6. Root README.md
     const readmeContent = `# ${settingsData.siteName}
 
-This static website was created with **Planfo CMS** (Beta v0.1) — a simple, database-free website builder.
+This static website was created with **Planfo CMS** (v1.0.0) — a simple, database-free website builder.
 
 ## Project Structure
 

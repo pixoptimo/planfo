@@ -960,10 +960,10 @@ export const PageEdit: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => setIsPaletteOpen(false)}
-                      className="text-on-surface-variant hover:text-on-surface p-0.5 rounded hover:bg-surface-container transition-colors"
+                      className="p-1 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors shrink-0"
                       title="Collapse block palette"
                     >
-                      <span className="material-symbols-outlined text-[16px]">chevron_left</span>
+                      <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_left</span>
                     </button>
                   </div>
                 </div>
@@ -1124,18 +1124,72 @@ export const PageEdit: React.FC = () => {
             </div>
           </aside>
         ) : (
-          <div className="w-12 border-r border-surface-container-high/60 bg-surface-container-lowest flex flex-col items-center py-4 shrink-0 gap-3">
+          <div className="w-16 border-r border-surface-container-high/60 bg-surface-container-lowest flex flex-col items-center py-3.5 shrink-0 gap-2 z-20 select-none transition-all duration-300 ease-in-out">
             <button
               type="button"
               onClick={() => setIsPaletteOpen(true)}
-              className="w-8 h-8 rounded-lg bg-surface-container hover:bg-primary hover:text-on-primary text-primary flex items-center justify-center transition-colors shadow-xs"
+              className="w-10 h-10 rounded-xl bg-primary-container text-primary hover:bg-primary hover:text-on-primary flex items-center justify-center transition-all shadow-xs group relative"
               title="Expand Insert Blocks (⌘K)"
             >
-              <span className="material-symbols-outlined text-[18px]">chevron_right</span>
+              <span className="material-symbols-outlined text-[20px]">widgets</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60 flex items-center gap-2">
+                <span>Expand Insert Blocks</span>
+                <span className="font-code text-[10px] text-primary bg-surface-container px-1.5 py-0.5 rounded">⌘K</span>
+              </div>
             </button>
-            <span className="[writing-mode:vertical-lr] rotate-180 font-label-xs text-label-xs uppercase tracking-widest text-outline font-semibold select-none">
-              Blocks
-            </span>
+            <button
+              type="button"
+              onClick={() => setIsPaletteOpen(true)}
+              className="w-10 h-7 rounded-lg text-on-surface-variant hover:text-on-surface hover:bg-surface-container flex items-center justify-center transition-colors"
+              title="Expand block palette"
+            >
+              <span className="material-symbols-outlined text-[18px]">keyboard_double_arrow_right</span>
+            </button>
+            <div className="w-8 h-px bg-surface-container-high/60 my-1" />
+            <button
+              type="button"
+              onClick={() => handleInsertBlock('heading')}
+              className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+              title="Insert Heading"
+            >
+              <span className="material-symbols-outlined text-[20px]">title</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+                Heading (H1/H2)
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleInsertBlock('paragraph')}
+              className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+              title="Insert Paragraph"
+            >
+              <span className="material-symbols-outlined text-[20px]">text_fields</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+                Paragraph
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleInsertBlock('image')}
+              className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+              title="Insert Media"
+            >
+              <span className="material-symbols-outlined text-[20px]">image</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+                Media Frame
+              </div>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleInsertBlock('grid')}
+              className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
+              title="Insert Grid"
+            >
+              <span className="material-symbols-outlined text-[20px]">grid_view</span>
+              <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
+                Feature Grid
+              </div>
+            </button>
           </div>
         )}
 

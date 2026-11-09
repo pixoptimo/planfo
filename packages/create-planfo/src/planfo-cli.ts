@@ -80,7 +80,7 @@ program
   .command('init [project-name]')
   .description('Initialize a new Planfo CMS project in the current or specified directory')
   .action((projectName = '.') => {
-    console.log(`\n\x1b[36m⚡ Planfo CMS Beta v0.1 — Initializing Project\x1b[0m\n`);
+    console.log(`\n\x1b[36m⚡ Planfo CMS v1.0.0 — Initializing Project\x1b[0m\n`);
     const result = createPlanfoProject({
       name: projectName === '.' ? path.basename(process.cwd()) : projectName,
       targetDir: projectName
