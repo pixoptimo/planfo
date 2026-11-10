@@ -1,13 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import type { Product, Category, RevisionMeta, ContentBlock } from '@cms/schemas';
+import type { Product, RevisionMeta, ContentBlock } from '@cms/schemas';
 import { api } from '../../api/client.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { StatusBadge } from '../../components/UI/StatusBadge.js';
 import { CategorySelector } from '../../components/Taxonomy/CategorySelector.js';
 import { SEOFields } from '../../components/SEO/SEOFields.js';
 import { slugify } from '../../utils/slugify.js';
-import { useAuth } from '../../context/AuthContext.js';
 import { useSidebar } from '../../context/SidebarContext.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { SidebarRail } from '../../components/Layout/SidebarRail.js';
@@ -75,7 +74,6 @@ export const ProductEdit: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
   const isNew = !slug || slug === 'new';
   const navigate = useNavigate();
-  const { user, can } = useAuth();
   const [slugManuallyEdited, setSlugManuallyEdited] = useState(!isNew);
 
   // Core Product Data
@@ -109,15 +107,19 @@ export const ProductEdit: React.FC = () => {
     }
   });
 
-  const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [error, setError] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [showToast, setShowToast] = useState(false);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [showPublishDropdown, setShowPublishDropdown] = useState(false);
   const [tagInput, setTagInput] = useState('');
+
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
 
   // Viewport & Studio Tabs
   const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
@@ -158,7 +160,6 @@ export const ProductEdit: React.FC = () => {
   };
 
   useEffect(() => {
-    loadCategories();
     if (!isNew && slug) {
       loadProduct(slug);
     } else {
@@ -177,15 +178,6 @@ export const ProductEdit: React.FC = () => {
     }
   }, [slug, isNew]);
 
-  const loadCategories = async () => {
-    try {
-      const data = await api.get<Category[]>('/api/categories?type=product');
-      setCategories(data);
-    } catch {
-      // ignore
-    }
-  };
-
   const loadProduct = async (prodSlug: string) => {
     setLoading(true);
     try {
@@ -193,7 +185,7 @@ export const ProductEdit: React.FC = () => {
       setProduct(data);
       pushHistory(data);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to load product');
+      triggerToast(err instanceof Error ? err.message : 'Failed to load product');
     } finally {
       setLoading(false);
     }
@@ -201,12 +193,11 @@ export const ProductEdit: React.FC = () => {
 
   const handleSave = async (publish = false) => {
     if (!product.name?.trim()) {
-      setError('Product name is required');
+      triggerToast('Product name is required');
       return;
     }
 
     setSaving(true);
-    setError(null);
 
     const targetStatus = publish ? 'published' : product.status || 'draft';
     const payload = {
@@ -218,8 +209,7 @@ export const ProductEdit: React.FC = () => {
     try {
       if (isNew) {
         const created = await api.post<Product>('/api/products', payload);
-        setToastMessage(`Product "${created.name}" created successfully!`);
-        setShowToast(true);
+        triggerToast(`Product "${created.name}" created successfully!`);
         setTimeout(() => {
           navigate(`/products/${created.slug}`, { replace: true });
         }, 600);
@@ -227,12 +217,10 @@ export const ProductEdit: React.FC = () => {
         const updated = await api.put<Product>(`/api/products/${slug}`, payload);
         setProduct(updated);
         pushHistory(updated);
-        setToastMessage('Product updated and synced live!');
-        setShowToast(true);
-        setTimeout(() => setShowToast(false), 3000);
+        triggerToast('Product updated and synced live!');
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to save product');
+      triggerToast(err instanceof Error ? err.message : 'Failed to save product');
     } finally {
       setSaving(false);
       setShowPublishDropdown(false);

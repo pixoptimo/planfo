@@ -1,10 +1,9 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
-import type { Page, RevisionMeta, ContentBlock, SEO, GridItem } from '@cms/schemas';
+import type { Page, RevisionMeta, ContentBlock } from '@cms/schemas';
 import { api } from '../../api/client.js';
 import { MediaPickerModal } from '../../components/Media/MediaPickerModal.js';
 import { slugify } from '../../utils/slugify.js';
-import { useAuth } from '../../context/AuthContext.js';
 import { useSidebar } from '../../context/SidebarContext.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { SidebarRail } from '../../components/Layout/SidebarRail.js';
@@ -220,7 +219,6 @@ export const PageEdit: React.FC = () => {
   const { slug } = useParams<{ slug?: string }>();
   const isNew = !slug || slug === 'new';
   const navigate = useNavigate();
-  const { user, can } = useAuth();
 
   // Core Page State
   const [page, setPage] = useState<Partial<Page>>({
@@ -268,7 +266,6 @@ export const PageEdit: React.FC = () => {
   // Editing & Block State
   const [activeBlockIndex, setActiveBlockIndex] = useState<number>(0);
   const [isPaletteOpen, setIsPaletteOpen] = useState(true);
-  const [editingBlockId, setEditingBlockId] = useState<string | null>(null);
 
   // History & Autosave
   const [history, setHistory] = useState<ContentBlock[][]>([]);
@@ -422,7 +419,6 @@ export const PageEdit: React.FC = () => {
     const nextBlocks = [...blocks.slice(0, insertAt), newBlock, ...blocks.slice(insertAt)];
     updateBlocks(nextBlocks);
     setActiveBlockIndex(insertAt);
-    setEditingBlockId(newBlock.id);
     triggerToast(`Inserted ${type.toUpperCase()} block`);
   };
 

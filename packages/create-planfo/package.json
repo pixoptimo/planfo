@@ -4,8 +4,8 @@
   "description": "Scaffold a new Planfo CMS project — Database-free static website builder",
   "type": "module",
   "bin": {
-    "create-planfo": "./bin/create-planfo.js",
-    "planfo": "./bin/planfo.js"
+    "create-planfo": "bin/create-planfo.js",
+    "planfo": "bin/planfo.js"
   },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
