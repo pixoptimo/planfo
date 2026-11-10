@@ -3,7 +3,7 @@
   "blueprintId": "templates",
   "title": "Trashed Template Showcase",
   "slug": "trashed-test-1792060687701",
-  "status": "draft",
+  "status": "published",
   "publishedAt": "2026-10-15T10:38:07.757Z",
   "category": "saas",
   "tags": [],
@@ -14,8 +14,33 @@
     "downloadFile": "sample-templates/trashed-test-1792060687701.html"
   },
   "content": {
-    "blocks": []
+    "blocks": [
+      {
+        "id": "block_1794238104481_qxpl",
+        "type": "heading",
+        "level": 2,
+        "text": "New Section Heading"
+      },
+      {
+        "id": "block_1794238105095_pzfa",
+        "type": "paragraph",
+        "text": "Enter your editorial narrative and paragraph content here..."
+      },
+      {
+        "id": "block_1794238105677_wkn3",
+        "type": "image",
+        "url": "",
+        "alt": "",
+        "caption": "Figure 1: Architectural diagram"
+      },
+      {
+        "id": "block_1794238114572_kfcb",
+        "type": "heading",
+        "level": 2,
+        "text": "New Section Heading"
+      }
+    ]
   },
   "createdAt": "2026-10-15T10:38:07.757Z",
-  "updatedAt": "2026-10-15T10:38:09.684Z"
+  "updatedAt": "2026-11-09T15:28:49.572Z"
 }
