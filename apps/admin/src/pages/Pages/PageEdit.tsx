@@ -1190,14 +1190,14 @@ export const PageEdit: React.FC = () => {
         )}
 
           {/* Center Stage: The Editorial Sheet Canvas with 24px side padding and inner scroll only */}
-          <main className="flex-1 overflow-y-auto px-6 py-8 flex flex-col items-center min-h-0 bg-surface">
+          <main className="flex-1 h-full overflow-y-auto px-6 py-8 flex flex-col items-center justify-start min-h-0 bg-surface">
             <div
               id="manuscriptPaper"
               ref={manuscriptRef}
               style={{
                 maxWidth: viewMode === 'mobile' ? '390px' : '100%'
               }}
-              className="w-full h-auto bg-surface-container-lowest rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-surface-container-high/40 overflow-hidden"
+              className="w-full h-auto shrink-0 bg-surface-container-lowest rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-surface-container-high/40 mb-16"
             >
               {/* Top-right floating indicator */}
               <div className="absolute -top-3 right-8 flex items-center gap-1 bg-inverse-surface text-inverse-on-surface px-2.5 py-1 rounded-full shadow-lg text-[12px] opacity-0 group-hover/canvas:opacity-100 transition-opacity select-none">
