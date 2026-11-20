@@ -431,7 +431,7 @@ export const BlueprintStudio: React.FC = () => {
 
         {/* Content Body with 24px side padding and inner scrolling only */}
         <main className="flex-1 overflow-y-auto px-6 py-6 bg-surface">
-          <div className="flex flex-col w-full max-w-7xl mx-auto">
+          <div className="flex flex-col w-full">
             {/* Sub-header Breadcrumb & Live Tokens bar */}
             <div className="w-full bg-surface-container-lowest rounded-xl px-6 py-3 flex flex-wrap items-center justify-between gap-space-md shadow-xs border border-surface-container-high/40 mb-6">
               <div className="flex items-center gap-space-sm text-body-sm font-body-sm min-w-0">
@@ -485,7 +485,7 @@ export const BlueprintStudio: React.FC = () => {
               </div>
             </div>
 
-            <div className="w-full px-space-xl py-space-lg flex flex-col gap-space-xl max-w-7xl mx-auto">
+            <div className="w-full py-space-lg flex flex-col gap-space-xl">
               {/* Hero / Title Overview Section */}
               <section className="flex flex-col lg:flex-row lg:items-end justify-between gap-space-lg">
                 <div className="flex flex-col gap-space-xs max-w-3xl">

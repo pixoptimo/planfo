@@ -51,7 +51,7 @@ export const Dashboard: React.FC = () => {
   const publishedCount = pages.filter((p) => p.status === 'published').length;
 
   return (
-    <div className="space-y-8 w-full max-w-7xl mx-auto">
+    <div className="space-y-8 w-full">
       {/* Dashboard Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>

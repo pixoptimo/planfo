@@ -70,7 +70,7 @@ export const SiteSettingsPage: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6 w-full max-w-7xl mx-auto pb-20">
+    <div className="space-y-6 w-full pb-20">
       <form onSubmit={handleSave} className="space-y-6">
         <div className="border-b border-surface-container-high/40 pb-4">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
@@ -100,8 +100,8 @@ export const SiteSettingsPage: React.FC = () => {
               type="button"
               onClick={() => setActiveTab('general')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${activeTab === 'general'
-                  ? 'bg-primary text-on-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                ? 'bg-primary text-on-primary shadow-sm'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
                 }`}
             >
               <Sliders className="w-3.5 h-3.5" />
@@ -120,8 +120,8 @@ export const SiteSettingsPage: React.FC = () => {
               type="button"
               onClick={() => setActiveTab('deployment')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${activeTab === 'deployment'
-                  ? 'bg-primary text-on-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                ? 'bg-primary text-on-primary shadow-sm'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
                 }`}
             >
               <Cloud className="w-3.5 h-3.5" />
@@ -132,8 +132,8 @@ export const SiteSettingsPage: React.FC = () => {
               type="button"
               onClick={() => setActiveTab('features')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${activeTab === 'features'
-                  ? 'bg-primary text-on-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                ? 'bg-primary text-on-primary shadow-sm'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
                 }`}
             >
               <Package className="w-3.5 h-3.5" />
@@ -144,8 +144,8 @@ export const SiteSettingsPage: React.FC = () => {
               type="button"
               onClick={() => setActiveTab('tools')}
               className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold flex items-center space-x-1.5 transition ${activeTab === 'tools'
-                  ? 'bg-primary text-on-primary shadow-sm'
-                  : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
+                ? 'bg-primary text-on-primary shadow-sm'
+                : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60'
                 }`}
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
@@ -254,8 +254,8 @@ export const SiteSettingsPage: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
               <label
                 className={`p-3 rounded-xl border cursor-pointer flex flex-col justify-between transition ${(settings.deployment?.target ?? 'local') === 'github-pages'
-                    ? 'bg-primary/10 border-primary text-primary font-semibold'
-                    : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
+                  ? 'bg-primary/10 border-primary text-primary font-semibold'
+                  : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
                   }`}
               >
                 <div className="flex items-center space-x-2 mb-1.5">
@@ -284,8 +284,8 @@ export const SiteSettingsPage: React.FC = () => {
 
               <label
                 className={`p-3 rounded-xl border cursor-pointer flex flex-col justify-between transition ${(settings.deployment?.target ?? 'local') === 'server'
-                    ? 'bg-primary/10 border-primary text-primary font-semibold'
-                    : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
+                  ? 'bg-primary/10 border-primary text-primary font-semibold'
+                  : 'bg-surface-container-low border-surface-container-high/40 text-on-surface-variant hover:border-surface-container-high/50'
                   }`}
               >
                 <div className="flex items-center space-x-2 mb-1.5">
@@ -694,8 +694,8 @@ const UrlRewriterCard: React.FC = () => {
 
       {report && (
         <div className={`p-4 rounded-xl border text-xs space-y-2 ${report.dryRun
-            ? 'bg-blue-500/10 border-blue-500/20 text-blue-800'
-            : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800'
+          ? 'bg-blue-500/10 border-blue-500/20 text-blue-800'
+          : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-800'
           }`}>
           <div className="flex items-center space-x-2 font-bold">
             <CheckCircle2 className="w-4 h-4" />

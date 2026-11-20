@@ -101,7 +101,7 @@ export const CategoryList: React.FC = () => {
   };
 
   return (
-    <div className="space-y-8 w-full max-w-7xl mx-auto font-body-md text-on-surface antialiased">
+    <div className="space-y-8 w-full font-body-md text-on-surface antialiased">
       {/* Header Banner */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-2">
         <div>

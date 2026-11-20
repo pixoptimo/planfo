@@ -462,7 +462,7 @@ export const BlueprintCreate: React.FC = () => {
 
         {/* Content Body with 24px side padding and inner scrolling only */}
         <main className="flex-1 overflow-y-auto px-6 py-6 bg-surface">
-          <div className="flex flex-col w-full max-w-7xl mx-auto">
+          <div className="flex flex-col w-full">
             {/* Top Command & Action Bar */}
             <section className="w-full bg-surface-container-lowest rounded-xl shadow-xs px-6 py-4 border border-surface-container-high/40 mb-6">
               <div className="flex flex-col md:flex-row md:items-center justify-between gap-space-md">

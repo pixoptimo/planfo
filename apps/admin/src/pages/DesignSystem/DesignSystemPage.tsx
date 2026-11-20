@@ -25,7 +25,7 @@ export const DesignSystemPage: React.FC = () => {
   };
 
   return (
-    <div className="flex flex-col w-full max-w-7xl mx-auto space-y-12 pb-16">
+    <div className="flex flex-col w-full space-y-12 pb-16">
       <Toast show={showToast} message={toastText} onClose={() => setShowToast(false)} />
 
       {/* SECTION 1: SYSTEM OVERVIEW BANNER */}

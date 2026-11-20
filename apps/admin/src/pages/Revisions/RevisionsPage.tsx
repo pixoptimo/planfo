@@ -26,7 +26,7 @@ export const RevisionsPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 w-full max-w-7xl mx-auto font-body-md text-on-surface antialiased">
+    <div className="space-y-6 w-full font-body-md text-on-surface antialiased">
       {/* Header Banner */}
       <div className="pb-2">
         <div className="flex items-center gap-2">
