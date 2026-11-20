@@ -66,7 +66,7 @@ export const AdminLayout: React.FC = () => {
   // If in Post Editor, Page Editor, Product Editor, or Blueprints Studio/Entry Editor, render the outlet directly
   if (isPostEditor || isPageEditor || isProductEditor || isBlueprintStudio || isBlueprintEntryEditor) {
     return (
-      <div className="min-h-screen bg-surface font-body-md text-on-surface antialiased">
+      <div className="h-screen bg-surface font-body-md text-on-surface antialiased overflow-hidden">
         <Outlet />
       </div>
     );
@@ -133,7 +133,7 @@ export const AdminLayout: React.FC = () => {
         </header>
 
         {/* View Body Container with 24px side padding on both sides */}
-        <main className="flex-1 overflow-y-auto px-6 py-6 bg-surface">
+        <main className="flex-1 overflow-y-auto px-6 py-6 bg-surface min-h-0">
           <Outlet />
         </main>
       </div>

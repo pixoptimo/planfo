@@ -1101,15 +1101,15 @@ export const PostEdit: React.FC = () => {
         )}
 
           {/* PANEL 2: Center Stage: Editorial Manuscript Canvas with 24px side padding and inner scroll */}
-          <main className="flex-1 h-full overflow-y-auto px-6 py-8 flex flex-col items-center justify-start">
+          <main className="flex-1 overflow-y-auto px-6 py-8 flex flex-col items-center justify-start min-h-0 bg-surface">
             <div
               ref={manuscriptRef}
               id="manuscriptPaper"
               style={{
-                maxWidth: viewportMode === 'mobile' ? '390px' : `${columnWidth}px`,
+                maxWidth: viewportMode === 'mobile' ? '390px' : '100%',
                 backgroundColor: canvasBgColor
               }}
-              className="w-full rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-outline-variant/20"
+              className="w-full h-auto rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-outline-variant/20 overflow-hidden"
             >
               {/* Hover contextual sheet badge */}
               <div className="absolute -top-3 right-8 flex items-center gap-1 bg-inverse-surface text-inverse-on-surface px-2.5 py-1 rounded-full shadow-lg text-[12px] opacity-0 group-hover/canvas:opacity-100 transition-opacity pointer-events-none">

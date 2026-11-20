@@ -721,14 +721,14 @@ export const DynamicEntryEdit: React.FC = () => {
       )}
 
         {/* PANEL 2: Center Manuscript Paper Canvas */}
-        <main className="flex-1 overflow-y-auto bg-surface-container-low/40 p-6 md:p-10 flex flex-col items-center">
+        <main className="flex-1 overflow-y-auto bg-surface-container-low/40 p-6 md:p-10 flex flex-col items-center min-h-0">
           <div
             style={{
-              maxWidth: viewportMode === 'mobile' ? '380px' : `${canvasWidth}px`,
+              maxWidth: viewportMode === 'mobile' ? '380px' : '100%',
               paddingTop: `${canvasPadding}px`,
               paddingBottom: `${canvasPadding}px`
             }}
-            className="w-full bg-white shadow-xl rounded-2xl p-8 md:p-14 border border-surface-container-high/40 transition-all duration-300 min-h-[850px] flex flex-col justify-between"
+            className="w-full h-auto bg-white shadow-xl rounded-2xl p-8 md:p-14 border border-surface-container-high/40 transition-all duration-300 flex flex-col space-y-8 overflow-hidden"
           >
             <div className="space-y-6">
               {/* Category, Status & Metadata pill */}

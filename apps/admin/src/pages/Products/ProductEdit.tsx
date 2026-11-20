@@ -674,10 +674,10 @@ export const ProductEdit: React.FC = () => {
       )}
 
         {/* Center Editorial Manuscript Canvas with 24px side padding */}
-        <main className="flex-1 overflow-y-auto px-6 py-8 flex justify-center bg-surface">
+        <main className="flex-1 overflow-y-auto px-6 py-8 flex justify-center bg-surface min-h-0">
           <div
-            style={{ width: `${canvasWidth}px` }}
-            className="w-full transition-all duration-300 bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl shadow-xl min-h-[850px] p-6 sm:p-12 flex flex-col space-y-8"
+            style={{ maxWidth: viewportMode === 'mobile' ? '390px' : '100%' }}
+            className="w-full h-auto transition-all duration-300 bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl shadow-xl p-6 sm:p-12 flex flex-col space-y-8 overflow-hidden"
           >
             {/* Top Product Identifier Tag & Status */}
             <div className="flex items-center justify-between border-b border-surface-container-high/30 pb-4">
