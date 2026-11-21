@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [v1.0.2] — 2026-11-21
+
+- fix(server): add automatic EADDRINUSE retry on listen and exact host probe (b8fc65a)
+
 ## [v1.0.1] — 2026-11-21
 
 - fix(port): dual-stack IPv4/IPv6 port collision check, dynamic Vite proxy router, and 1-click in-app Update Now button (d0d12ec)
