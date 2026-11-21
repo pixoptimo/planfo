@@ -19,26 +19,30 @@
 
 ---
 
-## Quick Start
+## Quick Start (One-Command Fresh Install)
 
-### 1. Clone & Install
+Create a **100% fresh Planfo CMS project** with a single command — no manual `git clone`, no demo blueprints, no sample clutter, and ready for the First-Run Setup Wizard:
+
+### Option A: Using `npx` (macOS, Linux, Windows)
 ```bash
-git clone https://github.com/pixoptimo/planfo.git my-website
-cd my-website
-npm install
+npx github:pixoptimo/planfo my-website
 ```
 
-### 2. Start Development Server
+### Option B: Using `curl` (macOS / Linux)
 ```bash
+curl -fsSL https://raw.githubusercontent.com/pixoptimo/planfo/main/install.sh | bash -s my-website
+```
+
+### Start Development Server
+```bash
+cd my-website
 npm run dev
 ```
 
-- **Admin Dashboard:** `http://localhost:3000/admin`
+- **Admin Dashboard:** `http://localhost:3000/admin` (launches the First-Run Setup Wizard automatically)
 - **Live Static Site:** `http://localhost:3000/`
 
-On a fresh install with no users, the **First-Run Setup Wizard** will guide you through creating your admin account.
-
-### 3. Production Build & Static Generation
+### Production Build & Static Generation
 ```bash
 npm run build
 npm run generate

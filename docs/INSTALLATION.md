@@ -19,50 +19,55 @@ git --version
 
 ---
 
-## Option 1: Fresh Standalone Project from GitHub (Recommended)
+## Option 1: One-Command Fresh Install via `npx` (Recommended)
 
-Clone the repository into a new project folder and install dependencies:
+Run a single command to download Planfo CMS, strip all demo content and custom blueprints, reset authentication for the Setup Wizard, and install dependencies automatically:
 
 ```bash
-git clone https://github.com/pixoptimo/planfo.git my-website
+npx github:pixoptimo/planfo my-website
+```
+
+*(Want to pin a specific version? Pass `--tag v1.0.0`)*:
+```bash
+npx github:pixoptimo/planfo my-website --tag v1.0.0
+```
+
+Then start developing immediately:
+```bash
 cd my-website
-npm install
-```
-
-### Reset Admin State for a Fresh Start (Optional)
-If you want the **First-Run Setup Wizard** to prompt you to create your own administrator account on first launch:
-
-```bash
-echo '{ "users": [] }' > storage/auth/users.json
-```
-
-### Start the Development Server
-```bash
 npm run dev
 ```
 
-This starts both the Express CMS API / Static Server and the Vite Admin UI concurrently:
-- **Admin Dashboard:** `http://localhost:3000/admin` (or the port printed in terminal)
+- **Admin Dashboard:** `http://localhost:3000/admin` (opens the First-Run Setup Wizard)
 - **Live Static Website:** `http://localhost:3000/`
 
 ---
 
-## Option 2: Using the Planfo CLI (`create-planfo`)
+## Option 2: One-Command Fresh Install via `curl` (macOS / Linux)
 
-If you have linked the Planfo CLI globally (`npm link packages/create-planfo`):
-
-### Download & Install a Fresh Standalone Dev Project
 ```bash
-planfo create-fresh my-website --repo https://github.com/pixoptimo/planfo.git
+curl -fsSL https://raw.githubusercontent.com/pixoptimo/planfo/main/install.sh | bash -s my-website
 cd my-website
 npm run dev
 ```
 
-### Initialize a Lightweight Content-Only Folder
+### What the Fresh Installer Cleans Automatically
+- Removes all manually created / demo blueprints from `storage/blueprints/`
+- Clears all sample pages, posts, products, demo uploads, revisions, backups, and trash
+- Initializes a single minimal `Home` page and empty categories/menus
+- Resets `storage/auth/users.json` so the **First-Run Setup Wizard** runs on first visit
+- Disables optional Feature Packs by default so you only enable what you need
+
+---
+
+## Option 3: Using the Local/Global Planfo CLI (`planfo`)
+
+If you have linked the Planfo CLI globally (`npm link packages/create-planfo`):
+
 ```bash
-planfo init my-site
-cd my-site
-planfo dev
+planfo create-fresh my-website
+cd my-website
+npm run dev
 ```
 
 ---

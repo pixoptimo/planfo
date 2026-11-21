@@ -7,6 +7,9 @@
     "type": "git",
     "url": "https://github.com/pixoptimo/planfo.git"
   },
+  "bin": {
+    "planfo": "./scripts/install.mjs"
+  },
   "type": "module",
   "workspaces": [
     "packages/*",

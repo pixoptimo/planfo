@@ -319,46 +319,24 @@ function findMonorepoRoot(): string {
 // planfo create-fresh <project-name>
 program
   .command('create-fresh <project-name>')
-  .description('Download a fresh standalone Planfo CMS development project from GitHub')
-  .option('-r, --repo <url>', 'GitHub repository URL', process.env.PLANFO_GITHUB_REPO_URL || 'https://github.com/pixoptimo/planfo.git')
-  .option('-b, --branch <branch>', 'Git branch or release tag to clone', 'main')
+  .description('Download & install a 100% fresh standalone Planfo CMS project (no demo blueprints or sample content)')
+  .option('-r, --repo <url>', 'GitHub repository slug or URL', process.env.PLANFO_GITHUB_REPO || 'pixoptimo/planfo')
+  .option('-b, --branch <branch>', 'Git branch or release tag to install', 'main')
   .action((projectName, options) => {
-    const targetDir = path.resolve(process.cwd(), projectName);
-    if (fs.existsSync(targetDir)) {
-      console.error(`\x1b[31m❌ Directory "${projectName}" already exists.\x1b[0m\n`);
-      process.exit(1);
+    const monorepoRoot = findMonorepoRoot();
+    const installerScript = path.join(monorepoRoot, 'scripts/install.mjs');
+    if (fs.existsSync(installerScript)) {
+      const child = spawn(
+        process.execPath,
+        [installerScript, projectName, '--repo', options.repo, '--branch', options.branch],
+        { stdio: 'inherit' }
+      );
+      child.on('close', (code) => process.exit(code || 0));
+      return;
     }
 
-    console.log(`\n\x1b[36m⚡ Downloading fresh Planfo CMS from ${options.repo} (${options.branch})...\x1b[0m\n`);
-    const clone = spawn('git', ['clone', '--depth', '1', '--branch', options.branch, options.repo, targetDir], {
-      stdio: 'inherit'
-    });
-
-    clone.on('close', (code) => {
-      if (code !== 0) {
-        console.error(`\x1b[31m❌ Git clone failed with exit code ${code}.\x1b[0m\n`);
-        process.exit(code || 1);
-      }
-
-      // Reset auth users so the First-Run Setup Wizard launches cleanly
-      const authUsersPath = path.join(targetDir, 'storage/auth/users.json');
-      if (fs.existsSync(path.dirname(authUsersPath))) {
-        fs.writeFileSync(authUsersPath, JSON.stringify({ users: [] }, null, 2) + '\n', 'utf-8');
-      }
-
-      console.log(`\n\x1b[36m📦 Installing dependencies...\x1b[0m\n`);
-      const install = spawn('npm', ['install'], { cwd: targetDir, stdio: 'inherit' });
-      install.on('close', (installCode) => {
-        if (installCode !== 0) {
-          console.error(`\x1b[31m❌ npm install failed.\x1b[0m\n`);
-          process.exit(installCode || 1);
-        }
-        console.log(`\n\x1b[32m✔ Fresh Planfo CMS project ready in ${targetDir}!\x1b[0m`);
-        console.log(`\nNext steps:`);
-        console.log(`  cd ${projectName}`);
-        console.log(`  npm run dev\n`);
-      });
-    });
+    console.error(`\x1b[31m❌ Installer script not found. Run: npx github:pixoptimo/planfo ${projectName}\x1b[0m\n`);
+    process.exit(1);
   });
 
 // planfo update
