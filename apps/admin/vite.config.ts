@@ -39,18 +39,22 @@ export default defineConfig({
     proxy: {
       '/api': {
         target: getTargetCmsUrl(),
+        router: () => getTargetCmsUrl(),
         changeOrigin: true
       },
       '/media': {
         target: getTargetCmsUrl(),
+        router: () => getTargetCmsUrl(),
         changeOrigin: true
       },
       '/demos': {
         target: getTargetCmsUrl(),
+        router: () => getTargetCmsUrl(),
         changeOrigin: true
       },
       '/admin/demos': {
         target: getTargetCmsUrl(),
+        router: () => getTargetCmsUrl(),
         changeOrigin: true,
         rewrite: (p) => p.replace(/^\/admin\/demos/, '/demos')
       }

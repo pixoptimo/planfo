@@ -1,17 +1,9 @@
 import net from 'node:net';
 
-/**
- * Checks if a specific port is currently available.
- * 
- * Performs a dual-check:
- * 1. Checks if another process is actively listening/responding on the port via TCP connection.
- * 2. Attempts binding to wildcard (0.0.0.0 / ::) and host to detect BSD socket collisions.
- */
-export async function isPortAvailable(port: number, host = 'localhost'): Promise<boolean> {
-  // 1. Connection check: if we can connect to 127.0.0.1:port, an active service is already running
-  const canConnect = await new Promise<boolean>((resolve) => {
-    const socket = net.createConnection({ port, host: '127.0.0.1' });
-    socket.setTimeout(250);
+function canConnectTo(port: number, host: string): Promise<boolean> {
+  return new Promise<boolean>((resolve) => {
+    const socket = net.createConnection({ port, host });
+    socket.setTimeout(200);
 
     socket.once('connect', () => {
       socket.destroy();
@@ -19,7 +11,7 @@ export async function isPortAvailable(port: number, host = 'localhost'): Promise
     });
 
     socket.once('error', () => {
-      resolve(false); // No listener
+      resolve(false);
     });
 
     socket.once('timeout', () => {
@@ -27,47 +19,57 @@ export async function isPortAvailable(port: number, host = 'localhost'): Promise
       resolve(false);
     });
   });
+}
 
-  if (canConnect) {
-    return false;
-  }
-
-  // 2. Wildcard bind check: prevents binding to ports where another app bound to wildcard
-  const wildcardFree = await new Promise<boolean>((resolve) => {
+function canBind(port: number, host?: string): Promise<boolean> {
+  return new Promise<boolean>((resolve) => {
     const server = net.createServer();
-    server.once('error', () => resolve(false));
+    server.once('error', (err: NodeJS.ErrnoException) => {
+      // If IPv6 is unavailable on this machine, ignore EADDRNOTAVAIL/EAFNOSUPPORT
+      if (host === '::1' && (err.code === 'EADDRNOTAVAIL' || err.code === 'EAFNOSUPPORT')) {
+        resolve(true);
+        return;
+      }
+      resolve(false);
+    });
     server.once('listening', () => {
       server.close(() => resolve(true));
     });
     try {
-      server.listen(port);
+      if (host) {
+        server.listen(port, host);
+      } else {
+        server.listen(port);
+      }
     } catch {
       resolve(false);
     }
   });
+}
 
-  if (!wildcardFree) {
+/**
+ * Checks if a specific port is currently available across both IPv4 and IPv6 loopback
+ * and wildcard interfaces so multiple CMS instances never collide on the same port.
+ */
+export async function isPortAvailable(port: number, host = 'localhost'): Promise<boolean> {
+  // 1. Active TCP connection checks on both IPv4 and IPv6 loopback
+  const [v4Occupied, v6Occupied] = await Promise.all([
+    canConnectTo(port, '127.0.0.1'),
+    canConnectTo(port, '::1')
+  ]);
+
+  if (v4Occupied || v6Occupied) {
     return false;
   }
 
-  // 3. Specific host check if host is not localhost or 0.0.0.0
-  if (host !== '0.0.0.0' && host !== 'localhost') {
-    const hostFree = await new Promise<boolean>((resolve) => {
-      const server = net.createServer();
-      server.once('error', () => resolve(false));
-      server.once('listening', () => {
-        server.close(() => resolve(true));
-      });
-      try {
-        server.listen(port, host);
-      } catch {
-        resolve(false);
-      }
-    });
+  // 2. Bind checks on wildcard, IPv4 loopback, and IPv6 loopback
+  if (!(await canBind(port))) return false;
+  if (!(await canBind(port, '127.0.0.1'))) return false;
+  if (!(await canBind(port, '::1'))) return false;
 
-    if (!hostFree) {
-      return false;
-    }
+  // 3. Specific custom host check if provided
+  if (host !== '0.0.0.0' && host !== 'localhost' && host !== '127.0.0.1' && host !== '::1') {
+    if (!(await canBind(port, host))) return false;
   }
 
   return true;

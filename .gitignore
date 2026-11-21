@@ -10,6 +10,7 @@ lerna-debug.log*
 # Node modules
 node_modules
 dist
+*.tsbuildinfo
 .staging*
 
 # OS Files

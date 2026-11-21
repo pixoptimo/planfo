@@ -39,11 +39,30 @@ export const SiteSettingsPage: React.FC = () => {
     status: 'up-to-date' | 'update-available' | 'offline' | 'unconfigured';
   } | null>(null);
   const [checkingUpdates, setCheckingUpdates] = useState(false);
+  const [applyingUpdate, setApplyingUpdate] = useState(false);
 
   useEffect(() => {
     loadSettings();
     fetchUpdateStatus(false);
   }, []);
+
+  const handleApplyUpdate = async () => {
+    if (!confirm(`Update Planfo CMS to v${updateInfo?.latestVersion}? Your storage/ content and themes/ will be preserved.`)) {
+      return;
+    }
+    setApplyingUpdate(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await api.post<{ updated: boolean; newVersion: string; message: string }>('/api/system/update-apply');
+      setSuccess(res?.message || 'Planfo CMS updated successfully! Restart your dev server to apply.');
+      await fetchUpdateStatus(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Update failed');
+    } finally {
+      setApplyingUpdate(false);
+    }
+  };
 
   const fetchUpdateStatus = async (force: boolean) => {
     setCheckingUpdates(true);
@@ -316,13 +335,21 @@ export const SiteSettingsPage: React.FC = () => {
               </div>
 
               {updateInfo?.hasUpdate && (
-                <div className="p-3.5 rounded-xl bg-primary-container/20 border border-primary/30 space-y-2">
-                  <p className="text-xs text-on-surface font-medium">
-                    A new version (<span className="font-mono font-bold text-primary">v{updateInfo.latestVersion}</span>) is ready. Your <code className="font-mono text-[11px] px-1 py-0.5 rounded bg-surface-container">storage/</code> content is preserved during updates. Run in your project root:
-                  </p>
-                  <pre className="p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/30 font-mono text-[11px] text-on-surface overflow-x-auto">
-                    git pull origin main && npm install && npm run build
-                  </pre>
+                <div className="p-3.5 rounded-xl bg-primary-container/20 border border-primary/30 space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <p className="text-xs text-on-surface font-medium">
+                      A new version (<span className="font-mono font-bold text-primary">v{updateInfo.latestVersion}</span>) is ready. Your <code className="font-mono text-[11px] px-1 py-0.5 rounded bg-surface-container">storage/</code> content and <code className="font-mono text-[11px] px-1 py-0.5 rounded bg-surface-container">themes/</code> are preserved automatically.
+                    </p>
+                    <button
+                      type="button"
+                      onClick={handleApplyUpdate}
+                      disabled={applyingUpdate}
+                      className="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-on-primary font-semibold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition disabled:opacity-50 shrink-0 self-start sm:self-center"
+                    >
+                      {applyingUpdate ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+                      <span>{applyingUpdate ? 'Updating CMS...' : `Update Now to v${updateInfo.latestVersion}`}</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>

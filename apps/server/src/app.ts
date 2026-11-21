@@ -5,10 +5,10 @@ import fs from 'node:fs';
 import { helmetMiddleware, corsMiddleware, csrfProtection } from './middleware/security.js';
 import { requestLogger } from './middleware/loggerMiddleware.js';
 import { errorHandler } from './middleware/errorHandler.js';
-import { apiRateLimiter } from './auth/middleware.js';
+import { apiRateLimiter, requireAuth } from './auth/middleware.js';
 import { config } from './config/env.js';
 import { systemInfo } from './systemInfo.js';
-import { checkForUpdates, getInstalledVersion, getConfiguredRepo } from './services/update-checker.js';
+import { checkForUpdates, applyCmsUpdate, getInstalledVersion, getConfiguredRepo } from './services/update-checker.js';
 
 // Import routers
 import { authRouter } from './routes/auth.routes.js';
@@ -179,6 +179,29 @@ export function createApp(): express.Application {
       success: true,
       data
     });
+  });
+
+  // One-click in-app CMS update from GitHub (Admin only)
+  app.post('/api/system/update-apply', requireAuth, async (req, res) => {
+    if (req.user?.role !== 'admin') {
+      res.status(403).json({
+        success: false,
+        error: { code: 'FORBIDDEN', message: 'Only administrators can update the CMS.' }
+      });
+      return;
+    }
+    try {
+      const result = await applyCmsUpdate();
+      res.json({ success: true, data: result });
+    } catch (err) {
+      res.status(500).json({
+        success: false,
+        error: {
+          code: 'UPDATE_FAILED',
+          message: err instanceof Error ? err.message : 'Failed to apply CMS update'
+        }
+      });
+    }
   });
 
   // Apply general rate limit to API

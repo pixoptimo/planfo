@@ -1,5 +1,7 @@
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
+import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -187,5 +189,137 @@ export async function checkForUpdates(force = false): Promise<UpdateCheckResult>
     };
     cachedResult = { data: offlineResult, expiresAt: now + 15 * 60 * 1000 };
     return offlineResult;
+  }
+}
+
+export interface UpdateApplyResult {
+  updated: boolean;
+  previousVersion: string;
+  newVersion: string;
+  message: string;
+}
+
+function findWorkspaceRootDir(): string {
+  const candidates = [
+    path.resolve(__dirname, '../../../../'),
+    path.resolve(process.cwd(), '../../'),
+    process.cwd()
+  ];
+  for (const dir of candidates) {
+    if (fs.existsSync(path.join(dir, 'package.json')) && fs.existsSync(path.join(dir, 'apps/server'))) {
+      return dir;
+    }
+  }
+  return process.cwd();
+}
+
+function removeTsBuildInfo(dir: string) {
+  if (!fs.existsSync(dir)) return;
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const full = path.join(dir, entry.name);
+    if (entry.isDirectory() && entry.name !== 'node_modules' && entry.name !== 'dist') {
+      removeTsBuildInfo(full);
+    } else if (entry.isFile() && entry.name.endsWith('.tsbuildinfo')) {
+      fs.rmSync(full, { force: true });
+    }
+  }
+}
+
+/**
+ * Downloads the latest Planfo CMS release from GitHub and updates ONLY CMS engine files
+ * (apps/, packages/, scripts/, docs/, package.json, README.md, CHANGELOG.md, install.sh)
+ * while strictly preserving storage/, themes/, generated/, and .env.
+ */
+export async function applyCmsUpdate(): Promise<UpdateApplyResult> {
+  const workspaceRoot = findWorkspaceRootDir();
+  const check = await checkForUpdates(true);
+  const previousVersion = check.currentVersion;
+  const targetVersion = check.latestVersion || previousVersion;
+  const repoSlug = check.repo || 'pixoptimo/planfo';
+
+  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), 'planfo-update-'));
+  const tarPath = path.join(tmpDir, 'release.tar.gz');
+  const extractDir = path.join(tmpDir, 'extracted');
+  fs.mkdirSync(extractDir, { recursive: true });
+
+  try {
+    // Prefer tagged archive, fallback to main branch archive
+    const urls = [
+      `https://github.com/${repoSlug}/archive/refs/tags/v${targetVersion}.tar.gz`,
+      `https://github.com/${repoSlug}/archive/refs/heads/main.tar.gz`
+    ];
+
+    let downloaded = false;
+    for (const url of urls) {
+      const res = await fetch(url, {
+        headers: { 'User-Agent': `Planfo-CMS/${previousVersion}` },
+        signal: AbortSignal.timeout(30000)
+      });
+      if (res.ok) {
+        const buf = Buffer.from(await res.arrayBuffer());
+        fs.writeFileSync(tarPath, buf);
+        downloaded = true;
+        break;
+      }
+    }
+
+    if (!downloaded) {
+      throw new Error(`Unable to download release archive from github.com/${repoSlug}`);
+    }
+
+    execSync(`tar -xzf "${tarPath}" -C "${extractDir}"`, { stdio: 'pipe' });
+    const extractedFolders = fs.readdirSync(extractDir).filter((f) => fs.statSync(path.join(extractDir, f)).isDirectory());
+    if (extractedFolders.length === 0) {
+      throw new Error('Downloaded archive was empty');
+    }
+    const sourceRoot = path.join(extractDir, extractedFolders[0]);
+
+    // Strictly copy ONLY CMS engine files — NEVER overwrite storage/, themes/, generated/, or .env
+    const enginePaths = [
+      'apps',
+      'packages',
+      'scripts',
+      'docs',
+      'package.json',
+      'package-lock.json',
+      'tsconfig.base.json',
+      'README.md',
+      'CHANGELOG.md',
+      'install.sh'
+    ];
+
+    for (const rel of enginePaths) {
+      const src = path.join(sourceRoot, rel);
+      const dest = path.join(workspaceRoot, rel);
+      if (!fs.existsSync(src)) continue;
+
+      const stat = fs.statSync(src);
+      if (stat.isDirectory()) {
+        fs.cpSync(src, dest, { recursive: true, force: true });
+      } else {
+        fs.copyFileSync(src, dest);
+      }
+    }
+
+    // Clear stale TypeScript incremental build caches
+    removeTsBuildInfo(path.join(workspaceRoot, 'packages'));
+    removeTsBuildInfo(path.join(workspaceRoot, 'apps'));
+
+    // Reinstall dependencies & rebuild all workspaces
+    execSync('npm install', { cwd: workspaceRoot, stdio: 'pipe' });
+    execSync('npm run build', { cwd: workspaceRoot, stdio: 'pipe' });
+
+    // Invalidate cached update check
+    cachedResult = null;
+    const newVersion = getInstalledVersion();
+
+    return {
+      updated: true,
+      previousVersion,
+      newVersion,
+      message: `Planfo CMS updated from v${previousVersion} to v${newVersion}. Restart your server to run the updated version.`
+    };
+  } finally {
+    fs.rmSync(tmpDir, { recursive: true, force: true });
   }
 }
