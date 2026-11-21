@@ -1,6 +1,6 @@
 {
   "name": "create-aero-cms",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Scaffold a new Aero CMS project with zero-database static architecture, modular Feature Packs, and QuickLaunch Wizard.",
   "type": "module",
   "bin": {

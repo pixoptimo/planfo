@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [v1.0.4] — 2026-11-21
+
+- fix(updater): run in-app CMS update in detached background worker with live progress polling (29cb6d6)
+
 ## [v1.0.3] — 2026-11-21
 
 - feat(admin): replace hardcoded v2.4 Live Tokens with dynamic system CMS version (e0b05b8)
