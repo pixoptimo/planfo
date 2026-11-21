@@ -25,6 +25,7 @@ Thumbs.db
 *.tmp
 *.temp
 .active-ports.json
+.update-status.json
 storage/sessions/*.json
 !storage/sessions/.gitkeep
 storage/trash/*.json

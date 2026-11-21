@@ -40,6 +40,7 @@ export const SiteSettingsPage: React.FC = () => {
   } | null>(null);
   const [checkingUpdates, setCheckingUpdates] = useState(false);
   const [applyingUpdate, setApplyingUpdate] = useState(false);
+  const [updateProgressText, setUpdateProgressText] = useState<string | null>(null);
 
   useEffect(() => {
     loadSettings();
@@ -51,16 +52,56 @@ export const SiteSettingsPage: React.FC = () => {
       return;
     }
     setApplyingUpdate(true);
+    setUpdateProgressText(`Starting update to v${updateInfo?.latestVersion}...`);
     setError(null);
     setSuccess(null);
     try {
-      const res = await api.post<{ updated: boolean; newVersion: string; message: string }>('/api/system/update-apply');
-      setSuccess(res?.message || 'Planfo CMS updated successfully! Restart your dev server to apply.');
-      await fetchUpdateStatus(true);
+      await api.post<{ started: boolean; message: string }>('/api/system/update-apply');
+
+      // Poll live progress while tolerating transient network drops during dev server restart
+      const pollStart = Date.now();
+      const poll = async () => {
+        if (Date.now() - pollStart > 180000) {
+          setApplyingUpdate(false);
+          setUpdateProgressText(null);
+          setSuccess('Update is taking longer than expected. Please refresh the page shortly.');
+          return;
+        }
+        try {
+          const prog = await api.get<{
+            status: string;
+            message?: string;
+            newVersion?: string;
+          }>('/api/system/update-status');
+
+          if (prog?.message) setUpdateProgressText(prog.message);
+
+          if (prog?.status === 'completed') {
+            setApplyingUpdate(false);
+            setUpdateProgressText(null);
+            setSuccess(prog.message || 'Planfo CMS updated successfully! Reloading...');
+            await fetchUpdateStatus(true);
+            setTimeout(() => window.location.reload(), 1500);
+            return;
+          }
+          if (prog?.status === 'error') {
+            setApplyingUpdate(false);
+            setUpdateProgressText(null);
+            setError(prog.message || 'Update failed');
+            return;
+          }
+        } catch {
+          // Server is restarting mid-update (expected under tsx watch) — keep polling
+          setUpdateProgressText('Restarting CMS server & finishing build...');
+        }
+        setTimeout(poll, 2000);
+      };
+
+      setTimeout(poll, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Update failed');
-    } finally {
       setApplyingUpdate(false);
+      setUpdateProgressText(null);
+      setError(err instanceof Error ? err.message : 'Update failed');
     }
   };
 
@@ -347,7 +388,7 @@ export const SiteSettingsPage: React.FC = () => {
                       className="px-3.5 py-1.5 bg-primary hover:bg-primary-container text-on-primary font-semibold text-xs rounded-lg flex items-center gap-1.5 shadow-sm transition disabled:opacity-50 shrink-0 self-start sm:self-center"
                     >
                       {applyingUpdate ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                      <span>{applyingUpdate ? 'Updating CMS...' : `Update Now to v${updateInfo.latestVersion}`}</span>
+                      <span>{applyingUpdate ? (updateProgressText || 'Updating CMS...') : `Update Now to v${updateInfo.latestVersion}`}</span>
                     </button>
                   </div>
                 </div>

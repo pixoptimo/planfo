@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { execSync } from 'node:child_process';
+import { execSync, spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -223,6 +223,91 @@ function removeTsBuildInfo(dir: string) {
       fs.rmSync(full, { force: true });
     }
   }
+}
+
+export interface UpdateProgressStatus {
+  status: 'idle' | 'downloading' | 'applying' | 'installing' | 'building' | 'completed' | 'error';
+  previousVersion?: string;
+  targetVersion?: string;
+  newVersion?: string;
+  message?: string;
+  updatedAt?: string;
+}
+
+export function getUpdateProgress(): UpdateProgressStatus {
+  const workspaceRoot = findWorkspaceRootDir();
+  const statusFile = path.join(workspaceRoot, '.update-status.json');
+  if (!fs.existsSync(statusFile)) {
+    return { status: 'idle' };
+  }
+  try {
+    return JSON.parse(fs.readFileSync(statusFile, 'utf-8')) as UpdateProgressStatus;
+  } catch {
+    return { status: 'idle' };
+  }
+}
+
+/**
+ * Spawns the detached background update worker (scripts/apply-update.mjs) and returns immediately
+ * so tsx watch restarts never drop the HTTP response with "Failed to fetch".
+ */
+export async function startBackgroundCmsUpdate(): Promise<{
+  started: boolean;
+  previousVersion: string;
+  targetVersion: string;
+  message: string;
+}> {
+  const workspaceRoot = findWorkspaceRootDir();
+  const check = await checkForUpdates(true);
+  const previousVersion = check.currentVersion;
+  const targetVersion = check.latestVersion || previousVersion;
+  const repoSlug = check.repo || 'pixoptimo/planfo';
+  const workerScript = path.join(workspaceRoot, 'scripts/apply-update.mjs');
+
+  if (!fs.existsSync(workerScript)) {
+    // Fallback to inline update if worker script is absent
+    const res = await applyCmsUpdate();
+    return {
+      started: true,
+      previousVersion: res.previousVersion,
+      targetVersion: res.newVersion,
+      message: res.message
+    };
+  }
+
+  const statusFile = path.join(workspaceRoot, '.update-status.json');
+  fs.writeFileSync(
+    statusFile,
+    JSON.stringify(
+      {
+        status: 'downloading',
+        previousVersion,
+        targetVersion,
+        message: `Starting update to v${targetVersion}...`,
+        updatedAt: new Date().toISOString()
+      },
+      null,
+      2
+    ),
+    'utf-8'
+  );
+
+  // Invalidate cache so post-update checks read fresh version
+  cachedResult = null;
+
+  const child = spawn(process.execPath, [workerScript, workspaceRoot, repoSlug, previousVersion, targetVersion], {
+    cwd: workspaceRoot,
+    detached: true,
+    stdio: 'ignore'
+  });
+  child.unref();
+
+  return {
+    started: true,
+    previousVersion,
+    targetVersion,
+    message: `Updating Planfo CMS from v${previousVersion} to v${targetVersion} in background...`
+  };
 }
 
 /**

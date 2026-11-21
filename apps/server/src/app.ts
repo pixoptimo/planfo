@@ -8,7 +8,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { apiRateLimiter, requireAuth } from './auth/middleware.js';
 import { config } from './config/env.js';
 import { systemInfo } from './systemInfo.js';
-import { checkForUpdates, applyCmsUpdate, getInstalledVersion, getConfiguredRepo } from './services/update-checker.js';
+import { checkForUpdates, startBackgroundCmsUpdate, getUpdateProgress, getInstalledVersion, getConfiguredRepo } from './services/update-checker.js';
 
 // Import routers
 import { authRouter } from './routes/auth.routes.js';
@@ -181,7 +181,7 @@ export function createApp(): express.Application {
     });
   });
 
-  // One-click in-app CMS update from GitHub (Admin only)
+  // One-click in-app CMS update from GitHub (Admin only — runs in detached background worker)
   app.post('/api/system/update-apply', requireAuth, async (req, res) => {
     if (req.user?.role !== 'admin') {
       res.status(403).json({
@@ -191,17 +191,22 @@ export function createApp(): express.Application {
       return;
     }
     try {
-      const result = await applyCmsUpdate();
+      const result = await startBackgroundCmsUpdate();
       res.json({ success: true, data: result });
     } catch (err) {
       res.status(500).json({
         success: false,
         error: {
           code: 'UPDATE_FAILED',
-          message: err instanceof Error ? err.message : 'Failed to apply CMS update'
+          message: err instanceof Error ? err.message : 'Failed to start CMS update'
         }
       });
     }
+  });
+
+  // Poll live background update progress
+  app.get('/api/system/update-status', (_req, res) => {
+    res.json({ success: true, data: getUpdateProgress() });
   });
 
   // Apply general rate limit to API
