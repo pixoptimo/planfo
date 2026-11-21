@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { PlanfoLogo } from '../UI/PlanfoLogo.js';
-import { ProfileDropdown } from '../UI/ProfileDropdown.js';
 import { api } from '../../api/client.js';
 import { useAuth } from '../../context/AuthContext.js';
 import { useSidebar } from '../../context/SidebarContext.js';
@@ -76,8 +75,6 @@ export const SidebarRail: React.FC = () => {
   const [customBlueprints, setCustomBlueprints] = useState<CustomBlueprintNav[]>([]);
   const [trashCount, setTrashCount] = useState<number>(0);
   const [siteName, setSiteName] = useState<string>('My Website');
-  const [liveSiteUrl, setLiveSiteUrl] = useState<string>('http://localhost:3000');
-  const [sitePort, setSitePort] = useState<number | null>(null);
 
   const loadData = () => {
     // 1. Load Custom Blueprints
@@ -104,14 +101,6 @@ export const SidebarRail: React.FC = () => {
         if (res?.siteName) {
           setSiteName(res.siteName);
         }
-      })
-      .catch(() => {});
-
-    // 4. Load System Info / Live Site URL
-    api.get<{ siteUrl: string; sitePort: number }>('/api/system/info')
-      .then((data) => {
-        if (data?.siteUrl) setLiveSiteUrl(data.siteUrl);
-        if (data?.sitePort) setSitePort(data.sitePort);
       })
       .catch(() => {});
   };
@@ -287,11 +276,11 @@ export const SidebarRail: React.FC = () => {
 
   return (
     <aside
-      className={`fixed left-0 top-0 bottom-0 ${sidebarWidthClass} bg-surface-container-lowest z-50 flex flex-col justify-between py-3 border-r border-surface-container-high/60 shadow-[0_1px_8px_rgba(0,0,0,0.04)] select-none transition-all duration-300 ease-in-out`}
+      className={`fixed left-0 top-0 bottom-0 ${sidebarWidthClass} bg-surface-container-lowest z-50 flex flex-col py-3 border-r border-surface-container-high/60 shadow-[0_1px_8px_rgba(0,0,0,0.04)] select-none transition-all duration-300 ease-in-out`}
       aria-label="Admin Sidebar Navigation"
     >
-      {/* Top Section: Brand Logo & Toggle Header */}
-      <div className="flex flex-col w-full min-h-0">
+      {/* Brand Logo, Toggle Header & Navigation */}
+      <div className="flex flex-col w-full h-full min-h-0">
         {isCollapsed ? (
           <div className="flex flex-col items-center gap-2 w-full px-2 pb-2">
             <Link
@@ -479,50 +468,6 @@ export const SidebarRail: React.FC = () => {
             );
           })}
         </nav>
-      </div>
-
-      {/* Bottom Section: Live Site Link & User Profile Dropdown */}
-      <div
-        className={`flex flex-col gap-1.5 w-full pt-2.5 border-t border-surface-container-high/60 shrink-0 ${
-          isCollapsed ? 'items-center px-2' : 'px-3'
-        }`}
-      >
-        {/* Visit Live Site Link */}
-        {isCollapsed ? (
-          <a
-            href={liveSiteUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            title="Visit Live Static Website"
-            className="relative group flex items-center justify-center w-10 h-10 rounded-xl text-on-surface-variant hover:text-primary hover:bg-surface-container transition-all"
-          >
-            <span className="material-symbols-outlined text-[20px]">open_in_new</span>
-            <div className="fixed left-20 px-2.5 py-1.5 bg-surface-container-highest text-on-surface text-xs font-semibold rounded-lg shadow-xl opacity-0 pointer-events-none group-hover:opacity-100 transition-opacity whitespace-nowrap z-50 border border-surface-container-high/60">
-              Visit Live Site ({sitePort ? `:${sitePort}` : '3001'})
-            </div>
-          </a>
-        ) : (
-          <a
-            href={liveSiteUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex items-center justify-between w-full px-3 py-1.5 rounded-xl text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors font-label-sm text-label-sm group"
-            title="Visit Live Static Website"
-          >
-            <div className="flex items-center gap-2">
-              <span className="material-symbols-outlined text-[16px] text-primary">open_in_new</span>
-              <span>Visit Live Site</span>
-            </div>
-            <span className="font-code text-[11px] text-outline group-hover:text-primary">
-              :{sitePort || 3001}
-            </span>
-          </a>
-        )}
-
-        {/* Profile Dropdown */}
-        <div className={`relative group ${isCollapsed ? 'flex justify-center' : 'w-full'}`}>
-          <ProfileDropdown />
-        </div>
       </div>
     </aside>
   );
