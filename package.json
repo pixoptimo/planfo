@@ -5,7 +5,7 @@
   "description": "Planfo CMS — Production-Ready File-Based Static CMS",
   "repository": {
     "type": "git",
-    "url": "https://github.com/planfo-cms/planfo.git"
+    "url": "https://github.com/pixoptimo/planfo.git"
   },
   "type": "module",
   "workspaces": [

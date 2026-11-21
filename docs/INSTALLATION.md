@@ -24,7 +24,7 @@ git --version
 Clone the repository into a new project folder and install dependencies:
 
 ```bash
-git clone https://github.com/<your-username>/planfo.git my-website
+git clone https://github.com/pixoptimo/planfo.git my-website
 cd my-website
 npm install
 ```
@@ -53,7 +53,7 @@ If you have linked the Planfo CLI globally (`npm link packages/create-planfo`):
 
 ### Download & Install a Fresh Standalone Dev Project
 ```bash
-planfo create-fresh my-website --repo https://github.com/<your-username>/planfo.git
+planfo create-fresh my-website --repo https://github.com/pixoptimo/planfo.git
 cd my-website
 npm run dev
 ```

@@ -42,7 +42,7 @@ function findRootPackageJson(): { version: string; repoSlug: string } {
           }
         }
 
-        return { version, repoSlug: repoSlug || 'planfo-cms/planfo' };
+        return { version, repoSlug: repoSlug || 'pixoptimo/planfo' };
       } catch {
         // continue
       }
@@ -51,7 +51,7 @@ function findRootPackageJson(): { version: string; repoSlug: string } {
 
   return {
     version: '1.0.0',
-    repoSlug: process.env.PLANFO_GITHUB_REPO || 'planfo-cms/planfo'
+    repoSlug: process.env.PLANFO_GITHUB_REPO || 'pixoptimo/planfo'
   };
 }
 

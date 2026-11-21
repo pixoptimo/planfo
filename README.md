@@ -23,7 +23,7 @@
 
 ### 1. Clone & Install
 ```bash
-git clone https://github.com/<your-username>/planfo.git my-website
+git clone https://github.com/pixoptimo/planfo.git my-website
 cd my-website
 npm install
 ```

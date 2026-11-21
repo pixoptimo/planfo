@@ -320,7 +320,7 @@ function findMonorepoRoot(): string {
 program
   .command('create-fresh <project-name>')
   .description('Download a fresh standalone Planfo CMS development project from GitHub')
-  .option('-r, --repo <url>', 'GitHub repository URL', process.env.PLANFO_GITHUB_REPO_URL || 'https://github.com/planfo-cms/planfo.git')
+  .option('-r, --repo <url>', 'GitHub repository URL', process.env.PLANFO_GITHUB_REPO_URL || 'https://github.com/pixoptimo/planfo.git')
   .option('-b, --branch <branch>', 'Git branch or release tag to clone', 'main')
   .action((projectName, options) => {
     const targetDir = path.resolve(process.cwd(), projectName);
