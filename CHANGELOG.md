@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [v1.0.5] — 2026-11-21
+
+- feat(settings): move System Updates into dedicated tab after URL Tools (9ff0352)
+
 ## [v1.0.4] — 2026-11-21
 
 - fix(updater): run in-app CMS update in detached background worker with live progress polling (29cb6d6)
