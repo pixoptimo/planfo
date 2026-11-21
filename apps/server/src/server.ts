@@ -55,9 +55,40 @@ async function startServer(): Promise<void> {
     });
   }, 60 * 60 * 1000);
 
-  // 3. Dynamically detect and allocate available CMS API port
+  // 3 & 4. Dynamically allocate an available port and bind with EADDRINUSE retry safety
   const preferredCmsPort = config.CMS_PORT;
-  const actualCmsPort = await findAvailablePort(preferredCmsPort, config.CMS_HOST, []);
+  const app = createApp();
+
+  const listenOnFreePort = async (startPort: number, host: string): Promise<{ server: Server; port: number }> => {
+    let candidate = await findAvailablePort(startPort, host, []);
+    for (let attempt = 0; attempt < 50; attempt++) {
+      try {
+        const boundServer = await new Promise<Server>((resolve, reject) => {
+          const srv = app.listen(candidate, host);
+          const onError = (err: NodeJS.ErrnoException) => {
+            srv.removeListener('listening', onListening);
+            reject(err);
+          };
+          const onListening = () => {
+            srv.removeListener('error', onError);
+            resolve(srv);
+          };
+          srv.once('error', onError);
+          srv.once('listening', onListening);
+        });
+        return { server: boundServer, port: candidate };
+      } catch (err: any) {
+        if (err?.code === 'EADDRINUSE') {
+          candidate += 1;
+          continue;
+        }
+        throw err;
+      }
+    }
+    throw new Error(`Could not bind Planfo CMS server to any open port starting from ${startPort}`);
+  };
+
+  const { server, port: actualCmsPort } = await listenOnFreePort(preferredCmsPort, config.CMS_HOST);
 
   if (actualCmsPort !== preferredCmsPort) {
     console.log('\n\x1b[43m\x1b[30m ⚠️  PORT CONFLICT NOTICE \x1b[0m');
@@ -69,20 +100,16 @@ async function startServer(): Promise<void> {
     );
   }
 
-  // 4. Create CMS Unified Server (Website, Admin & API on 1 single host/port)
-  const app = createApp();
-  const server = app.listen(actualCmsPort, config.CMS_HOST, () => {
-    const aliases = getWebsiteAliases();
-    const primaryAlias = aliases.find((a: string) => a !== 'website' && a !== 'site') || 'website';
-    logger.info(`⚡ Planfo CMS Unified Server running at http://${config.CMS_HOST}:${actualCmsPort}`);
-    logger.info(`🌐 Public Website:       http://${config.CMS_HOST}:${actualCmsPort}/`);
-    logger.info(`🌐 Website Named Alias:  http://${config.CMS_HOST}:${actualCmsPort}/${primaryAlias}/`);
-    logger.info(`🛠️  Admin Dashboard:      http://${config.CMS_HOST}:${actualCmsPort}/admin`);
-    logger.info(`🔌 REST API:             http://${config.CMS_HOST}:${actualCmsPort}/api`);
-    logger.info(`🔑 Admin Login:          admin / admin123`);
-    logger.info(`📂 Storage Root:         ${config.STORAGE_PATH}`);
-    logger.info(`🌐 Static Output:        ${config.OUTPUT_PATH}`);
-  });
+  const aliases = getWebsiteAliases();
+  const primaryAlias = aliases.find((a: string) => a !== 'website' && a !== 'site') || 'website';
+  logger.info(`⚡ Planfo CMS Unified Server running at http://${config.CMS_HOST}:${actualCmsPort}`);
+  logger.info(`🌐 Public Website:       http://${config.CMS_HOST}:${actualCmsPort}/`);
+  logger.info(`🌐 Website Named Alias:  http://${config.CMS_HOST}:${actualCmsPort}/${primaryAlias}/`);
+  logger.info(`🛠️  Admin Dashboard:      http://${config.CMS_HOST}:${actualCmsPort}/admin`);
+  logger.info(`🔌 REST API:             http://${config.CMS_HOST}:${actualCmsPort}/api`);
+  logger.info(`🔑 Admin Login:          admin / admin123`);
+  logger.info(`📂 Storage Root:         ${config.STORAGE_PATH}`);
+  logger.info(`🌐 Static Output:        ${config.OUTPUT_PATH}`);
 
   const actualSitePort = actualCmsPort;
   const actualSiteUrl = `http://${config.CMS_HOST}:${actualCmsPort}`;

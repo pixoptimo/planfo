@@ -62,13 +62,11 @@ export async function isPortAvailable(port: number, host = 'localhost'): Promise
     return false;
   }
 
-  // 2. Bind checks on wildcard, IPv4 loopback, and IPv6 loopback
+  // 2. Bind checks on wildcard, IPv4 loopback, IPv6 loopback, and exact target host
   if (!(await canBind(port))) return false;
   if (!(await canBind(port, '127.0.0.1'))) return false;
   if (!(await canBind(port, '::1'))) return false;
-
-  // 3. Specific custom host check if provided
-  if (host !== '0.0.0.0' && host !== 'localhost' && host !== '127.0.0.1' && host !== '::1') {
+  if (host && host !== '0.0.0.0' && host !== '127.0.0.1' && host !== '::1') {
     if (!(await canBind(port, host))) return false;
   }
 
