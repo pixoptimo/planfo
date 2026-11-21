@@ -30,6 +30,21 @@ function getTargetCmsUrl(): string {
   return `http://${envHost}:${envPort}`;
 }
 
+function createDynamicProxy(extra?: Record<string, unknown>) {
+  return {
+    target: getTargetCmsUrl(),
+    changeOrigin: true,
+    ...extra,
+    configure: (proxy: any) => {
+      const origWeb = proxy.web.bind(proxy);
+      proxy.web = (req: any, res: any, options: any, ...rest: any[]) => {
+        const liveTarget = getTargetCmsUrl();
+        return origWeb(req, res, { ...options, target: liveTarget }, ...rest);
+      };
+    }
+  };
+}
+
 export default defineConfig({
   base: '/admin/',
   plugins: [react() as any],
@@ -37,27 +52,12 @@ export default defineConfig({
     port: 5173,
     strictPort: false,
     proxy: {
-      '/api': {
-        target: getTargetCmsUrl(),
-        router: () => getTargetCmsUrl(),
-        changeOrigin: true
-      },
-      '/media': {
-        target: getTargetCmsUrl(),
-        router: () => getTargetCmsUrl(),
-        changeOrigin: true
-      },
-      '/demos': {
-        target: getTargetCmsUrl(),
-        router: () => getTargetCmsUrl(),
-        changeOrigin: true
-      },
-      '/admin/demos': {
-        target: getTargetCmsUrl(),
-        router: () => getTargetCmsUrl(),
-        changeOrigin: true,
-        rewrite: (p) => p.replace(/^\/admin\/demos/, '/demos')
-      }
+      '/api': createDynamicProxy(),
+      '/media': createDynamicProxy(),
+      '/demos': createDynamicProxy(),
+      '/admin/demos': createDynamicProxy({
+        rewrite: (p: string) => p.replace(/^\/admin\/demos/, '/demos')
+      })
     }
   }
 });

@@ -13,7 +13,7 @@ const program = new Command();
 program
   .name('planfo')
   .description('Planfo CMS CLI — Database-free static website manager')
-  .version('1.0.0');
+  .version('1.0.1');
 
 program.on('--help', () => {
   console.log(`
@@ -73,7 +73,7 @@ program
   .command('init [project-name]')
   .description('Initialize a new Planfo CMS project in the current or specified directory')
   .action((projectName = '.') => {
-    console.log(`\n\x1b[36m⚡ Planfo CMS v1.0.0 — Initializing Project\x1b[0m\n`);
+    console.log(`\n\x1b[36m⚡ Planfo CMS v1.0.1 — Initializing Project\x1b[0m\n`);
     const result = createPlanfoProject({
       name: projectName === '.' ? path.basename(process.cwd()) : projectName,
       targetDir: projectName
