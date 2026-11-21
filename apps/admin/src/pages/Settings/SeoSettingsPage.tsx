@@ -16,7 +16,8 @@ import {
   Share2,
   Cloud,
   Package,
-  ArrowRightLeft
+  ArrowRightLeft,
+  RefreshCw
 } from 'lucide-react';
 import type { SiteSettings, SEO } from '@cms/schemas';
 import { api } from '../../api/client.js';
@@ -183,6 +184,14 @@ export const SeoSettingsPage: React.FC = () => {
             >
               <ArrowRightLeft className="w-3.5 h-3.5" />
               <span>URL Tools</span>
+            </Link>
+
+            <Link
+              to="/settings?tab=updates"
+              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high/60 flex items-center space-x-1.5 transition"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>System Updates</span>
             </Link>
           </div>
         </div>

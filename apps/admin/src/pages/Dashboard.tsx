@@ -156,7 +156,7 @@ export const Dashboard: React.FC = () => {
               Release Notes
             </a>
             <Link
-              to="/settings"
+              to="/settings?tab=updates"
               className="px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface hover:text-primary font-label-sm text-label-sm font-semibold border border-outline-variant/30 transition-colors"
             >
               Update Info
