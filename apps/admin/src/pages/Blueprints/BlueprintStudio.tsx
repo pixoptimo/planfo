@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext.js';
 import { useSidebar } from '../../context/SidebarContext.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { SidebarRail } from '../../components/Layout/SidebarRail.js';
+import { CMS_VERSION } from '../../utils/version.js';
 import { FEATURE_PACKS } from '../../data/featurePacks.js';
 
 interface EnrichedBlueprint extends Blueprint {
@@ -393,7 +394,7 @@ export const BlueprintStudio: React.FC = () => {
               </div>
               <span className="px-space-xs py-0.5 rounded bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                v2.4 Live Tokens
+                v{CMS_VERSION}
               </span>
             </div>
 
@@ -452,7 +453,7 @@ export const BlueprintStudio: React.FC = () => {
                 <span className="text-primary font-semibold">Schema Architect</span>
                 <span className="ml-space-sm inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container font-code text-code text-primary font-medium">
                   <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                  v2.4 Live Tokens
+                  v{CMS_VERSION}
                 </span>
               </div>
               <div className="flex items-center gap-space-sm">
@@ -1206,7 +1207,7 @@ export const BlueprintStudio: React.FC = () => {
               <pre className="whitespace-pre-wrap leading-relaxed">
 {`// ==========================================
 // AUTO-GENERATED BLUEPRINT SCHEMA TYPINGS
-// Planfo Static CMS AST Engine • v2.4 Live
+// Planfo Static CMS AST Engine • v${CMS_VERSION}
 // ==========================================
 
 export interface PageCollection {

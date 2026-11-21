@@ -7,6 +7,7 @@ import { useAuth } from '../../context/AuthContext.js';
 import { useSidebar } from '../../context/SidebarContext.js';
 import { ProfileDropdown } from '../../components/UI/ProfileDropdown.js';
 import { SidebarRail } from '../../components/Layout/SidebarRail.js';
+import { CMS_VERSION } from '../../utils/version.js';
 import { FEATURE_PACKS } from '../../data/featurePacks.js';
 
 const AVAILABLE_ICONS = [
@@ -426,7 +427,7 @@ export const BlueprintCreate: React.FC = () => {
               </div>
               <span className="px-space-xs py-0.5 rounded bg-surface-container font-label-sm text-label-sm text-on-surface-variant font-medium flex items-center gap-1.5 whitespace-nowrap">
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-                v2.4 Live Tokens
+                v{CMS_VERSION}
               </span>
             </div>
 

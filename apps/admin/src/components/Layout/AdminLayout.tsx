@@ -6,6 +6,7 @@ import { useSidebar } from '../../context/SidebarContext.js';
 import { api } from '../../api/client.js';
 import { SidebarRail } from './SidebarRail.js';
 import { ProfileDropdown } from '../UI/ProfileDropdown.js';
+import { CMS_VERSION } from '../../utils/version.js';
 import type { PublishResult } from '@cms/types';
 
 export const AdminLayout: React.FC = () => {
@@ -34,12 +35,14 @@ export const AdminLayout: React.FC = () => {
   const [showPublishModal, setShowPublishModal] = useState(false);
   const [liveSiteUrl, setLiveSiteUrl] = useState('http://localhost:3000');
   const [sitePort, setSitePort] = useState<number | null>(null);
+  const [cmsVersion, setCmsVersion] = useState<string>(CMS_VERSION);
 
   useEffect(() => {
-    api.get<{ siteUrl: string; sitePort: number }>('/api/system/info')
+    api.get<{ siteUrl: string; sitePort: number; version?: string }>('/api/system/info')
       .then((data) => {
         if (data?.siteUrl) setLiveSiteUrl(data.siteUrl);
         if (data?.sitePort) setSitePort(data.sitePort);
+        if (data?.version) setCmsVersion(data.version);
       })
       .catch(() => {});
   }, []);
@@ -93,7 +96,7 @@ export const AdminLayout: React.FC = () => {
             <div className="h-4 w-px bg-surface-container-high/60 hidden sm:block" />
             <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container font-label-xs text-label-xs text-primary font-semibold shrink-0 hidden sm:inline-flex">
               <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              v2.4 Live Tokens
+              v{cmsVersion}
             </span>
           </div>
 

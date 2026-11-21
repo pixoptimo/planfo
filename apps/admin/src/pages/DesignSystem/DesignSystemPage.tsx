@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { CMS_VERSION } from '../../utils/version.js';
 import { Toast } from '../../components/DesignSystem/Toast.js';
 
 export const DesignSystemPage: React.FC = () => {
@@ -841,7 +842,7 @@ export const DesignSystemPage: React.FC = () => {
               <span className="material-symbols-outlined text-[24px]">verified</span>
             </div>
             <div>
-              <h4 className="font-headline-sm text-headline-sm text-on-surface">Editorial Design System v2.4 Compliant</h4>
+              <h4 className="font-headline-sm text-headline-sm text-on-surface">Planfo Design System v{CMS_VERSION}</h4>
               <p className="font-body-sm text-body-sm text-on-surface-variant">
                 Validated for high-velocity multi-pane publication desktops, newsrooms, and longform reading canvases.
               </p>

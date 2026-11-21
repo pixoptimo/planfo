@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext.js';
+import { CMS_VERSION } from '../../utils/version.js';
 
 interface ProfileDropdownProps {
   className?: string;
@@ -86,7 +87,7 @@ export const ProfileDropdown: React.FC<ProfileDropdownProps> = ({ className = ''
                 <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
                 {roleName}
               </span>
-              <span className="text-[10px] text-on-surface-variant font-code">v2.4 Active</span>
+              <span className="text-[10px] text-on-surface-variant font-code">v{CMS_VERSION}</span>
             </div>
           </div>
 

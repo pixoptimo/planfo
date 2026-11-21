@@ -45,8 +45,27 @@ function createDynamicProxy(extra?: Record<string, unknown>) {
   };
 }
 
+function getCmsVersion(): string {
+  const candidates = [
+    path.resolve(__dirname, '../../package.json'),
+    path.resolve(__dirname, 'package.json')
+  ];
+  for (const pkgPath of candidates) {
+    try {
+      if (fs.existsSync(pkgPath)) {
+        const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'));
+        if (pkg.version) return String(pkg.version);
+      }
+    } catch {}
+  }
+  return '1.0.0';
+}
+
 export default defineConfig({
   base: '/admin/',
+  define: {
+    __CMS_VERSION__: JSON.stringify(getCmsVersion())
+  },
   plugins: [react() as any],
   server: {
     port: 5173,
