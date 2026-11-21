@@ -155,6 +155,22 @@ export const SidebarRail: React.FC = () => {
         }
       ]
     },
+    ...(customBlueprints.length > 0
+      ? [
+          {
+            title: 'COLLECTIONS',
+            items: customBlueprints.map((bp) => ({
+              to: `/blueprints/${bp.slug}`,
+              label: bp.name,
+              icon: getBlueprintMaterialIcon(bp.icon),
+              show: true,
+              badge: bp.entryCount && bp.entryCount > 0 ? bp.entryCount : undefined,
+              badgeColor: 'primary' as const,
+              isActiveCheck: () => isBlueprintActive(bp.slug)
+            }))
+          }
+        ]
+      : []),
     {
       title: 'BLUEPRINTS & TAXONOMY',
       items: [
@@ -181,22 +197,6 @@ export const SidebarRail: React.FC = () => {
         }
       ]
     },
-    ...(customBlueprints.length > 0
-      ? [
-          {
-            title: 'COLLECTIONS',
-            items: customBlueprints.map((bp) => ({
-              to: `/blueprints/${bp.slug}`,
-              label: bp.name,
-              icon: getBlueprintMaterialIcon(bp.icon),
-              show: true,
-              badge: bp.entryCount && bp.entryCount > 0 ? bp.entryCount : undefined,
-              badgeColor: 'primary' as const,
-              isActiveCheck: () => isBlueprintActive(bp.slug)
-            }))
-          }
-        ]
-      : []),
     {
       title: 'ASSETS & NAV',
       items: [
