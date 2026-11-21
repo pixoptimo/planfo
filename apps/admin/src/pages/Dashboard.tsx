@@ -12,12 +12,23 @@ interface BlueprintSummary {
   entryCount?: number;
 }
 
+interface UpdateCheckInfo {
+  currentVersion: string;
+  latestVersion: string | null;
+  hasUpdate: boolean;
+  releaseUrl: string;
+  releaseNotes: string;
+  status: 'up-to-date' | 'update-available' | 'offline' | 'unconfigured';
+}
+
 export const Dashboard: React.FC = () => {
   const { can } = useAuth();
   const [pages, setPages] = useState<Page[]>([]);
   const [posts, setPosts] = useState<Post[]>([]);
   const [blueprints, setBlueprints] = useState<BlueprintSummary[]>([]);
   const [mediaCount, setMediaCount] = useState<number>(0);
+  const [updateInfo, setUpdateInfo] = useState<UpdateCheckInfo | null>(null);
+  const [dismissedUpdate, setDismissedUpdate] = useState(false);
   const [loading, setLoading] = useState(true);
   const [building, setBuilding] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
@@ -28,16 +39,18 @@ export const Dashboard: React.FC = () => {
 
   const loadDashboardData = async () => {
     try {
-      const [pagesRes, postsRes, blueprintsRes, mediaRes] = await Promise.all([
+      const [pagesRes, postsRes, blueprintsRes, mediaRes, updateRes] = await Promise.all([
         api.get<Page[]>('/api/pages').catch(() => []),
         api.get<Post[]>('/api/posts').catch(() => []),
         api.get<BlueprintSummary[]>('/api/blueprints').catch(() => []),
-        api.get<unknown[]>('/api/media').catch(() => [])
+        api.get<unknown[]>('/api/media').catch(() => []),
+        api.get<UpdateCheckInfo>('/api/system/update-check').catch(() => null)
       ]);
       setPages(Array.isArray(pagesRes) ? pagesRes : []);
       setPosts(Array.isArray(postsRes) ? postsRes : []);
       setBlueprints(Array.isArray(blueprintsRes) ? blueprintsRes.filter((b) => !b.isBuiltIn) : []);
       setMediaCount(Array.isArray(mediaRes) ? mediaRes.length : 0);
+      if (updateRes) setUpdateInfo(updateRes);
     } finally {
       setLoading(false);
     }
@@ -111,6 +124,54 @@ export const Dashboard: React.FC = () => {
           )}
         </div>
       </div>
+
+      {/* CMS Update Available Notification Banner */}
+      {updateInfo?.hasUpdate && !dismissedUpdate && (
+        <div className="p-4 rounded-2xl bg-primary-container/25 border border-primary/30 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start sm:items-center gap-3">
+            <div className="w-9 h-9 rounded-xl bg-primary text-on-primary flex items-center justify-center shrink-0 shadow-xs">
+              <span className="material-symbols-outlined text-[20px]">system_update</span>
+            </div>
+            <div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="font-label-md text-label-md font-bold text-on-surface">
+                  Planfo CMS v{updateInfo.latestVersion} is available
+                </span>
+                <span className="px-2 py-0.5 rounded-full bg-surface-container-lowest text-primary font-code text-[11px] font-semibold">
+                  Installed: v{updateInfo.currentVersion}
+                </span>
+              </div>
+              <p className="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+                A newer release is published on GitHub. Review release notes or update from Settings.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0 self-end sm:self-center">
+            <a
+              href={updateInfo.releaseUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-3.5 py-1.5 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-semibold hover:bg-primary-container transition-colors"
+            >
+              Release Notes
+            </a>
+            <Link
+              to="/settings"
+              className="px-3 py-1.5 rounded-lg bg-surface-container-lowest text-on-surface hover:text-primary font-label-sm text-label-sm font-semibold border border-outline-variant/30 transition-colors"
+            >
+              Update Info
+            </Link>
+            <button
+              type="button"
+              onClick={() => setDismissedUpdate(true)}
+              className="p-1.5 text-on-surface-variant hover:text-on-surface"
+              title="Dismiss notification"
+            >
+              ✕
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Action Notification */}
       {actionMessage && (

@@ -29,10 +29,41 @@ export const SiteSettingsPage: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   const [activeMediaTarget, setActiveMediaTarget] = useState<'logo' | 'favicon' | null>(null);
+  const [updateInfo, setUpdateInfo] = useState<{
+    currentVersion: string;
+    latestVersion: string | null;
+    hasUpdate: boolean;
+    releaseUrl: string;
+    repo: string;
+    checkedAt: string;
+    status: 'up-to-date' | 'update-available' | 'offline' | 'unconfigured';
+  } | null>(null);
+  const [checkingUpdates, setCheckingUpdates] = useState(false);
 
   useEffect(() => {
     loadSettings();
+    fetchUpdateStatus(false);
   }, []);
+
+  const fetchUpdateStatus = async (force: boolean) => {
+    setCheckingUpdates(true);
+    try {
+      const data = await api.get<{
+        currentVersion: string;
+        latestVersion: string | null;
+        hasUpdate: boolean;
+        releaseUrl: string;
+        repo: string;
+        checkedAt: string;
+        status: 'up-to-date' | 'update-available' | 'offline' | 'unconfigured';
+      }>(`/api/system/update-check${force ? '?force=true' : ''}`);
+      if (data) setUpdateInfo(data);
+    } catch {
+      // ignore offline
+    } finally {
+      setCheckingUpdates(false);
+    }
+  };
 
   const loadSettings = async () => {
     try {
@@ -234,6 +265,66 @@ export const SiteSettingsPage: React.FC = () => {
                   <div className="w-11 h-6 bg-surface-container peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-outline-variant after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary"></div>
                 </label>
               </div>
+            </div>
+
+            {/* CMS Version & Updates Panel */}
+            <div className="pt-4 border-t border-surface-container-high/40 space-y-3">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider font-mono flex items-center gap-2">
+                    <span>Planfo CMS Version & Updates</span>
+                    {updateInfo?.hasUpdate ? (
+                      <span className="px-2 py-0.5 rounded-full bg-primary/15 text-primary text-[10px] font-bold">
+                        Update Available: v{updateInfo.latestVersion}
+                      </span>
+                    ) : updateInfo?.status === 'up-to-date' ? (
+                      <span className="px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-700 text-[10px] font-bold">
+                        Up to Date
+                      </span>
+                    ) : null}
+                  </h3>
+                  <p className="text-[11px] text-on-surface-variant mt-0.5">
+                    Installed version: <strong className="font-mono text-on-surface">v{updateInfo?.currentVersion || '1.0.0'}</strong>
+                    {updateInfo?.latestVersion && (
+                      <> • Latest on GitHub: <strong className="font-mono text-on-surface">v{updateInfo.latestVersion}</strong></>
+                    )}
+                    {updateInfo?.status === 'offline' && <> • Unable to reach GitHub right now</>}
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-2 self-start sm:self-center">
+                  <button
+                    type="button"
+                    onClick={() => fetchUpdateStatus(true)}
+                    disabled={checkingUpdates}
+                    className="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high text-on-surface font-semibold text-xs rounded-lg flex items-center gap-1.5 transition disabled:opacity-50"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${checkingUpdates ? 'animate-spin' : ''}`} />
+                    <span>{checkingUpdates ? 'Checking...' : 'Check for Updates'}</span>
+                  </button>
+                  {updateInfo?.releaseUrl && (
+                    <a
+                      href={updateInfo.releaseUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3 py-1.5 bg-primary/10 hover:bg-primary/20 text-primary font-semibold text-xs rounded-lg transition"
+                    >
+                      GitHub Releases
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {updateInfo?.hasUpdate && (
+                <div className="p-3.5 rounded-xl bg-primary-container/20 border border-primary/30 space-y-2">
+                  <p className="text-xs text-on-surface font-medium">
+                    A new version (<span className="font-mono font-bold text-primary">v{updateInfo.latestVersion}</span>) is ready. Your <code className="font-mono text-[11px] px-1 py-0.5 rounded bg-surface-container">storage/</code> content is preserved during updates. Run in your project root:
+                  </p>
+                  <pre className="p-2.5 rounded-lg bg-surface-container-lowest border border-outline-variant/30 font-mono text-[11px] text-on-surface overflow-x-auto">
+                    git pull origin main && npm install && npm run build
+                  </pre>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -13,35 +13,28 @@ const program = new Command();
 program
   .name('planfo')
   .description('Planfo CMS CLI — Database-free static website manager')
-  .version('0.1.0');
+  .version('1.0.0');
 
 program.on('--help', () => {
   console.log(`
 \x1b[1mExamples:\x1b[0m
-  $ planfo init my-site          Initialize a new Planfo website project
+  $ planfo create-fresh my-site  Download & install a fresh standalone Planfo CMS from GitHub
+  $ planfo init my-site          Initialize a lightweight Planfo website folder
   $ cd my-site
   $ planfo dev                   Start Planfo CMS on http://localhost:3000
   $ planfo dev -p 4000           Start Planfo CMS on a custom port
   $ planfo build                 Compile static HTML/CSS into generated/
   $ planfo preview               Preview website and admin on http://localhost:3000
+  $ planfo update                Check GitHub and update your Planfo CMS installation
   $ planfo reset-admin           Reset/restore admin login to admin/admin123
   $ planfo publish               Build and publish static output to GitHub Pages
 
-\x1b[1m\x1b[33mImportant Note:\x1b[0m
-  Planfo website projects are database-free and intentionally \x1b[1mDO NOT\x1b[0m contain a package.json file.
-  \x1b[31m✖ Do NOT run 'npm run dev' inside your website project folder!\x1b[0m
-    (Doing so causes: npm error enoent Could not read package.json)
-  \x1b[32m✔ Run 'planfo dev' instead.\x1b[0m
-
 \x1b[1mTroubleshooting & Global Setup:\x1b[0m
   If the 'planfo' command is not recognized globally on your system:
-  1. Link it globally from the CMS Monorepo:
-     $ cd "/Users/bejoynj/Downloads/Static CMS/CMS Project"
+  1. Link it globally from your Planfo CMS folder:
      $ npm link packages/create-planfo
-  2. Or run it directly via Node:
-     $ node "<CMS-Monorepo>/packages/create-planfo/bin/planfo.js" dev
-  3. Or run it from the CMS Monorepo targeting your website folder:
-     $ npm run planfo -- dev "/path/to/your-website"
+  2. Or run it directly via npm scripts:
+     $ npm run planfo -- dev
 `);
 });
 
@@ -322,5 +315,70 @@ function findMonorepoRoot(): string {
   }
   return candidate;
 }
+
+// planfo create-fresh <project-name>
+program
+  .command('create-fresh <project-name>')
+  .description('Download a fresh standalone Planfo CMS development project from GitHub')
+  .option('-r, --repo <url>', 'GitHub repository URL', process.env.PLANFO_GITHUB_REPO_URL || 'https://github.com/planfo-cms/planfo.git')
+  .option('-b, --branch <branch>', 'Git branch or release tag to clone', 'main')
+  .action((projectName, options) => {
+    const targetDir = path.resolve(process.cwd(), projectName);
+    if (fs.existsSync(targetDir)) {
+      console.error(`\x1b[31m❌ Directory "${projectName}" already exists.\x1b[0m\n`);
+      process.exit(1);
+    }
+
+    console.log(`\n\x1b[36m⚡ Downloading fresh Planfo CMS from ${options.repo} (${options.branch})...\x1b[0m\n`);
+    const clone = spawn('git', ['clone', '--depth', '1', '--branch', options.branch, options.repo, targetDir], {
+      stdio: 'inherit'
+    });
+
+    clone.on('close', (code) => {
+      if (code !== 0) {
+        console.error(`\x1b[31m❌ Git clone failed with exit code ${code}.\x1b[0m\n`);
+        process.exit(code || 1);
+      }
+
+      // Reset auth users so the First-Run Setup Wizard launches cleanly
+      const authUsersPath = path.join(targetDir, 'storage/auth/users.json');
+      if (fs.existsSync(path.dirname(authUsersPath))) {
+        fs.writeFileSync(authUsersPath, JSON.stringify({ users: [] }, null, 2) + '\n', 'utf-8');
+      }
+
+      console.log(`\n\x1b[36m📦 Installing dependencies...\x1b[0m\n`);
+      const install = spawn('npm', ['install'], { cwd: targetDir, stdio: 'inherit' });
+      install.on('close', (installCode) => {
+        if (installCode !== 0) {
+          console.error(`\x1b[31m❌ npm install failed.\x1b[0m\n`);
+          process.exit(installCode || 1);
+        }
+        console.log(`\n\x1b[32m✔ Fresh Planfo CMS project ready in ${targetDir}!\x1b[0m`);
+        console.log(`\nNext steps:`);
+        console.log(`  cd ${projectName}`);
+        console.log(`  npm run dev\n`);
+      });
+    });
+  });
+
+// planfo update
+program
+  .command('update')
+  .description('Pull the latest Planfo CMS updates from GitHub and rebuild')
+  .action(() => {
+    const monorepoRoot = findMonorepoRoot();
+    console.log(`\n\x1b[36m⚡ Updating Planfo CMS in ${monorepoRoot}...\x1b[0m\n`);
+    const child = spawn('sh', ['-c', 'git pull origin main && npm install && npm run build'], {
+      cwd: monorepoRoot,
+      stdio: 'inherit'
+    });
+    child.on('close', (code) => {
+      if (code === 0) {
+        console.log(`\n\x1b[32m✔ Planfo CMS updated successfully!\x1b[0m\n`);
+      } else {
+        console.error(`\n\x1b[31m❌ Update failed with exit code ${code}.\x1b[0m\n`);
+      }
+    });
+  });
 
 program.parse(process.argv);

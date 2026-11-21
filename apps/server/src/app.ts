@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/errorHandler.js';
 import { apiRateLimiter } from './auth/middleware.js';
 import { config } from './config/env.js';
 import { systemInfo } from './systemInfo.js';
+import { checkForUpdates, getInstalledVersion, getConfiguredRepo } from './services/update-checker.js';
 
 // Import routers
 import { authRouter } from './routes/auth.routes.js';
@@ -158,6 +159,8 @@ export function createApp(): express.Application {
     res.json({
       success: true,
       data: {
+        version: getInstalledVersion(),
+        repository: getConfiguredRepo(),
         cmsHost: systemInfo.cmsHost,
         cmsPort: systemInfo.cmsPort,
         cmsUrl: systemInfo.cmsUrl,
@@ -165,6 +168,16 @@ export function createApp(): express.Application {
         siteUrl: systemInfo.siteUrl,
         isStaticServerRunning: systemInfo.isStaticServerRunning
       }
+    });
+  });
+
+  // Check GitHub for newer CMS releases
+  app.get('/api/system/update-check', async (req, res) => {
+    const force = req.query.force === 'true';
+    const data = await checkForUpdates(force);
+    res.json({
+      success: true,
+      data
     });
   });
 

@@ -1,8 +1,12 @@
 {
-  "name": "static-cms-monorepo",
+  "name": "planfo",
   "version": "1.0.0",
   "private": true,
-  "description": "Production-Ready File-Based Static CMS",
+  "description": "Planfo CMS — Production-Ready File-Based Static CMS",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/planfo-cms/planfo.git"
+  },
   "type": "module",
   "workspaces": [
     "packages/*",
@@ -22,6 +26,7 @@
     "seed": "npx tsx scripts/seed-sample-content.ts",
     "create-admin": "npx tsx scripts/create-admin.ts",
     "reset-admin": "npx tsx scripts/reset-admin.ts",
+    "release": "npx tsx scripts/release.ts",
     "test": "vitest run"
   },
   "devDependencies": {
