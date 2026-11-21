@@ -140,80 +140,6 @@ const createDefaultBlock = (type: string): ContentBlock => {
   }
 };
 
-// Initial default blocks matching the user's reference HTML
-const getInitialDefaultBlocks = (): ContentBlock[] => [
-  {
-    id: 'block_intro_p',
-    type: 'paragraph',
-    text: "At Planfo, we believe publishing interfaces shouldn't require compromise between boundless creative expression and rigorous systemic architecture. Rather than treating layouts as arbitrary combinations of static canvas elements, our paradigm binds layout primitives, typographic cadence, and autonomous editorial toolchains into a singular fluid craft."
-  },
-  {
-    id: 'block_hero_img',
-    type: 'image',
-    url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
-    alt: 'Company Headquarters & Modernist Design Studio',
-    caption: 'Fig 1.1: Company Headquarters & Modernist Design Studio'
-  },
-  {
-    id: 'block_middle_p',
-    type: 'paragraph',
-    text: 'When editorial organizations unify around responsive atomic blocks, cross-functional velocity accelerates naturally. Newsrooms, corporate communications, and high-growth venture publications can ship intricate story packages without engineering backlogs or fragile custom code.'
-  },
-  {
-    id: 'block_quote',
-    type: 'blockquote',
-    text: '“Great pages don’t constrain storytelling; they empower content teams to ship with architectural dignity and zero engineering bottlenecks.”',
-    citation: '— Planfo Design Manifesto • The Next Decade of Editorial Craft'
-  },
-  {
-    id: 'block_pillars_grid',
-    type: 'grid',
-    columns: 3,
-    items: [
-      {
-        id: 'pillar_1',
-        icon: '01',
-        badge: '#secondary',
-        title: 'Modular Blocks',
-        text: 'Compose multi-layered layouts with plug-and-play editorial components.',
-        buttonText: '',
-        buttonUrl: ''
-      },
-      {
-        id: 'pillar_2',
-        icon: '02',
-        badge: '#secondary-container',
-        title: 'Dynamic Routing',
-        text: 'Instant path remapping and sub-millisecond edge pre-rendering.',
-        buttonText: '',
-        buttonUrl: ''
-      },
-      {
-        id: 'pillar_3',
-        icon: '03',
-        badge: '#primary',
-        title: 'SEO & OpenGraph',
-        text: 'Engineered metadata schema generation validated on every keystroke.',
-        buttonText: '',
-        buttonUrl: ''
-      }
-    ]
-  },
-  {
-    id: 'block_conclusion_p',
-    type: 'paragraph',
-    text: 'Our mandate as builders is to furnish an uncompromising standard for digital longevity. Pages created inside Planfo are ready for the modern web: semantic, lightning fast, and typographically sublime.'
-  },
-  {
-    id: 'block_cta_syndicate',
-    type: 'button',
-    text: 'Join Our Syndicate / Contact Us',
-    url: '#',
-    variant: 'primary',
-    target: '_self'
-  }
-];
-
 export const PageEdit: React.FC = () => {
   const { mainPaddingClass } = useSidebar();
   const { slug } = useParams<{ slug?: string }>();
@@ -222,31 +148,17 @@ export const PageEdit: React.FC = () => {
 
   // Core Page State
   const [page, setPage] = useState<Partial<Page>>({
-    title: isNew ? 'About Planfo & The Next Decade of Digital Publishing' : '',
-    slug: isNew ? 'about-us-company' : '',
+    title: '',
+    slug: '',
     status: 'draft',
     template: 'default',
-    content: { blocks: isNew ? getInitialDefaultBlocks() : [] },
-    featuredImage:
-      'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+    content: { blocks: [] },
+    featuredImage: '',
     noIndex: false,
-    seo: {
-      title: isNew ? 'About Planfo & The Next Decade of Digital Publishing' : '',
-      description: isNew
-        ? 'Systemic page structures, modular layouts, and headless publishing workflows for editorial and product teams.'
-        : '',
-      canonical: '',
-      ogTitle: '',
-      ogDescription: '',
-      ogImage: '',
-      robots: 'index,follow',
-      noIndex: false
-    }
+    seo: { ...DEFAULT_SEO }
   });
 
-  const [subtitle, setSubtitle] = useState(
-    'Systemic page structures, modular layouts, and headless publishing workflows for editorial and product teams.'
-  );
+  const [subtitle, setSubtitle] = useState('');
 
   // Inspector & Viewport State
   const [activeTab, setActiveTab] = useState<'settings' | 'seo'>('settings');
@@ -270,7 +182,7 @@ export const PageEdit: React.FC = () => {
   // History & Autosave
   const [history, setHistory] = useState<ContentBlock[][]>([]);
   const [historyIndex, setHistoryIndex] = useState<number>(-1);
-  const [saveStatus, setSaveStatus] = useState<string>('Auto-synced 1m ago');
+  const [saveStatus, setSaveStatus] = useState<string>(isNew ? 'Unsaved draft' : 'Synced');
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
   const [showPublishDropdown, setShowPublishDropdown] = useState(false);
@@ -358,9 +270,6 @@ export const PageEdit: React.FC = () => {
               { id: 'b1', type: 'paragraph', text: String((data.content as any).html) }
             ];
           }
-          if (loadedBlocks.length === 0) {
-            loadedBlocks = getInitialDefaultBlocks();
-          }
           setPage((prev) => ({
             ...prev,
             content: { blocks: loadedBlocks }
@@ -370,7 +279,7 @@ export const PageEdit: React.FC = () => {
           }
           setHistory([JSON.parse(JSON.stringify(loadedBlocks))]);
           setHistoryIndex(0);
-          setSaveStatus('Auto-synced just now');
+          setSaveStatus('Synced');
         })
         .catch((err) => {
           triggerToast(err instanceof Error ? err.message : 'Failed to load page');
@@ -379,8 +288,7 @@ export const PageEdit: React.FC = () => {
           setLoading(false);
         });
     } else {
-      const initial = getInitialDefaultBlocks();
-      setHistory([JSON.parse(JSON.stringify(initial))]);
+      setHistory([[]]);
       setHistoryIndex(0);
     }
   }, [slug, isNew]);

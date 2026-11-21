@@ -152,13 +152,6 @@ export const SidebarRail: React.FC = () => {
           icon: 'menu_book',
           show: can('posts.read'),
           isActiveCheck: (p) => p.startsWith('/posts')
-        },
-        {
-          to: '/products',
-          label: 'Products',
-          icon: 'shopping_bag',
-          show: can('products.read'),
-          isActiveCheck: (p) => p.startsWith('/products') || p.startsWith('/templates')
         }
       ]
     },

@@ -1,26 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import type { Page } from '@cms/schemas';
+import type { Page, Post } from '@cms/schemas';
 import { api } from '../api/client.js';
 import { useAuth } from '../context/AuthContext.js';
 
+interface BlueprintSummary {
+  id: string;
+  name: string;
+  slug: string;
+  isBuiltIn?: boolean;
+  entryCount?: number;
+}
+
 export const Dashboard: React.FC = () => {
-  const { user, can } = useAuth();
+  const { can } = useAuth();
   const [pages, setPages] = useState<Page[]>([]);
+  const [posts, setPosts] = useState<Post[]>([]);
+  const [blueprints, setBlueprints] = useState<BlueprintSummary[]>([]);
+  const [mediaCount, setMediaCount] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [building, setBuilding] = useState(false);
   const [actionMessage, setActionMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
 
   useEffect(() => {
-    loadPages();
+    loadDashboardData();
   }, []);
 
-  const loadPages = async () => {
+  const loadDashboardData = async () => {
     try {
-      const data = await api.get<Page[]>('/api/pages');
-      setPages(Array.isArray(data) ? data : []);
-    } catch {
-      // Fallback
+      const [pagesRes, postsRes, blueprintsRes, mediaRes] = await Promise.all([
+        api.get<Page[]>('/api/pages').catch(() => []),
+        api.get<Post[]>('/api/posts').catch(() => []),
+        api.get<BlueprintSummary[]>('/api/blueprints').catch(() => []),
+        api.get<unknown[]>('/api/media').catch(() => [])
+      ]);
+      setPages(Array.isArray(pagesRes) ? pagesRes : []);
+      setPosts(Array.isArray(postsRes) ? postsRes : []);
+      setBlueprints(Array.isArray(blueprintsRes) ? blueprintsRes.filter((b) => !b.isBuiltIn) : []);
+      setMediaCount(Array.isArray(mediaRes) ? mediaRes.length : 0);
     } finally {
       setLoading(false);
     }
@@ -50,6 +67,12 @@ export const Dashboard: React.FC = () => {
   const draftsCount = pages.filter((p) => p.status === 'draft').length;
   const publishedCount = pages.filter((p) => p.status === 'published').length;
 
+  const postsCount = posts.length;
+  const publishedPostsCount = posts.filter((p) => p.status === 'published').length;
+  const draftPostsCount = posts.filter((p) => p.status === 'draft').length;
+
+  const totalCollectionEntries = blueprints.reduce((sum, bp) => sum + (bp.entryCount || 0), 0);
+
   return (
     <div className="space-y-8 w-full">
       {/* Dashboard Header Banner */}
@@ -57,7 +80,7 @@ export const Dashboard: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <span className="font-label-xs text-label-xs uppercase tracking-widest text-primary font-bold">
-              00 / Overview
+              Overview
             </span>
             <span className="h-1.5 w-1.5 rounded-full bg-primary animate-pulse" />
           </div>
@@ -111,50 +134,43 @@ export const Dashboard: React.FC = () => {
 
       {/* Core Studio Metric Cards Grid */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {/* Metric 1: Readership Analytics with SVG Sparkline */}
-        <div className="rounded-2xl p-6 bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between space-y-4">
+        {/* Metric 1: Editorial Posts */}
+        <Link
+          to="/posts"
+          className="rounded-2xl p-6 bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between space-y-4 hover:border-primary/40 transition-colors group"
+        >
           <div>
             <div className="flex items-center justify-between">
               <span className="font-label-xs text-label-xs uppercase tracking-widest text-on-surface-variant font-bold">
-                Readership Analytics
+                Editorial Posts
               </span>
-              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined text-[18px]">trending_up</span>
+              <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
+                <span className="material-symbols-outlined text-[18px]">menu_book</span>
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="font-headline-xl text-headline-xl text-on-surface font-normal">84.2k</span>
-              <span className="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-xs text-label-xs font-bold">
-                +18.4%
+              <span className="font-headline-xl text-headline-xl text-on-surface font-normal">
+                {loading ? '...' : postsCount}
+              </span>
+              <span className="font-body-sm text-body-sm text-on-surface-variant">total articles</span>
+            </div>
+            <div className="pt-2 flex items-center gap-2">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-highest text-primary font-label-xs text-label-xs font-semibold">
+                {publishedPostsCount} Published
+              </span>
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-xs text-label-xs font-medium">
+                {draftPostsCount} Drafts
               </span>
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant pt-1">
-              Monthly long-form article completions
-            </p>
           </div>
 
-          <div className="h-14 w-full pt-2">
-            <svg className="w-full h-full text-primary" fill="none" preserveAspectRatio="none" viewBox="0 0 280 60">
-              <path
-                d="M0 45 C 40 45, 60 20, 100 25 C 140 30, 160 5, 200 12 C 240 18, 260 2, 280 5"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="3"
-                strokeLinecap="round"
-              />
-              <path
-                d="M0 45 C 40 45, 60 20, 100 25 C 140 30, 160 5, 200 12 C 240 18, 260 2, 280 5 L 280 60 L 0 60 Z"
-                fill="currentColor"
-                fillOpacity="0.08"
-              />
-            </svg>
+          <div className="pt-4 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs border-t border-outline-variant/10">
+            <span>storage/content/posts/</span>
+            <span className="text-primary font-semibold group-hover:translate-x-1 transition-transform">
+              Manage posts →
+            </span>
           </div>
-
-          <div className="pt-2 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs border-t border-outline-variant/10">
-            <span>Target: 100k / mo</span>
-            <span className="text-primary font-semibold">On Track (92%)</span>
-          </div>
-        </div>
+        </Link>
 
         {/* Metric 2: Pages & Documents */}
         <Link
@@ -164,7 +180,7 @@ export const Dashboard: React.FC = () => {
           <div>
             <div className="flex items-center justify-between">
               <span className="font-label-xs text-label-xs uppercase tracking-widest text-on-surface-variant font-bold">
-                Content Composition
+                Site Pages
               </span>
               <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary group-hover:bg-primary-container group-hover:text-on-primary-container transition-colors">
                 <span className="material-symbols-outlined text-[18px]">article</span>
@@ -187,52 +203,55 @@ export const Dashboard: React.FC = () => {
           </div>
 
           <div className="pt-4 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs border-t border-outline-variant/10">
-            <span>planfo/content/pages/</span>
+            <span>storage/content/pages/</span>
             <span className="text-primary font-semibold group-hover:translate-x-1 transition-transform">
               Manage pages →
             </span>
           </div>
         </Link>
 
-        {/* Metric 3: Static Delivery Readiness */}
+        {/* Metric 3: Collections, Media & Static Build */}
         <div className="rounded-2xl p-6 bg-surface-container-lowest shadow-sm border border-outline-variant/20 flex flex-col justify-between space-y-4">
           <div>
             <div className="flex items-center justify-between">
               <span className="font-label-xs text-label-xs uppercase tracking-widest text-on-surface-variant font-bold">
-                Static Engine Health
+                Collections & Media
               </span>
               <div className="w-8 h-8 rounded-lg bg-surface-container flex items-center justify-center text-primary">
-                <span className="material-symbols-outlined text-[18px]">bolt</span>
+                <span className="material-symbols-outlined text-[18px]">schema</span>
               </div>
             </div>
             <div className="mt-3 flex items-baseline gap-2">
-              <span className="font-headline-xl text-headline-xl text-primary font-normal">100%</span>
-              <span className="px-2 py-0.5 rounded-full bg-surface-container text-primary font-label-xs text-label-xs font-bold">
-                Zero Runtime
+              <span className="font-headline-xl text-headline-xl text-on-surface font-normal">
+                {loading ? '...' : totalCollectionEntries}
+              </span>
+              <span className="font-body-sm text-body-sm text-on-surface-variant">
+                entries in {blueprints.length} collections
               </span>
             </div>
-            <p className="font-body-sm text-body-sm text-on-surface-variant pt-1">
-              Atomic staging swap active • Zero database overhead
-            </p>
+            <div className="pt-2 flex items-center gap-2">
+              <Link
+                to="/blueprints/studio"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-highest text-primary font-label-xs text-label-xs font-semibold hover:underline"
+              >
+                {blueprints.length} Blueprints
+              </Link>
+              <Link
+                to="/media"
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container text-on-surface-variant font-label-xs text-label-xs font-medium hover:text-primary"
+              >
+                {mediaCount} Media Assets
+              </Link>
+            </div>
           </div>
 
-          <div className="space-y-2">
-            <div className="w-full bg-surface-container h-2 rounded-full overflow-hidden">
-              <div className="bg-primary h-full rounded-full w-full" />
-            </div>
-            <div className="flex items-center justify-between font-label-xs text-label-xs text-on-surface-variant">
-              <span>WCAG AAA Certified</span>
-              <span className="text-primary font-semibold">100/100 Lighthouse Ready</span>
-            </div>
-          </div>
-
-          <div className="pt-2 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs border-t border-outline-variant/10">
-            <span>Instant Compilation</span>
+          <div className="pt-4 flex items-center justify-between text-on-surface-variant font-label-xs text-label-xs border-t border-outline-variant/10">
+            <span>Static Site Generator</span>
             <button
               type="button"
               onClick={handleBuild}
               disabled={building}
-              className="text-primary font-semibold hover:underline"
+              className="text-primary font-semibold hover:underline disabled:opacity-50"
             >
               {building ? 'Building...' : 'Recompile site →'}
             </button>

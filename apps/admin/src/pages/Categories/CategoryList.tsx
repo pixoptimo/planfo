@@ -107,7 +107,7 @@ export const CategoryList: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <span className="font-label-xs text-label-xs uppercase tracking-widest text-primary font-bold">
-              04 / Taxonomy & Indexing
+              Taxonomy & Indexing
             </span>
             <span className="h-1.5 w-1.5 rounded-full bg-primary" />
           </div>

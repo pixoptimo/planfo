@@ -136,18 +136,16 @@ export const PostEdit: React.FC = () => {
 
   // Core Post Data
   const [post, setPost] = useState<Partial<Post>>({
-    title: isNew ? 'The Evolution of Design Systems in Autonomous Workflows' : '',
-    slug: isNew ? 'evolution-of-design-systems' : '',
-    excerpt: isNew
-      ? 'A practical framework for scaling typographic cadence, token consistency, and fluid layouts across distributed engineering and generative product teams.'
-      : '',
-    author: user?.name || user?.email || 'Elena Rostova',
-    category: 'technology',
-    tags: ['DesignSystems', 'Typography', 'Architecture'],
+    title: '',
+    slug: '',
+    excerpt: '',
+    author: user?.name || user?.email || '',
+    category: 'general',
+    tags: [],
     status: 'draft',
     template: 'default',
     content: { blocks: [] },
-    featuredImage: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
+    featuredImage: '',
     seo: {
       title: '',
       description: '',
@@ -165,8 +163,8 @@ export const PostEdit: React.FC = () => {
   const [tagInput, setTagInput] = useState('');
   const [loading, setLoading] = useState(!isNew);
   const [saving, setSaving] = useState(false);
-  const [saveStatus, setSaveStatus] = useState<string>('Auto-synced 1m ago');
-  const [activeInspectorTab, setActiveInspectorTab] = useState<'design' | 'settings'>('design');
+  const [saveStatus, setSaveStatus] = useState<string>(isNew ? 'Unsaved draft' : 'Synced');
+  const [activeInspectorTab, setActiveInspectorTab] = useState<'settings' | 'seo'>('settings');
   const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
@@ -176,16 +174,6 @@ export const PostEdit: React.FC = () => {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [showBlockPalette, setShowBlockPalette] = useState(true);
-
-  // Design Inspector Controls State
-  const [columnWidth, setColumnWidth] = useState<number>(720);
-  const [headlineFont, setHeadlineFont] = useState<'Newsreader' | 'Inter' | 'Plus Jakarta Sans'>('Newsreader');
-  const [bodyFont, setBodyFont] = useState<'Inter' | 'Newsreader' | 'Plus Jakarta Sans'>('Inter');
-  const [fontSizeHeading, setFontSizeHeading] = useState<'32px' | '36px' | '40px' | '48px'>('36px');
-  const [fontSizeBody, setFontSizeBody] = useState<'15px' | '16px' | '18px'>('18px');
-  const [textAlignment, setTextAlignment] = useState<'left' | 'center' | 'justify'>('left');
-  const [canvasBgColor, setCanvasBgColor] = useState<string>('#FFFFFF');
-  const [tokenSearch, setTokenSearch] = useState<string>('');
 
   // History Stack for Undo/Redo
   const [history, setHistory] = useState<Array<ContentBlock[]>>([]);
@@ -270,85 +258,7 @@ export const PostEdit: React.FC = () => {
     if (!isNew && slug) {
       loadPost(slug);
     } else {
-      // Seed default editorial blocks matching Reference 2
-      const defaultBlocks: ContentBlock[] = [
-        {
-          id: 'p1',
-          type: 'paragraph',
-          text: 'In an era where modern interfaces evolve in fractions of seconds through programmatic synthesis and model-driven assembly, the foundational tenets of typography and typographic cadence are not relics—they are our most dependable structural anchors. Rather than relying on arbitrary pixel choices, systematic design mandates that whitespace behaves as a functional variable, orchestrating cognitive calm amidst information density.'
-        },
-        {
-          id: 'img1',
-          type: 'image',
-          url: 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=1200&q=80',
-          alt: 'A clean architectural photograph of modern brutalist concrete structures paired with smooth glass panels and natural light casting rhythmic geometric shadows on a white studio gallery floor.',
-          caption: 'Fig 1.1: Geometric modulation and structural whitespace in modern architecture.   ISO 400 • 50mm'
-        },
-        {
-          id: 'p2',
-          type: 'paragraph',
-          text: 'When teams unify around atomic layout primitives, component ergonomics shift from rigid styling specifications into resilient relational contracts. Layouts adapt fluidly without fracturing reading rhythms, ensuring that an editorial piece reads with the deliberate dignity of hand-set letterpress, whether consumed on an ultrawide canvas or an ambient mobile viewport.'
-        },
-        {
-          id: 'quote1',
-          type: 'blockquote',
-          text: '“Great systems don’t constrain creativity; they liberate designers and engineers from repeatedly solving solved problems.”',
-          citation: '— Systems Manifesto, Vol. IV • Design Principles Chapter'
-        },
-        {
-          id: 'grid1',
-          type: 'grid',
-          columns: 3,
-          items: [
-            {
-              id: 'tk1',
-              icon: '01',
-              badge: '#primary',
-              title: 'Cadence over Clutter',
-              text: 'Lock all vertical margins strictly to modular line-height multiples.',
-              buttonText: '',
-              buttonUrl: ''
-            },
-            {
-              id: 'tk2',
-              icon: '02',
-              badge: '#secondary',
-              title: 'Intentional Tokens',
-              text: 'Colors express semantic role hierarchy, never decorative mood boards.',
-              buttonText: '',
-              buttonUrl: ''
-            },
-            {
-              id: 'tk3',
-              icon: '03',
-              badge: '#tertiary',
-              title: 'Adaptive Shells',
-              text: 'Decouple reading columns from dynamic auxiliary toolchains.',
-              buttonText: '',
-              buttonUrl: ''
-            }
-          ]
-        },
-        {
-          id: 'p3',
-          type: 'paragraph',
-          text: 'As autonomous tooling continues to generate code and visual patterns in real time, our mandate as architects is to establish uncompromising benchmarks for editorial legibility and tonal composure. The future belongs not to louder interfaces, but to sharper ones.'
-        },
-        {
-          id: 'cta1',
-          type: 'button',
-          text: 'Subscribe to Dispatch',
-          url: '#',
-          variant: 'primary',
-          target: '_self'
-        }
-      ];
-
-      setPost((prev) => ({
-        ...prev,
-        content: { blocks: defaultBlocks }
-      }));
-      setHistory([defaultBlocks]);
+      setHistory([[]]);
       setHistoryIndex(0);
     }
   }, [slug, isNew]);
@@ -1106,10 +1016,9 @@ export const PostEdit: React.FC = () => {
               ref={manuscriptRef}
               id="manuscriptPaper"
               style={{
-                maxWidth: viewportMode === 'mobile' ? '390px' : '100%',
-                backgroundColor: canvasBgColor
+                maxWidth: viewportMode === 'mobile' ? '390px' : '100%'
               }}
-              className="w-full h-auto shrink-0 rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-outline-variant/20 mb-16"
+              className="w-full h-auto shrink-0 bg-surface-container-lowest rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-outline-variant/20 mb-16"
             >
               {/* Hover contextual sheet badge */}
               <div className="absolute -top-3 right-8 flex items-center gap-1 bg-inverse-surface text-inverse-on-surface px-2.5 py-1 rounded-full shadow-lg text-[12px] opacity-0 group-hover/canvas:opacity-100 transition-opacity pointer-events-none">
@@ -1142,13 +1051,7 @@ export const PostEdit: React.FC = () => {
                     setSaveStatus('Unsaved changes');
                   }}
                   placeholder="Enter Article Headline..."
-                  className="w-full text-on-surface mb-3 tracking-tight bg-transparent focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 -mx-1"
-                  style={{
-                    fontFamily: headlineFont,
-                    fontSize: fontSizeHeading,
-                    lineHeight: '1.2',
-                    fontWeight: 500
-                  }}
+                  className="w-full font-serif text-[36px] leading-[1.2] font-medium text-on-surface mb-3 tracking-tight bg-transparent focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 -mx-1"
                 />
 
                 {/* Inline Editable Subtitle / Excerpt */}
@@ -1159,26 +1062,22 @@ export const PostEdit: React.FC = () => {
                     setPost((prev) => ({ ...prev, excerpt: e.target.value }));
                     setSaveStatus('Unsaved changes');
                   }}
-                  placeholder="Draft a provocative summary to invite reader immersion..."
-                  className="w-full text-on-surface-variant italic mb-6 leading-relaxed bg-transparent focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 -mx-1 resize-none"
-                  style={{
-                    fontFamily: bodyFont,
-                    fontSize: fontSizeBody
-                  }}
+                  placeholder="Write a concise summary or excerpt for this article..."
+                  className="w-full text-[17px] text-on-surface-variant italic mb-6 leading-relaxed bg-transparent focus:outline-none focus:ring-1 focus:ring-primary/30 rounded px-1 -mx-1 resize-none"
                 />
 
                 {/* Byline Strip with Author Avatar & Date */}
                 <div className="flex items-center justify-between py-3 bg-surface-container-low px-4 rounded-lg">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm shadow-sm">
-                      {post.author?.[0] || 'E'}
+                    <div className="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-label-sm shadow-sm uppercase">
+                      {(post.author || user?.name || user?.email || 'A')[0]}
                     </div>
                     <div className="flex flex-col">
                       <span className="font-label-md text-label-md text-on-surface font-semibold">
-                        {post.author || 'Elena Rostova'}
+                        {post.author || user?.name || user?.email || 'Author'}
                       </span>
-                      <span className="font-body-sm text-body-sm text-on-surface-variant">
-                        Principal Director of Design Architecture
+                      <span className="font-body-sm text-body-sm text-on-surface-variant capitalize">
+                        {user?.role || 'Editorial Author'}
                       </span>
                     </div>
                   </div>
@@ -1193,7 +1092,7 @@ export const PostEdit: React.FC = () => {
               <div className="w-full h-px bg-surface-container-high mb-6" />
 
               {/* Rendered Block Flow */}
-              <article className="space-y-6 text-on-surface" style={{ textAlign: textAlignment }}>
+              <article className="space-y-6 text-on-surface">
                 {blocks.map((block, idx) => {
                   const isSelected = selectedBlockId === block.id;
 
@@ -1263,12 +1162,10 @@ export const PostEdit: React.FC = () => {
                             value={block.text || ''}
                             onChange={(e) => updateBlock(block.id, { text: e.target.value })}
                             placeholder="Heading text..."
-                            className="w-full text-on-surface tracking-tight bg-transparent focus:outline-none"
+                            className="w-full font-serif text-on-surface tracking-tight bg-transparent focus:outline-none font-semibold"
                             style={{
-                              fontFamily: headlineFont,
-                              fontSize: block.level === 1 ? fontSizeHeading : block.level === 2 ? '28px' : '22px',
-                              lineHeight: '1.25',
-                              fontWeight: 600
+                              fontSize: block.level === 1 ? '32px' : block.level === 2 ? '26px' : '21px',
+                              lineHeight: '1.25'
                             }}
                           />
                         </div>
@@ -1280,11 +1177,7 @@ export const PostEdit: React.FC = () => {
                           value={block.text || ''}
                           onChange={(e) => updateBlock(block.id, { text: e.target.value })}
                           placeholder="Write paragraph..."
-                          className="w-full leading-relaxed text-on-surface bg-transparent focus:outline-none resize-none"
-                          style={{
-                            fontFamily: bodyFont,
-                            fontSize: fontSizeBody
-                          }}
+                          className="w-full text-[16px] leading-relaxed text-on-surface bg-transparent focus:outline-none resize-none"
                         />
                       )}
 
@@ -1304,7 +1197,6 @@ export const PostEdit: React.FC = () => {
                               className="font-body-sm text-body-sm text-on-surface-variant bg-transparent focus:outline-none flex-1"
                             />
                             <div className="flex items-center gap-2">
-                              <span className="font-code text-code text-on-surface-variant">ISO 400 • 50mm</span>
                               <button
                                 type="button"
                                 onClick={(e) => {
@@ -1329,8 +1221,7 @@ export const PostEdit: React.FC = () => {
                             value={block.text || ''}
                             onChange={(e) => updateBlock(block.id, { text: e.target.value })}
                             placeholder="Enter pull quote..."
-                            className="w-full font-headline-md text-headline-md italic text-on-surface leading-snug bg-transparent focus:outline-none resize-none"
-                            style={{ fontFamily: headlineFont }}
+                            className="w-full font-serif font-headline-md text-headline-md italic text-on-surface leading-snug bg-transparent focus:outline-none resize-none"
                           />
                           <footer className="mt-2 font-label-md text-label-md text-on-surface-variant not-italic flex items-center gap-2">
                             <input
@@ -1609,17 +1500,6 @@ export const PostEdit: React.FC = () => {
               <div className="flex items-center p-1 bg-surface-container-low rounded-lg w-full">
                 <button
                   type="button"
-                  onClick={() => setActiveInspectorTab('design')}
-                  className={`flex-1 py-1.5 text-center font-label-md text-label-md rounded-md transition-all ${
-                    activeInspectorTab === 'design'
-                      ? 'bg-surface-container-lowest text-on-surface shadow-xs font-semibold'
-                      : 'text-on-surface-variant hover:text-on-surface'
-                  }`}
-                >
-                  Design
-                </button>
-                <button
-                  type="button"
                   onClick={() => setActiveInspectorTab('settings')}
                   className={`flex-1 py-1.5 text-center font-label-md text-label-md rounded-md transition-all ${
                     activeInspectorTab === 'settings'
@@ -1627,287 +1507,45 @@ export const PostEdit: React.FC = () => {
                       : 'text-on-surface-variant hover:text-on-surface'
                   }`}
                 >
-                  Settings
+                  Post Settings
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setActiveInspectorTab('seo')}
+                  className={`flex-1 py-1.5 text-center font-label-md text-label-md rounded-md transition-all ${
+                    activeInspectorTab === 'seo'
+                      ? 'bg-surface-container-lowest text-on-surface shadow-xs font-semibold'
+                      : 'text-on-surface-variant hover:text-on-surface'
+                  }`}
+                >
+                  SEO & Social
                 </button>
               </div>
             </div>
 
             {/* Inspector Scrollable Controls */}
-            <div className="flex-1 overflow-y-auto px-4 py-2 space-y-6">
-              {activeInspectorTab === 'design' ? (
-                <>
-                  {/* Search properties */}
-                  <div className="relative">
-                    <span className="material-symbols-outlined absolute left-2.5 top-2.5 text-[18px] text-on-surface-variant">
-                      search
-                    </span>
-                    <input
-                      type="text"
-                      value={tokenSearch}
-                      onChange={(e) => setTokenSearch(e.target.value)}
-                      placeholder="Search tokens & properties..."
-                      className="w-full pl-9 pr-3 py-2 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface placeholder:text-on-surface-variant focus:outline-none focus:ring-1 focus:ring-primary"
-                    />
-                  </div>
-
-                  {/* Section: Palette & Tokens */}
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
-                        Palette & Tokens
-                      </span>
-                      <span className="material-symbols-outlined text-[16px] text-on-surface-variant">palette</span>
-                    </div>
-
-                    <div className="space-y-2 pt-1">
-                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
-                        <span className="font-body-sm text-body-sm text-on-surface">Background</span>
-                        <div className="flex items-center gap-2">
-                          <button
-                            type="button"
-                            className="w-5 h-5 rounded shadow-xs ring-1 ring-outline-variant/30 cursor-pointer"
-                            style={{ backgroundColor: canvasBgColor }}
-                            onClick={() => {
-                              const next = canvasBgColor === '#FFFFFF' ? '#FAF8FF' : canvasBgColor === '#FAF8FF' ? '#F4EAFF' : '#FFFFFF';
-                              setCanvasBgColor(next);
-                            }}
-                            title="Cycle canvas background"
-                          />
-                          <span className="font-code text-code text-on-surface font-medium">{canvasBgColor}</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
-                        <span className="font-body-sm text-body-sm text-on-surface">Text Primary</span>
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded bg-on-surface shadow-xs" />
-                          <span className="font-code text-code text-on-surface font-medium">#201636</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
-                        <div className="flex items-center gap-1">
-                          <span className="font-body-sm text-body-sm text-on-surface">Primary Accent</span>
-                          <span className="material-symbols-outlined text-[14px] text-on-surface-variant" title="Brand token">
-                            info
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded bg-primary shadow-xs" />
-                          <span className="font-code text-code text-on-surface font-medium">#5427E6</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
-                        <span className="font-body-sm text-body-sm text-on-surface">Secondary Coral</span>
-                        <div className="flex items-center gap-2">
-                          <span className="w-5 h-5 rounded bg-secondary-container shadow-xs" />
-                          <span className="font-code text-code text-on-surface font-medium">#FF6B6B</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section: Typography Hierarchy */}
-                  <div className="space-y-2 pt-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
-                        Typography Hierarchy
-                      </span>
-                      <span className="material-symbols-outlined text-[16px] text-on-surface-variant">format_size</span>
-                    </div>
-
-                    <div className="space-y-3 pt-1">
-                      <div>
-                        <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
-                          Headline Font Family
-                        </label>
-                        <select
-                          value={headlineFont}
-                          onChange={(e) => setHeadlineFont(e.target.value as any)}
-                          className="w-full p-2 bg-surface-container-low rounded-lg text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                        >
-                          <option value="Newsreader">Newsreader (Editorial Serif)</option>
-                          <option value="Inter">Inter (Clean Modern Sans)</option>
-                          <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
-                        </select>
-                      </div>
-
-                      <div>
-                        <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
-                          Body Text Family
-                        </label>
-                        <select
-                          value={bodyFont}
-                          onChange={(e) => setBodyFont(e.target.value as any)}
-                          className="w-full p-2 bg-surface-container-low rounded-lg text-on-surface font-body-sm text-body-sm focus:outline-none focus:ring-1 focus:ring-primary"
-                        >
-                          <option value="Inter">Inter (Modern Sans)</option>
-                          <option value="Newsreader">Newsreader (Serif Reading)</option>
-                          <option value="Plus Jakarta Sans">Plus Jakarta Sans</option>
-                        </select>
-                      </div>
-
-                      <div className="grid grid-cols-2 gap-2">
-                        <div>
-                          <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
-                            Heading Size
-                          </label>
-                          <select
-                            value={fontSizeHeading}
-                            onChange={(e) => setFontSizeHeading(e.target.value as any)}
-                            className="w-full p-2 bg-surface-container-low rounded-lg text-on-surface font-code text-code focus:outline-none focus:ring-1 focus:ring-primary"
-                          >
-                            <option value="32px">32px</option>
-                            <option value="36px">36px</option>
-                            <option value="40px">40px</option>
-                            <option value="48px">48px</option>
-                          </select>
-                        </div>
-                        <div>
-                          <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
-                            Body Size
-                          </label>
-                          <select
-                            value={fontSizeBody}
-                            onChange={(e) => setFontSizeBody(e.target.value as any)}
-                            className="w-full p-2 bg-surface-container-low rounded-lg text-on-surface font-code text-code focus:outline-none focus:ring-1 focus:ring-primary"
-                          >
-                            <option value="15px">15px</option>
-                            <option value="16px">16px</option>
-                            <option value="18px">18px</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Formatting Toolstrip */}
-                      <div className="flex items-center justify-between bg-surface-container-low p-1 rounded-lg">
-                        <button
-                          type="button"
-                          className="p-1.5 rounded bg-surface-container-lowest text-on-surface shadow-xs font-bold text-[14px]"
-                          title="Bold"
-                        >
-                          B
-                        </button>
-                        <button
-                          type="button"
-                          className="p-1.5 rounded text-on-surface-variant hover:text-on-surface italic text-[14px]"
-                          title="Italic"
-                        >
-                          I
-                        </button>
-                        <button
-                          type="button"
-                          className="p-1.5 rounded text-on-surface-variant hover:text-on-surface underline text-[14px]"
-                          title="Underline"
-                        >
-                          U
-                        </button>
-                        <div className="h-4 w-px bg-surface-container-high" />
-                        <button
-                          type="button"
-                          onClick={() => setTextAlignment('left')}
-                          className={`p-1.5 rounded ${
-                            textAlignment === 'left' ? 'bg-surface-container-lowest text-primary shadow-xs' : 'text-on-surface-variant'
-                          }`}
-                          title="Align Left"
-                        >
-                          <span className="material-symbols-outlined text-[16px]">format_align_left</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setTextAlignment('center')}
-                          className={`p-1.5 rounded ${
-                            textAlignment === 'center' ? 'bg-surface-container-lowest text-primary shadow-xs' : 'text-on-surface-variant'
-                          }`}
-                          title="Align Center"
-                        >
-                          <span className="material-symbols-outlined text-[16px]">format_align_center</span>
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => setTextAlignment('justify')}
-                          className={`p-1.5 rounded ${
-                            textAlignment === 'justify' ? 'bg-surface-container-lowest text-primary shadow-xs' : 'text-on-surface-variant'
-                          }`}
-                          title="Align Justify"
-                        >
-                          <span className="material-symbols-outlined text-[16px]">format_align_justify</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section: Canvas & Spacing */}
-                  <div className="space-y-2 pt-1">
-                    <div className="flex items-center justify-between">
-                      <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold">
-                        Canvas & Spacing
-                      </span>
-                      <span className="material-symbols-outlined text-[16px] text-on-surface-variant">aspect_ratio</span>
-                    </div>
-
-                    <div className="space-y-3 pt-1">
-                      <div>
-                        <div className="flex items-center justify-between text-on-surface mb-1">
-                          <span className="font-body-sm text-body-sm text-on-surface-variant">Max Column Width</span>
-                          <span className="font-code text-code font-semibold text-primary">{columnWidth} px</span>
-                        </div>
-                        <input
-                          type="range"
-                          min="540"
-                          max="860"
-                          value={columnWidth}
-                          onChange={(e) => setColumnWidth(Number(e.target.value))}
-                          className="w-full accent-primary h-1.5 bg-surface-container-high rounded-lg cursor-pointer"
-                        />
-                        <div className="flex justify-between font-code text-code text-on-surface-variant text-[10px] mt-1">
-                          <span>540px</span>
-                          <span className="text-primary font-semibold">Target: 720px</span>
-                          <span>860px</span>
-                        </div>
-                      </div>
-
-                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
-                        <span className="font-body-sm text-body-sm text-on-surface">Vertical Padding</span>
-                        <span className="font-code text-code text-on-surface">48px (3rem)</span>
-                      </div>
-
-                      <div className="flex items-center justify-between bg-surface-container-low p-2 rounded-lg">
-                        <span className="font-body-sm text-body-sm text-on-surface">Drop Elevation</span>
-                        <span className="px-2 py-0.5 rounded bg-surface-container-lowest font-label-sm text-label-sm text-primary font-medium">
-                          Ambient 12px
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Section: Delivery Readiness */}
-                  <div className="p-3.5 bg-surface-container-low rounded-xl space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="font-label-sm text-label-sm font-bold uppercase tracking-wider text-on-surface">
-                        Delivery Readiness
-                      </span>
-                      <span className="font-code text-code text-primary font-bold">96%</span>
-                    </div>
-                    <div className="w-full bg-surface-container-high h-1.5 rounded-full overflow-hidden">
-                      <div className="bg-primary h-full rounded-full w-[96%]" />
-                    </div>
-                    <div className="flex items-center justify-between text-on-surface-variant font-body-sm text-body-sm pt-1">
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[14px] text-primary">check_circle</span>
-                        Spelling & Syntax
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <span className="material-symbols-outlined text-[14px] text-primary">check_circle</span>
-                        Contrast Valid
-                      </span>
-                    </div>
-                  </div>
-                </>
-              ) : (
-                /* SETTINGS TAB */
+            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-5">
+              {activeInspectorTab === 'settings' ? (
                 <div className="space-y-4">
+                  {/* Status */}
+                  <div>
+                    <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
+                      Publication Status
+                    </label>
+                    <select
+                      value={post.status || 'draft'}
+                      onChange={(e) => {
+                        setPost((prev) => ({ ...prev, status: e.target.value as 'draft' | 'published' }));
+                        setSaveStatus('Unsaved changes');
+                      }}
+                      className="w-full h-10 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                    >
+                      <option value="draft">Draft</option>
+                      <option value="published">Published</option>
+                    </select>
+                  </div>
+
+                  {/* Slug */}
                   <div>
                     <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
                       Publication Slug
@@ -1915,7 +1553,10 @@ export const PostEdit: React.FC = () => {
                     <input
                       type="text"
                       value={post.slug || ''}
-                      onChange={(e) => setPost((prev) => ({ ...prev, slug: e.target.value }))}
+                      onChange={(e) => {
+                        setPost((prev) => ({ ...prev, slug: e.target.value }));
+                        setSaveStatus('Unsaved changes');
+                      }}
                       placeholder="post-slug"
                       className="w-full h-10 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                     />
@@ -1924,13 +1565,34 @@ export const PostEdit: React.FC = () => {
                     </p>
                   </div>
 
+                  {/* Author */}
+                  <div>
+                    <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
+                      Author
+                    </label>
+                    <input
+                      type="text"
+                      value={post.author || ''}
+                      onChange={(e) => {
+                        setPost((prev) => ({ ...prev, author: e.target.value }));
+                        setSaveStatus('Unsaved changes');
+                      }}
+                      placeholder="Author name"
+                      className="w-full h-10 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+
+                  {/* Category */}
                   <div>
                     <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
                       Category
                     </label>
                     <select
                       value={post.category || 'general'}
-                      onChange={(e) => setPost((prev) => ({ ...prev, category: e.target.value }))}
+                      onChange={(e) => {
+                        setPost((prev) => ({ ...prev, category: e.target.value }));
+                        setSaveStatus('Unsaved changes');
+                      }}
                       className="w-full h-10 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                     >
                       <option value="general">General</option>
@@ -1942,6 +1604,7 @@ export const PostEdit: React.FC = () => {
                     </select>
                   </div>
 
+                  {/* Tags */}
                   <div>
                     <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
                       Tags
@@ -1980,6 +1643,7 @@ export const PostEdit: React.FC = () => {
                             if (val && !post.tags?.includes(val)) {
                               setPost((prev) => ({ ...prev, tags: [...(prev.tags || []), val] }));
                               setTagInput('');
+                              setSaveStatus('Unsaved changes');
                             }
                           }
                         }}
@@ -1989,6 +1653,7 @@ export const PostEdit: React.FC = () => {
                     </div>
                   </div>
 
+                  {/* Featured Cover Image */}
                   <div>
                     <label className="block font-label-md text-label-md text-on-surface font-semibold mb-1">
                       Featured Cover Image
@@ -2042,7 +1707,10 @@ export const PostEdit: React.FC = () => {
                     </label>
                     <select
                       value={post.template || 'default'}
-                      onChange={(e) => setPost((prev) => ({ ...prev, template: e.target.value }))}
+                      onChange={(e) => {
+                        setPost((prev) => ({ ...prev, template: e.target.value }));
+                        setSaveStatus('Unsaved changes');
+                      }}
                       className="w-full h-10 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                     >
                       <option value="default">Default Longform</option>
@@ -2050,37 +1718,127 @@ export const PostEdit: React.FC = () => {
                       <option value="full-width">Full Bleed Visual</option>
                     </select>
                   </div>
+                </div>
+              ) : (
+                /* SEO & SOCIAL TAB */
+                <div className="space-y-4">
+                  {/* Live SERP Preview */}
+                  <div className="p-3.5 rounded-xl bg-surface-container-low border border-outline-variant/20 space-y-1">
+                    <span className="font-label-xs text-[10px] uppercase tracking-wider text-on-surface-variant font-bold block mb-1">
+                      Search Result Preview
+                    </span>
+                    <p className="text-[11px] font-mono text-on-surface-variant truncate">
+                      yoursite.com/blog/{post.slug || 'post-slug'}
+                    </p>
+                    <p className="text-sm font-semibold text-primary line-clamp-1">
+                      {post.seo?.title || post.title || 'Untitled Article'}
+                    </p>
+                    <p className="text-xs text-on-surface-variant line-clamp-2">
+                      {post.seo?.description || post.excerpt || 'Add a meta description to control how this post appears in search engines.'}
+                    </p>
+                  </div>
 
-                  {/* SEO Fields */}
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="font-label-sm text-label-sm text-on-surface font-semibold">
+                        Meta Title
+                      </label>
+                      <span className="font-code text-[10px] text-on-surface-variant">
+                        {(post.seo?.title || post.title || '').length}/60
+                      </span>
+                    </div>
+                    <input
+                      type="text"
+                      value={post.seo?.title || ''}
+                      onChange={(e) => updateSEO({ title: e.target.value })}
+                      placeholder={post.title || 'Article meta title'}
+                      className="w-full h-9 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="font-label-sm text-label-sm text-on-surface font-semibold">
+                        Meta Description
+                      </label>
+                      <span className="font-code text-[10px] text-on-surface-variant">
+                        {(post.seo?.description || post.excerpt || '').length}/160
+                      </span>
+                    </div>
+                    <textarea
+                      rows={3}
+                      value={post.seo?.description || ''}
+                      onChange={(e) => updateSEO({ description: e.target.value })}
+                      placeholder={post.excerpt || 'Summarize this article for search engines...'}
+                      className="w-full p-2.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block font-label-sm text-label-sm text-on-surface font-semibold mb-1">
+                      Canonical URL
+                    </label>
+                    <input
+                      type="text"
+                      value={post.seo?.canonical || ''}
+                      onChange={(e) => updateSEO({ canonical: e.target.value })}
+                      placeholder="https://example.com/blog/..."
+                      className="w-full h-9 px-3 bg-surface-container-low rounded-lg font-code text-xs text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
+                    />
+                  </div>
+
                   <div className="pt-2 border-t border-outline-variant/20 space-y-3">
-                    <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-bold block">
-                      Search Engine Optimization
+                    <span className="font-label-xs text-label-xs uppercase tracking-wider text-on-surface-variant font-bold block">
+                      Social / OpenGraph
                     </span>
                     <div>
                       <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
-                        Meta Title
+                        OG Title
                       </label>
                       <input
                         type="text"
-                        value={post.seo?.title || ''}
-                        onChange={(e) => updateSEO({ title: e.target.value })}
-                        placeholder={post.title}
+                        value={post.seo?.ogTitle || ''}
+                        onChange={(e) => updateSEO({ ogTitle: e.target.value })}
+                        placeholder={post.seo?.title || post.title || 'Social share title'}
                         className="w-full h-9 px-3 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                       />
                     </div>
-
                     <div>
                       <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
-                        Meta Description
+                        OG Description
                       </label>
                       <textarea
                         rows={2}
-                        value={post.seo?.description || ''}
-                        onChange={(e) => updateSEO({ description: e.target.value })}
-                        placeholder={post.excerpt}
+                        value={post.seo?.ogDescription || ''}
+                        onChange={(e) => updateSEO({ ogDescription: e.target.value })}
+                        placeholder={post.seo?.description || post.excerpt || 'Social share description'}
                         className="w-full p-2.5 bg-surface-container-low rounded-lg font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary resize-none"
                       />
                     </div>
+                  </div>
+
+                  <div className="pt-2 border-t border-outline-variant/20">
+                    <label className="flex items-center justify-between cursor-pointer p-2.5 rounded-lg bg-surface-container-low">
+                      <div>
+                        <span className="font-label-sm text-label-sm text-on-surface font-semibold block">
+                          Exclude from Search Engines
+                        </span>
+                        <span className="text-[11px] text-on-surface-variant">
+                          Adds noindex, nofollow meta tag
+                        </span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={Boolean(post.seo?.noIndex)}
+                        onChange={(e) =>
+                          updateSEO({
+                            noIndex: e.target.checked,
+                            robots: e.target.checked ? 'noindex,nofollow' : 'index,follow'
+                          })
+                        }
+                        className="w-4 h-4 accent-primary rounded"
+                      />
+                    </label>
                   </div>
                 </div>
               )}
@@ -2090,27 +1848,19 @@ export const PostEdit: React.FC = () => {
             <div className="p-4 bg-surface-container-lowest border-t border-outline-variant/20 shadow-[0_-1px_4px_rgba(19,27,46,0.02)] flex items-center justify-between">
               <button
                 type="button"
-                onClick={() => {
-                  setColumnWidth(720);
-                  setHeadlineFont('Newsreader');
-                  setBodyFont('Inter');
-                  setFontSizeHeading('36px');
-                  setFontSizeBody('18px');
-                  setTextAlignment('left');
-                  setCanvasBgColor('#FFFFFF');
-                  triggerToast('Defaults restored');
-                }}
-                className="flex items-center gap-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-semibold"
+                onClick={() => setShowStatsModal(true)}
+                className="flex items-center gap-1.5 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-semibold"
               >
-                <span className="material-symbols-outlined text-[16px]">restart_alt</span>
-                Reset Defaults
+                <span className="material-symbols-outlined text-[16px]">insights</span>
+                <span>{stats.words} words</span>
               </button>
               <button
                 type="button"
-                onClick={() => triggerToast('Styles applied to manuscript')}
-                className="px-3 py-1.5 rounded-lg bg-primary text-on-primary font-label-sm text-label-sm font-semibold shadow-xs hover:bg-primary-container transition-all"
+                onClick={() => handleSave(false)}
+                disabled={saving}
+                className="px-3 py-1.5 rounded-lg bg-surface-container hover:bg-surface-container-high text-on-surface font-label-sm text-label-sm font-semibold transition-all disabled:opacity-50"
               >
-                Apply Styles
+                {saving ? 'Saving...' : 'Save Draft'}
               </button>
             </div>
           </aside>

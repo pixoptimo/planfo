@@ -9,8 +9,6 @@ import { PageList } from './pages/Pages/PageList.js';
 import { PageEdit } from './pages/Pages/PageEdit.js';
 import { PostList } from './pages/Posts/PostList.js';
 import { PostEdit } from './pages/Posts/PostEdit.js';
-import { ProductList } from './pages/Products/ProductList.js';
-import { ProductEdit } from './pages/Products/ProductEdit.js';
 import { CategoryList } from './pages/Categories/CategoryList.js';
 import { MediaLibrary } from './pages/Media/MediaLibrary.js';
 import { NavigationManager } from './pages/Navigation/NavigationManager.js';
