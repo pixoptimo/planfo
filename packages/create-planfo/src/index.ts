@@ -54,7 +54,7 @@ export function createPlanfoProject(options: PlanfoProjectOptions): { success: b
     // 2. planfo/config.json
     const configData = {
       name,
-      version: '1.0.2',
+      version: '1.0.3',
       activeTheme: theme,
       siteUrl,
       createdAt: new Date().toISOString()

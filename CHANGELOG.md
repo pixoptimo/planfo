@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [v1.0.3] — 2026-11-21
+
+- feat(admin): replace hardcoded v2.4 Live Tokens with dynamic system CMS version (e0b05b8)
+
 ## [v1.0.2] — 2026-11-21
 
 - fix(server): add automatic EADDRINUSE retry on listen and exact host probe (b8fc65a)

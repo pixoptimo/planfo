@@ -1,6 +1,6 @@
 {
   "name": "create-planfo",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Scaffold a new Planfo CMS project — Database-free static website builder",
   "type": "module",
   "bin": {
