@@ -1809,40 +1809,17 @@ export const PageEdit: React.FC = () => {
                     </div>
                   </div>
 
-                  {/* Section: SEO & Search Indexing (Quick card) */}
+                  {/* Section: Permalink & Routing */}
                   <div className="space-y-space-sm pt-space-xs">
                     <div className="flex items-center justify-between">
                       <span className="font-label-md text-label-md text-on-surface uppercase tracking-wider font-semibold">
-                        SEO & Search Indexing
+                        Permalink & URL
                       </span>
                       <span className="material-symbols-outlined text-[16px] text-on-surface-variant">
-                        travel_explore
+                        link
                       </span>
                     </div>
-                    <div className="p-3 bg-surface-container-low rounded-lg space-y-3">
-                      <div className="flex items-center justify-between">
-                        <div>
-                          <span className="block font-label-sm text-label-sm font-semibold text-on-surface">
-                            Search Indexing
-                          </span>
-                          <span className="font-body-sm text-body-sm text-on-surface-variant text-[11px]">
-                            {page.noIndex ? 'Page hidden from engines' : 'Index this page on search engines'}
-                          </span>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setPage((prev) => ({ ...prev, noIndex: !prev.noIndex }));
-                            setSaveStatus('Unsaved changes');
-                          }}
-                          className={`w-5 h-5 rounded-full flex items-center justify-center transition-colors ${
-                            page.noIndex ? 'bg-surface-container-high' : 'bg-primary'
-                          }`}
-                        >
-                          <span className="w-2.5 h-2.5 rounded-full bg-white"></span>
-                        </button>
-                      </div>
-
+                    <div className="p-3 bg-surface-container-low rounded-lg space-y-2">
                       <div>
                         <label className="block font-label-sm text-label-sm text-on-surface-variant mb-1">
                           URL Slug
@@ -1854,43 +1831,12 @@ export const PageEdit: React.FC = () => {
                             setPage((prev) => ({ ...prev, slug: slugify(e.target.value) }));
                             setSaveStatus('Unsaved changes');
                           }}
+                          placeholder="page-slug"
                           className="w-full px-2.5 py-1.5 bg-surface-container-lowest rounded border border-outline-variant/30 font-code text-code text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
                         />
-                      </div>
-
-                      <div>
-                        <div className="flex items-center justify-between mb-1">
-                          <label className="font-label-sm text-label-sm text-on-surface-variant">Meta Title</label>
-                          <span className="font-code text-[11px] text-primary">
-                            {(page.seo?.title || page.title || '').length} / 60
-                          </span>
-                        </div>
-                        <input
-                          type="text"
-                          value={page.seo?.title || page.title || ''}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setPage((prev) => ({
-                              ...prev,
-                              seo: { ...DEFAULT_SEO, ...(prev.seo || {}), title: val }
-                            }));
-                            setSaveStatus('Unsaved changes');
-                          }}
-                          className="w-full px-2.5 py-1.5 bg-surface-container-lowest rounded border border-outline-variant/30 font-body-sm text-body-sm text-on-surface focus:outline-none focus:ring-1 focus:ring-primary"
-                        />
-                      </div>
-
-                      {/* Google Snippet Preview */}
-                      <div className="p-2 rounded bg-surface-container-lowest border border-outline-variant/30 space-y-1">
-                        <span className="block text-[10px] font-code text-primary uppercase">
-                          Google Snippet Preview
-                        </span>
-                        <span className="block font-body-sm text-body-sm font-semibold text-secondary hover:underline cursor-pointer truncate">
-                          {page.seo?.title || page.title || 'Untitled Page'}
-                        </span>
-                        <span className="block text-[11px] text-on-surface-variant leading-snug line-clamp-2">
-                          {subtitle || 'Systemic page structures and headless publishing workflows.'}
-                        </span>
+                        <p className="font-mono text-[11px] text-on-surface-variant mt-1 truncate">
+                          /{page.slug || 'page-slug'}
+                        </p>
                       </div>
                     </div>
                   </div>
