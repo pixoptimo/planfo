@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ---
 
+## [v1.0.6] — 2026-11-22
+
+- chore(editor): remove Interactive Canvas badge and Desktop/Mobile viewport toggles from all inner pages and headers (8da15e7)
+
 ## [v1.0.5] — 2026-11-21
 
 - feat(settings): move System Updates into dedicated tab after URL Tools (9ff0352)
