@@ -53,7 +53,6 @@ export const DynamicEntryEdit: React.FC = () => {
 
   // Inspector & Viewport
   const [activeTab, setActiveTab] = useState<'attributes' | 'seo'>('attributes');
-  const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
   const [canvasWidth, setCanvasWidth] = useState(720);
   const [canvasPadding, setCanvasPadding] = useState(48);
 
@@ -413,36 +412,9 @@ export const DynamicEntryEdit: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Viewport & Undo/Redo */}
+        {/* Center: Undo/Redo */}
         <div className="hidden md:flex items-center gap-4">
-          <div className="flex items-center bg-surface-container rounded-lg p-0.5 border border-surface-container-high/40">
-            <button
-              type="button"
-              onClick={() => setViewportMode('desktop')}
-              className={`px-3 py-1 rounded-md text-label-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                viewportMode === 'desktop'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[15px]">desktop_windows</span>
-              <span>Desktop [720px]</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => setViewportMode('mobile')}
-              className={`px-3 py-1 rounded-md text-label-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                viewportMode === 'mobile'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[15px]">smartphone</span>
-              <span>Mobile [380px]</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-1 text-on-surface-variant border-l border-surface-container-high/40 pl-3">
+          <div className="flex items-center gap-1 text-on-surface-variant">
             <button
               type="button"
               onClick={handleUndo}
@@ -724,7 +696,7 @@ export const DynamicEntryEdit: React.FC = () => {
         <main className="flex-1 h-full overflow-y-auto bg-surface-container-low/40 px-6 py-8 flex flex-col items-center justify-start min-h-0">
           <div
             style={{
-              maxWidth: viewportMode === 'mobile' ? '380px' : '100%',
+              maxWidth: '100%',
               paddingTop: `${canvasPadding}px`,
               paddingBottom: `${canvasPadding}px`
             }}

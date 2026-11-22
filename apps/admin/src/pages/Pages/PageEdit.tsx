@@ -163,7 +163,6 @@ export const PageEdit: React.FC = () => {
   // Inspector & Viewport State
   const [activeTab, setActiveTab] = useState<'settings' | 'seo'>('settings');
   const [searchFilter, setSearchFilter] = useState('');
-  const [viewMode, setViewMode] = useState<'desktop' | 'mobile'>('desktop');
   const [canvasWidth, setCanvasWidth] = useState(720);
   const [selectedPreset, setSelectedPreset] = useState<string>('default');
   const [showPresetDropdown, setShowPresetDropdown] = useState(false);
@@ -587,34 +586,6 @@ export const PageEdit: React.FC = () => {
 
           {/* Right: Controls, Preview & Publish */}
           <div className="flex items-center gap-space-md">
-            {/* Viewport switcher */}
-            <div className="flex items-center p-1 bg-surface-container-low rounded-lg">
-              <button
-                type="button"
-                onClick={() => setViewMode('desktop')}
-                className={`flex items-center justify-center p-1.5 rounded transition-all ${
-                  viewMode === 'desktop'
-                    ? 'bg-surface-container-lowest text-on-surface shadow-[0_1px_4px_rgba(0,0,0,0.04)]'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-                title="Desktop view"
-              >
-                <span className="material-symbols-outlined text-[18px]">desktop_windows</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('mobile')}
-                className={`flex items-center justify-center p-1.5 rounded transition-all ${
-                  viewMode === 'mobile'
-                    ? 'bg-surface-container-lowest text-on-surface shadow-[0_1px_4px_rgba(0,0,0,0.04)]'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-                title="Mobile view"
-              >
-                <span className="material-symbols-outlined text-[18px]">smartphone</span>
-              </button>
-            </div>
-
             {/* Undo / Redo */}
             <div className="flex items-center gap-1">
               <button
@@ -728,14 +699,9 @@ export const PageEdit: React.FC = () => {
         </div>
       </header>
 
-      {/* Sub-bar: Document Meta & View Switcher */}
+      {/* Sub-bar: Document Meta & Quick Actions */}
       <section className="shrink-0 w-full bg-surface-container-lowest shadow-[0_1px_3px_rgba(19,27,46,0.03)] px-6 py-2 flex items-center justify-between gap-space-md border-b border-surface-container-high/40 z-30">
           <div className="flex items-center gap-space-md">
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
-              Interactive Canvas
-            </div>
-
             {/* Preset Selector */}
             <div className="relative">
               <button
@@ -782,37 +748,8 @@ export const PageEdit: React.FC = () => {
             </div>
           </div>
 
-          {/* View Mode Switcher on Sub-bar */}
+          {/* Quick Actions on Sub-bar */}
           <div className="flex items-center gap-space-md">
-            <div className="flex items-center bg-surface-container-low p-1 rounded-lg">
-              <button
-                type="button"
-                onClick={() => setViewMode('desktop')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all font-label-sm text-label-sm ${
-                  viewMode === 'desktop'
-                    ? 'bg-surface-container-lowest text-on-surface shadow-[0_1px_3px_rgba(19,27,46,0.06)] font-semibold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px]">desktop_windows</span>
-                <span>Desktop ({canvasWidth}px)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('mobile')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all font-label-sm text-label-sm ${
-                  viewMode === 'mobile'
-                    ? 'bg-surface-container-lowest text-on-surface shadow-[0_1px_3px_rgba(19,27,46,0.06)] font-semibold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px]">smartphone</span>
-                <span>Mobile (390px)</span>
-              </button>
-            </div>
-
-            <div className="h-4 w-px bg-surface-container-high"></div>
-
             <div className="flex items-center gap-1.5">
               <button
                 type="button"
@@ -1103,7 +1040,7 @@ export const PageEdit: React.FC = () => {
               id="manuscriptPaper"
               ref={manuscriptRef}
               style={{
-                maxWidth: viewMode === 'mobile' ? '390px' : '100%'
+                maxWidth: '100%'
               }}
               className="w-full h-auto shrink-0 bg-surface-container-lowest rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-surface-container-high/40 mb-16"
             >
@@ -1973,7 +1910,6 @@ export const PageEdit: React.FC = () => {
                 type="button"
                 onClick={() => {
                   setCanvasWidth(720);
-                  setViewMode('desktop');
                   triggerToast('Canvas defaults reset');
                 }}
                 className="flex items-center gap-1 text-on-surface-variant hover:text-on-surface font-label-sm text-label-sm font-semibold transition-colors"

@@ -165,7 +165,6 @@ export const PostEdit: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [saveStatus, setSaveStatus] = useState<string>(isNew ? 'Unsaved draft' : 'Synced');
   const [activeInspectorTab, setActiveInspectorTab] = useState<'settings' | 'seo'>('settings');
-  const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
   const [selectedBlockId, setSelectedBlockId] = useState<string | null>(null);
   const [showMediaPicker, setShowMediaPicker] = useState(false);
   const [mediaPickerTarget, setMediaPickerTarget] = useState<'featured' | 'new' | string>('featured');
@@ -537,34 +536,6 @@ export const PostEdit: React.FC = () => {
 
             {/* Header Right Actions */}
             <div className="flex items-center gap-3 shrink-0">
-              {/* Responsive Viewport Toggle Buttons */}
-              <div className="flex items-center p-1 bg-surface-container-low rounded-lg">
-                <button
-                  type="button"
-                  onClick={() => setViewportMode('desktop')}
-                  className={`flex items-center justify-center p-1.5 rounded transition-all ${
-                    viewportMode === 'desktop'
-                      ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`}
-                  title="Desktop Canvas (720px)"
-                >
-                  <span className="material-symbols-outlined text-[18px]">desktop_windows</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewportMode('mobile')}
-                  className={`flex items-center justify-center p-1.5 rounded transition-all ${
-                    viewportMode === 'mobile'
-                      ? 'bg-surface-container-lowest text-primary shadow-xs font-semibold'
-                      : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                  }`}
-                  title="Mobile Viewport (390px)"
-                >
-                  <span className="material-symbols-outlined text-[18px]">smartphone</span>
-                </button>
-              </div>
-
               {/* Live Preview Button */}
               {!isNew && (
                 <a
@@ -652,11 +623,6 @@ export const PostEdit: React.FC = () => {
         {/* Sub-bar: Document Meta, Presets & Quick Actions */}
         <div className="shrink-0 bg-surface-container-lowest border-b border-surface-container-high/40 shadow-[0_1px_3px_rgba(19,27,46,0.03)] px-6 py-2 flex items-center justify-between gap-4 z-30">
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-low text-on-surface-variant font-label-sm text-label-sm uppercase tracking-wider font-semibold">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
-              Interactive Canvas
-            </div>
-
             <div className="flex items-center gap-1.5 text-on-surface font-body-sm text-body-sm">
               <span className="text-on-surface-variant">Preset:</span>
               <span className="font-label-md text-label-md font-semibold">Longform Editorial</span>
@@ -671,36 +637,6 @@ export const PostEdit: React.FC = () => {
           </div>
 
           <div className="flex items-center gap-4">
-            {/* Viewport switch buttons */}
-            <div className="flex items-center bg-surface-container-low p-1 rounded-lg">
-              <button
-                type="button"
-                onClick={() => setViewportMode('desktop')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded font-label-sm text-label-sm transition-all ${
-                  viewportMode === 'desktop'
-                    ? 'bg-surface-container-lowest text-on-surface shadow-[0_1px_3px_rgba(19,27,46,0.06)] font-semibold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px]">desktop_windows</span>
-                <span>Desktop (720px)</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewportMode('mobile')}
-                className={`flex items-center gap-1.5 px-3 py-1 rounded font-label-sm text-label-sm transition-all ${
-                  viewportMode === 'mobile'
-                    ? 'bg-surface-container-lowest text-on-surface shadow-[0_1px_3px_rgba(19,27,46,0.06)] font-semibold'
-                    : 'text-on-surface-variant hover:text-on-surface hover:bg-surface-container'
-                }`}
-              >
-                <span className="material-symbols-outlined text-[16px]">smartphone</span>
-                <span>Mobile (390px)</span>
-              </button>
-            </div>
-
-            <div className="h-4 w-px bg-surface-container-high hidden sm:block" />
-
             {/* Undo / Redo / Stats */}
             <div className="flex items-center gap-1.5">
               <button
@@ -1016,7 +952,7 @@ export const PostEdit: React.FC = () => {
               ref={manuscriptRef}
               id="manuscriptPaper"
               style={{
-                maxWidth: viewportMode === 'mobile' ? '390px' : '100%'
+                maxWidth: '100%'
               }}
               className="w-full h-auto shrink-0 bg-surface-container-lowest rounded-xl shadow-[0_1px_3px_rgba(19,27,46,0.04),0_12px_36px_-6px_rgba(19,27,46,0.06)] px-8 sm:px-14 py-12 transition-all duration-300 relative group/canvas border border-outline-variant/20 mb-16"
             >

@@ -122,7 +122,6 @@ export const ProductEdit: React.FC = () => {
   };
 
   // Viewport & Studio Tabs
-  const [viewportMode, setViewportMode] = useState<'desktop' | 'mobile'>('desktop');
   const [canvasWidth, setCanvasWidth] = useState(720);
   const [activeTab, setActiveTab] = useState<'specs' | 'seo'>('specs');
   const [showBlockPalette, setShowBlockPalette] = useState(true);
@@ -384,42 +383,9 @@ export const ProductEdit: React.FC = () => {
           </div>
         </div>
 
-        {/* Center: Viewport & Undo/Redo */}
+        {/* Center: Undo/Redo */}
         <div className="hidden md:flex items-center gap-4">
-          <div className="flex items-center bg-surface-container rounded-lg p-0.5 border border-surface-container-high/40">
-            <button
-              type="button"
-              onClick={() => {
-                setViewportMode('desktop');
-                setCanvasWidth(720);
-              }}
-              className={`px-3 py-1 rounded-md text-label-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                viewportMode === 'desktop'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[15px]">desktop_windows</span>
-              <span>Desktop [720px]</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => {
-                setViewportMode('mobile');
-                setCanvasWidth(380);
-              }}
-              className={`px-3 py-1 rounded-md text-label-xs font-semibold flex items-center gap-1.5 transition-colors ${
-                viewportMode === 'mobile'
-                  ? 'bg-surface-container-lowest text-primary shadow-xs'
-                  : 'text-on-surface-variant hover:text-on-surface'
-              }`}
-            >
-              <span className="material-symbols-outlined text-[15px]">smartphone</span>
-              <span>Mobile [380px]</span>
-            </button>
-          </div>
-
-          <div className="flex items-center gap-1 text-on-surface-variant border-l border-surface-container-high/40 pl-3">
+          <div className="flex items-center gap-1 text-on-surface-variant">
             <button
               type="button"
               onClick={handleUndo}
@@ -676,7 +642,7 @@ export const ProductEdit: React.FC = () => {
         {/* Center Editorial Manuscript Canvas with 24px side padding */}
         <main className="flex-1 h-full overflow-y-auto px-6 py-8 flex flex-col items-center justify-start min-h-0 bg-surface">
           <div
-            style={{ maxWidth: viewportMode === 'mobile' ? '390px' : '100%' }}
+            style={{ maxWidth: '100%' }}
             className="w-full h-auto shrink-0 transition-all duration-300 bg-surface-container-lowest border border-surface-container-high/40 rounded-2xl shadow-xl p-6 sm:p-12 flex flex-col space-y-8 mb-16"
           >
             {/* Top Product Identifier Tag & Status */}
